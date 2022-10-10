@@ -1,4 +1,4 @@
-import subprocess, os, requests, signal, psutil
+import subprocess, os, requests, signal
 import urllib.parse
 import time
 
