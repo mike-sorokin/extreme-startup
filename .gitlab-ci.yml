@@ -29,4 +29,4 @@ bot-resp-test:
   stage: test
   script:
     - *preamble
-    - pytest test/bots.test_bot_resp.py
+    - pytest test/bots/test_bot_resp.py
