@@ -22,3 +22,11 @@ sanity-test:
   script:
     - *preamble
     - pytest test/test_sanity.py
+
+# Test of the support test code which should be executed
+# before other bot-related tests
+bot-resp-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest test/bots.test_bot_resp.py
