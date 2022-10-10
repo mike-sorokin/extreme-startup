@@ -12,7 +12,13 @@ sast:
 include:
 - template: Security/SAST.gitlab-ci.yml
 
+.preamble: &preamble
+  - python3 -m venv venv
+  - source venv/bin/activate
+  - pip install -r test/requirements.txt
+
 sanity-test:
   stage: test
   script:
-    pytest test/test_sanity.py
+    - *preamble
+    - pytest test/test_sanity.py
