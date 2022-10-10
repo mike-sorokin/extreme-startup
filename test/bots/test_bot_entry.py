@@ -6,7 +6,7 @@ import time
 BOT_CWD = os.path.join("test", "bots")
 SOME_PORT = 5003
 REQUEST_ATEMPT_WAITING_TIME = 0.25
-MAX_REQUESTS = 20
+MAX_REQUESTS = 5
 
 
 def query_bot(bot_type, query):
