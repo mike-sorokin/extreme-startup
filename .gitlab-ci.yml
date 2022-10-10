@@ -11,3 +11,8 @@ sast:
   stage: test
 include:
 - template: Security/SAST.gitlab-ci.yml
+
+sanity-test:
+  stage: test
+  script:
+    pytest test/test_sanity.py
