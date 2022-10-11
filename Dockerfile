@@ -1,10 +1,14 @@
-FROM ubuntu:20.04
+FROM python:3
 
-RUN apt-get update
-RUN apt-get install -y python3-pip
+# Update packages
+RUN apt-get -y update
+RUN apt-get -y upgrade
 
-RUN pip install flask
+# Install flask, set environment variables for our app
+RUN apt-get -y install python3-flask
+ENV FLASK_APP=simpleFlask.py
+ENV FLASK_ENV=development
 
 COPY . .
 
-CMD python simpleFlask.py
+CMD flask run --host=0.0.0.0
