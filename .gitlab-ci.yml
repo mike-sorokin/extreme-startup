@@ -18,12 +18,13 @@ docker-build:
 docker-kill-previous:
   stage: kill
   script:
-    - docker kill sexp-container
-    - docker rm sexp-container
+    - docker stop sexp-container
+  allow_failure: true
+
 
 docker-deploy:
   stage: deploy
   script:
-    - docker run --name sexp-container -d -p5000:5000 sexp
+    - docker run --rm --name sexp-container -d -p5000:5000 sexp
 
 
