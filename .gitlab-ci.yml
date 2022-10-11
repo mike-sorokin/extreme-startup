@@ -18,7 +18,7 @@ docker-build:
 docker-kill-previous:
   stage: kill
   script:
-    - docker kill $(docker ps -q)
+    - docker kill `docker ps -q`
 
 docker-deploy:
   stage: deploy
