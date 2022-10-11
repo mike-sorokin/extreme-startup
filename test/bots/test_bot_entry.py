@@ -9,40 +9,54 @@ REQUEST_ATEMPT_WAITING_TIME = 0.25
 MAX_REQUESTS = 5
 
 
-def query_bot(bot_type, query):
-    '''Creates temporary Flask server and tests a query on it'''
-    # TODO: TURN THIS INTO A DECORATOR TO REUSE THE SERVER CREATION
-    #       Right now it creates and destroys new server for every query.
+def with_bot_server(bot_type):
+    '''Creates a Flask server for a bot player to test requsts on it'''
 
-    process = subprocess.Popen(
-        ["python3", "bot_entry.py", bot_type, str(SOME_PORT)],
-        cwd=BOT_CWD,
-    )
+    def inner(test_func):
 
-    count = 0
-    while True:
-        try:
-            response = requests.get(
-                f"http://localhost:{SOME_PORT}", params={"q": urllib.parse.quote(query)}
+        def wrapper():
+            # Running server and waiting for successfull response
+            # before running the actual test
+            process = subprocess.Popen(
+                ["python3", "bot_entry.py", bot_type, str(SOME_PORT)],
+                cwd=BOT_CWD,
             )
-            if response.status_code == 200:
-                break
-        except:
-            count += 1
-            if count >= MAX_REQUESTS:
-                assert False
-            time.sleep(REQUEST_ATEMPT_WAITING_TIME)
+            count = 0
+            while True:
+                try:
+                    response = requests.get(f"http://localhost:{SOME_PORT}")
+                    if response.status_code == 200:
+                        break
+                except:
+                    count += 1
+                    if count >= MAX_REQUESTS:
+                        assert False
+                    time.sleep(REQUEST_ATEMPT_WAITING_TIME)
+
+            # Running test body
+            test_func()
+
+            # Removing server
+            os.kill(process.pid, signal.SIGTERM)
+
+        return wrapper
+
+    return inner
 
 
-    os.kill(process.pid, signal.SIGTERM)
-
+def query_bot(query):
+    response = requests.get(
+        f"http://localhost:{SOME_PORT}", params={"q": urllib.parse.quote(query)}
+    )
     return response.text
 
 
+@with_bot_server("ignorant")
 def test_bot_entry_ignorant():
-    assert query_bot("ignorant", "What is 1 + 1?") == "I don't know"
+    assert query_bot("What is 1 + 1?") == "I don't know"
 
 
+@with_bot_server("math")
 def test_bot_entry_math():
-    assert query_bot("math", "What is 1 + 1?") == "2"
-    assert query_bot("math", "What is 1 + 0?") == "1"
+    assert query_bot("What is 1 + 1?") == "2"
+    assert query_bot("What is 1 + 0?") == "1"
