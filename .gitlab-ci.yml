@@ -35,6 +35,9 @@ bot-entry-test:
     - pytest test/bots/test_bot_entry.py
 
 
+
+# The following are done only on master branch.
+
 docker-build:
   stage: build
   script:
@@ -42,7 +45,14 @@ docker-build:
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
 
-docker-kill-previous:
+docker-prune-images:
+  stage: build
+  script:
+    - docker image prune
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+
+docker-kill-prev-container:
   stage: kill
   script:
     - docker stop sexp-container
@@ -54,5 +64,27 @@ docker-deploy:
   stage: deploy
   script:
     - docker run --rm --name sexp-container -d -p5000:5000 sexp
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+
+aws-login:
+  stage: deploy
+  script:
+    - aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 105339933835.dkr.ecr.eu-west-2.amazonaws.com
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+
+aws-tag:
+  stage: deploy
+  script:
+    - docker tag sexp 105339933835.dkr.ecr.eu-west-2.amazonaws.com/sexp:latest
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+
+aws-push:
+  stage: deploy
+  needs: ["aws-login", "aws-tag"]
+  script:
+    - docker push 105339933835.dkr.ecr.eu-west-2.amazonaws.com/sexp:latest
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
