@@ -35,6 +35,7 @@ def with_bot_server(bot_type, bot_name="default"):
                 except:
                     count += 1
                     if count >= MAX_REQUESTS:
+                        os.kill(process.pid, signal.SIGTERM)
                         assert False
                     time.sleep(REQUEST_ATEMPT_WAITING_TIME)
 
@@ -51,9 +52,14 @@ def with_bot_server(bot_type, bot_name="default"):
 
 def query_bot(query):
     response = requests.get(
-        f"http://localhost:{SOME_PORT}", params={"q": urllib.parse.quote(query)}
+        f"http://localhost:{SOME_PORT}", params={"q": query}
     )
     return response.text
+
+
+@with_bot_server("math", bot_name="John_Doe")
+def test_bot_entry_can_reply_to_its_name():
+    assert query_bot("What is your name?") == "John_Doe"
 
 
 @with_bot_server("ignorant")
