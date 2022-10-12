@@ -9,6 +9,32 @@ testing:
   script:
     - echo testing
 
+.preamble: &preamble
+  - python3 -m venv venv
+  - source venv/bin/activate
+  - pip install -r test/requirements.txt
+
+sanity-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest test/test_sanity.py
+
+# Tests of the support test code which should be executed
+# before other bot-related tests
+bot-resp-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest test/bots/test_bot_resp.py
+
+bot-entry-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest test/bots/test_bot_entry.py
+
+
 docker-build:
   stage: build
   script:
