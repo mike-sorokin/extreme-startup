@@ -10,16 +10,14 @@ MAX_REQUESTS = 5
 
 
 def with_bot_server(bot_type):
-    '''Creates a Flask server for a bot player to test requsts on it'''
+    """Creates a Flask server for a bot player to test requsts on it"""
 
     def inner(test_func):
-
         def wrapper():
             # Running server and waiting for successfull response
             # before running the actual test
             process = subprocess.Popen(
-                ["python3", "bot_entry.py", bot_type, str(SOME_PORT)],
-                cwd=BOT_CWD,
+                ["python3", "bot_entry.py", bot_type, str(SOME_PORT)], cwd=BOT_CWD
             )
             count = 0
             while True:

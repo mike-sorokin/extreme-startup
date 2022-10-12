@@ -4,19 +4,20 @@ from bot_resp import *
 
 REQUIRED_ARGC = 3
 
+
 def print_usage_and_exit():
     print("... <argument> <port>")
-    print("Please, use the bot entry script with one of the following arguments:")
+    print(
+        "Please, use the bot entry script \
+        with one of the following arguments:"
+    )
     print("\n  - " + "\n  - ".join(bot_resp_functions.keys()))
     sys.exit(1)
 
 
-bot_resp_functions = {
-    "ignorant": ignorant_response,
-    "math": math_response
-}
+bot_resp_functions = {"ignorant": ignorant_response, "math": math_response}
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     if len(sys.argv) != REQUIRED_ARGC:
         print_usage_and_exit()
@@ -28,7 +29,6 @@ if __name__ == '__main__':
         print_usage_and_exit()
 
     app = Flask(__name__)
-
 
     @app.route("/", methods=["GET"])
     def hello_world():
