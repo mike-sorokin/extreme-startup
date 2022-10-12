@@ -39,15 +39,20 @@ docker-build:
   stage: build
   script:
     - docker build -t sexp  .
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
 
 docker-kill-previous:
   stage: kill
   script:
     - docker stop sexp-container
+  rules:
+  - if: $CI_COMMIT_BRANCH == "master"
   allow_failure: true
-
 
 docker-deploy:
   stage: deploy
   script:
     - docker run --rm --name sexp-container -d -p5000:5000 sexp
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
