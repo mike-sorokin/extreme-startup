@@ -41,7 +41,7 @@ bot-entry-test:
 docker-build:
   stage: build
   script:
-    - docker build -t sexp  .
+    - docker build -t se-xp  .
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
 
@@ -55,7 +55,7 @@ docker-prune-images:
 docker-kill-prev-container:
   stage: kill
   script:
-    - docker stop sexp-container
+    - docker stop se-xp-container
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   allow_failure: true
@@ -63,6 +63,6 @@ docker-kill-prev-container:
 docker-deploy:
   stage: deploy
   script:
-    - docker run --rm --name sexp-container -d -p5000:5000 sexp
+    - docker run --rm --name se-xp-container -d -p80:5000 sexp
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
