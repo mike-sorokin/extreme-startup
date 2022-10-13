@@ -1,9 +1,12 @@
 from crypt import methods
 from flask import Flask, render_template, request
+from flaskr.player import Player
 
 app = Flask(__name__)
 
-players = []
+players = set()
+scoreboard = None
+
 
 @app.route("/")
 def index():
@@ -14,5 +17,6 @@ def add_player():
     if request.method == 'GET':
         return render_template('add_player.html')
     else:
-        players.append({'name': request.form['name'], "score": 0})
+        player = Player(request.form['name'], request.form['url'])
+        players.add(player)
         return render_template('player_added.html')
