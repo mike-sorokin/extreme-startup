@@ -9,7 +9,7 @@ REQUEST_ATEMPT_WAITING_TIME = 0.25
 MAX_REQUESTS = 5
 
 
-def with_bot_server(bot_type):
+def with_bot_server(bot_type, bot_name="default"):
     """Creates a Flask server for a bot player to test requsts on it"""
 
     def inner(test_func):
@@ -17,7 +17,14 @@ def with_bot_server(bot_type):
             # Running server and waiting for successfull response
             # before running the actual test
             process = subprocess.Popen(
-                ["python3", "bot_entry.py", bot_type, str(SOME_PORT)], cwd=BOT_CWD
+                [
+                    "python3",
+                    "bot_entry.py",
+                    bot_name,
+                    bot_type,
+                    str(SOME_PORT)
+                ],
+                cwd=BOT_CWD
             )
             count = 0
             while True:
@@ -28,6 +35,7 @@ def with_bot_server(bot_type):
                 except:
                     count += 1
                     if count >= MAX_REQUESTS:
+                        os.kill(process.pid, signal.SIGTERM)
                         assert False
                     time.sleep(REQUEST_ATEMPT_WAITING_TIME)
 
@@ -44,9 +52,14 @@ def with_bot_server(bot_type):
 
 def query_bot(query):
     response = requests.get(
-        f"http://localhost:{SOME_PORT}", params={"q": urllib.parse.quote(query)}
+        f"http://localhost:{SOME_PORT}", params={"q": query}
     )
     return response.text
+
+
+@with_bot_server("math", bot_name="John_Doe")
+def test_bot_entry_can_reply_to_its_name():
+    assert query_bot("What is your name?") == "John_Doe"
 
 
 @with_bot_server("ignorant")
