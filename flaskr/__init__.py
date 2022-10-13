@@ -1,11 +1,12 @@
 from crypt import methods
 from flask import Flask, render_template, request
 from flaskr.player import Player
+from flaskr.scoreboard import Scoreboard
 
 app = Flask(__name__)
 
 players = set()
-scoreboard = None
+scoreboard = Scoreboard(os.getenv('LENIENT'))
 
 
 @app.route("/")
