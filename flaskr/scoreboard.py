@@ -39,7 +39,7 @@ class Scoreboard:
 
     def leaderboard(self):
         return {k: v for k, v in sorted(self.scores.items(), key=lambda item : item[1])}
-    
+
     def leaderboard_position(self, player):
         return list(self.leaderboard().keys()).index(player.uuid) + 1
 
@@ -59,7 +59,3 @@ class Scoreboard:
 
     def penalty(self, question, leaderboard_position):
         return -1 * question.points / leaderboard_position
-    
-        
-
-    
