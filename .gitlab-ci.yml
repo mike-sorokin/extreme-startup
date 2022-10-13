@@ -66,3 +66,10 @@ docker-deploy:
     - docker run --rm --name se-xp-container -d -p80:5000 sexp
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
+
+fly-deploy:
+  stage: deploy
+  script:
+    - /home/gitlab-runner/.fly/bin/fly deploy . --detach --now
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"

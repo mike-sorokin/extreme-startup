@@ -11,4 +11,6 @@ ENV FLASK_ENV=development
 
 COPY . .
 
-CMD flask run --host=0.0.0.0
+EXPOSE 80
+
+CMD flask run --host 0.0.0.0 --port 80
