@@ -12,7 +12,7 @@ class Player:
     def log_result(id, msg, point):
         pass
 
-    def __str__():
+    def __str__(self):
         return f"{self.name} ({self.url})"
 
 

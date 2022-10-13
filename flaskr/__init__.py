@@ -2,6 +2,7 @@ from crypt import methods
 from flask import Flask, render_template, request
 from flaskr.player import Player
 from flaskr.scoreboard import Scoreboard
+import os
 
 app = Flask(__name__)
 
