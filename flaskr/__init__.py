@@ -32,8 +32,8 @@ def add_player():
 
 def sendQuestion(player):
     while True:
-        r = requests.get(player.url, params={'q': "What is your name?"}).content
-        if r.decode("utf-8") == player.name:
+        r = requests.get(player.url, params={'q': "What is your name?"}).text
+        if r == player.name:
             scoreboard[player] += 2
         else:
             scoreboard[player] -= 1
