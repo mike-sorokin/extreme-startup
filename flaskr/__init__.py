@@ -3,16 +3,19 @@ from flask import Flask, render_template, request
 from flaskr.player import Player
 from flaskr.scoreboard import Scoreboard
 import os
+import threading
+import requests
+import time
 
 app = Flask(__name__)
 
-players = set()
-scoreboard = Scoreboard(os.getenv('LENIENT'))
-
+players = {}
+# scoreboard = Scoreboard(os.getenv('LENIENT'))
+scoreboard = {}
 
 @app.route("/")
 def index():
-    return render_template('leaderboard.html', leaderboard=players)
+    return render_template('leaderboard.html', leaderboard=scoreboard)
 
 @app.route("/players", methods=['GET', 'POST'])
 def add_player():
@@ -20,5 +23,19 @@ def add_player():
         return render_template('add_player.html')
     else:
         player = Player(request.form['name'], request.form['url'])
-        players.add(player)
+        # scoreboard.new_player(player)
+        scoreboard[player] = 0
+        players[player.uuid] = player
+        player_thread = threading.Thread(target=sendQuestion, args=(player,))
+        player_thread.start()
         return render_template('player_added.html')
+
+def sendQuestion(player):
+    while True:
+        r = requests.get(player.url, params={'q': "What is your name"}).content
+        if r.decode("utf-8") == 'Jonathan':
+            scoreboard[player] += 2
+        else:
+            scoreboard[player] -= 1
+        time.sleep(1)
+

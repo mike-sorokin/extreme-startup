@@ -1,5 +1,5 @@
 class Scoreboard:
-    def __init(self, lenient):
+    def __init__(self, lenient):
         self.lenient = lenient
         self.scores = {}
         self.correct_tally = {}

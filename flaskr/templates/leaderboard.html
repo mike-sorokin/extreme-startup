@@ -5,10 +5,10 @@
     <h1>Leaderboard</h1>
 
     <table>
-    {% for player in leaderboard %}
+    {% for player, score in leaderboard.items() %}
         <tr>
             <td>{{ player.name }}</td>
-            <td>{{ player.url }}</td>
+            <td>{{ score }}</td>
         </tr>
     {% endfor %}
     </table>
