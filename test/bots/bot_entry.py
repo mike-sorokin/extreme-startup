@@ -34,8 +34,6 @@ if __name__ == "__main__":
     @app.route("/", methods=["GET"])
     def hello_world():
         query = request.args.get("q")
-        print(query)
-        print(repr(query))
         if query is None:
             return "None"
         if query == "What is your name?":
