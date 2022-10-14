@@ -33,8 +33,9 @@ def add_player():
         player_threads[player.uuid] = player_thread
         player_thread.start()
         r = make_response(render_template("player_added.html", player_id=player.uuid))
-        r.headers.set('UUID', player.uuid)
-        return r 
+        r.headers.set("UUID", player.uuid)
+        return r
+
 
 @app.get("/players/<id>")
 def player_page(id):
@@ -44,19 +45,27 @@ def player_page(id):
 
 @app.get("/withdraw/<id>")
 def remove_player(id):
-    assert id in player_threads 
-    thread = player_threads.pop(id) 
-    del thread
-    del scoreboard[players[id]]
+    assert id in player_threads
     players[id].active = False
+    time.sleep(5)
+    del player_threads[id]
+    del scoreboard[players[id]]
     del players[id]
     return redirect("/")
 
 
 def sendQuestion(player):
     while player.active:
-        r = requests.get(player.url, params={"q": "What is your name?"}).text
-        if r == player.name:
+        r = None
+        try:
+            r = requests.get(
+                player.url, params={"q": "What is your name?"}, timeout=10
+            ).text
+        except Exception:
+            print("Connection Timeout")
+        if r == None:
+            pass
+        elif r == player.name:
             scoreboard[player] += 2
         else:
             scoreboard[player] -= 1
