@@ -8,6 +8,7 @@ class Player:
         self.url = url
         self.uuid = str(uuid.uuid4())
         self.log = []
+        self.active = True 
 
     def log_result(id, msg, point):
         pass

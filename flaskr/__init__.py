@@ -1,5 +1,5 @@
 from crypt import methods
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, make_response
 from flaskr.player import Player
 from flaskr.scoreboard import Scoreboard
 import os
@@ -32,8 +32,9 @@ def add_player():
         player_thread = threading.Thread(target=sendQuestion, args=(player,))
         player_threads[player.uuid] = player_thread
         player_thread.start()
-        return render_template("player_added.html", player_id=player.uuid)
-
+        r = make_response(render_template("player_added.html", player_id=player.uuid))
+        r.headers.set('UUID', player.uuid)
+        return r 
 
 @app.get("/players/<id>")
 def player_page(id):
@@ -43,15 +44,17 @@ def player_page(id):
 
 @app.get("/withdraw/<id>")
 def remove_player(id):
-    assert id in player_threads
-    del player_threads[id]
+    assert id in player_threads 
+    thread = player_threads.pop(id) 
+    del thread
     del scoreboard[players[id]]
+    players[id].active = False
     del players[id]
     return redirect("/")
 
 
 def sendQuestion(player):
-    while True:
+    while player.active:
         r = requests.get(player.url, params={"q": "What is your name?"}).text
         if r == player.name:
             scoreboard[player] += 2

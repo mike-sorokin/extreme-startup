@@ -9,15 +9,9 @@ def test_app():
     # SETTING UP HERE
     yield app
     # CLEAN UP HERE
+    
 
 
 @pytest.fixture
 def client(test_app):
     return test_app.test_client()
-
-
-@pytest.fixture
-def client_server():
-    app.config.update({"TESTING": True, "PORT": 5050})
-    yield app
-    assert True

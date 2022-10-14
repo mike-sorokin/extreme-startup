@@ -26,11 +26,10 @@ def test_post_players(client):
     """
     On POST request to add_player page, should return player_added page
     """
-    response = client.post(
-        "/players", data={"name": "John Doe", "url": "http://172.0.0.1:5050"}
-    )
+    response = client.post("/players", data={"name": "John Doe", "url": "http://172.0.0.1:5050"})
     player_id = response.headers.get("UUID")
     assert response.status_code == 200
     assert "player added" in response.text.lower()
-    response2 = client.post(f"/withdraw/{player_id}")
-    assert response2.status_code == 200
+    response2 = client.get(f"/withdraw/{player_id}")
+    assert response2.status_code == 302
+
