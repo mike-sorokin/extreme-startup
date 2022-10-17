@@ -5,6 +5,7 @@ import json
 
 import flaskr
 import threading
+import time
 
 
 def test_get_index(client):
@@ -28,15 +29,21 @@ def test_players_post_endpoint(arbitrary_player):
     assert arbitrary_player.status_code == 200
 
 
-def test_can_get_players(client, arbitrary_player):
+def test_can_get_players(client):
     """
     On GET request to /players page, should return non-empty dictionary with players
     """
-    player_id = arbitrary_player.headers.get("UUID")
+    resp = client.post(
+        "/players", data={"name": "John Doe", "url": "http://172.0.0.1:5050"}
+    )
+    player_id = resp.headers.get("UUID")
+    time.sleep(2)
     response = client.get("/players")
     player = response.json[player_id]
+    client.get(f"/withdraw/{player_id}")
     assert player["name"] == "John Doe"
     assert player["api"] == "http://172.0.0.1:5050"
     assert player["game_id"] == "dummy_game"
     assert "score" in player
     assert "events" in player
+    assert len(player["events"]) != 0

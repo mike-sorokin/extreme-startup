@@ -19,9 +19,9 @@ class JSONEncoder(json.JSONEncoder):
                 id=obj.event_id,
                 player_id=obj.player_id,
                 query=obj.query,
-                difficulty=obj.dificulty,
+                difficulty=obj.difficulty,
                 points_gained=obj.points_gained,
                 response_type=obj.response_type,
-                timestamp=obj.timestamp
+                timestamp=obj.timestamp,
             )
         return super().default(obj)
