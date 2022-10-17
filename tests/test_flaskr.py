@@ -30,6 +30,8 @@ def with_request(req_type, url, expected_code, json_req=None, query_str=None, se
                 response == client.delete(url, query_string=query_str)
             
             assert response.status_code == expected_code
+
+            print(response.data)
             test_func(json.loads(response.data))
 
         return wrapper
