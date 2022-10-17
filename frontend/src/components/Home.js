@@ -1,6 +1,10 @@
 import React from 'react'
 
 function Home() {
+
+  // const [name, setName] = useState("")
+  // const [url, setUrl] = useState("")
+
   return (
     <div className="Home">
     <h1>Add a new player</h1>
