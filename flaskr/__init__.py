@@ -1,7 +1,10 @@
 from crypt import methods
+from uuid import uuid4
 from flask import Flask, render_template, request, redirect, make_response
 from flaskr.player import Player
+from flaskr.event import Event
 from flaskr.scoreboard import Scoreboard
+from flaskr.json_encoder import JSONEncoder
 import os
 import threading
 import requests
@@ -14,6 +17,12 @@ players = {}
 # scoreboard = Scoreboard(os.getenv('LENIENT'))
 scoreboard = {}
 player_threads = {}
+encoder = JSONEncoder()
+lock = threading.Lock()
+game_id = str(uuid4())
+
+QUESTION_TIMEOUT = 10
+QUESTION_DELAY = 5
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -24,12 +33,15 @@ def index():
         games["abcdef"] = {"id": "abcdef"}
         return {"id": "abcdef"}
 
+
 @app.route("/players", methods=["GET", "POST"])
 def add_player():
     if request.method == "GET":
-        return render_template("add_player.html")
+        r = make_response(encoder.encode(players))
+        r.mimetype = "application/json"
+        return r
     else:
-        player = Player(request.form["name"], request.form["url"])
+        player = Player(game_id, request.form["name"], api=request.form["url"])
         # scoreboard.new_player(player)
         scoreboard[player] = 0
         players[player.uuid] = player
@@ -51,10 +63,14 @@ def player_page(id):
 def remove_player(id):
     assert id in player_threads
     players[id].active = False
-    time.sleep(5)
+    player_threads[id].join()
     del player_threads[id]
     del scoreboard[players[id]]
+
+    lock.acquire()
     del players[id]
+    lock.release()
+
     return redirect("/")
 
 
@@ -63,14 +79,24 @@ def sendQuestion(player):
         r = None
         try:
             r = requests.get(
-                player.url, params={"q": "What is your name?"}, timeout=10
+                player.api, params={"q": "What is your name?"}, timeout=QUESTION_TIMEOUT
             ).text
         except Exception:
             print("Connection Timeout")
-        if r == None:
-            pass
-        elif r == player.name:
-            scoreboard[player] += 2
-        else:
-            scoreboard[player] -= 1
-        time.sleep(1)
+        lock.acquire()
+        if player in scoreboard:
+            if r == None:
+                points_gained = -50
+                response_type = "NO_RESPONSE"
+            elif r == player.name:
+                points_gained = +50
+                response_type = "CORRECT"
+            else:
+                points_gained = -50
+                response_type = "WRONG"
+            event = Event(
+                player.uuid, "What is your name?", 0, points_gained, response_type
+            )
+            player.log_event(event)
+        lock.release()
+        time.sleep(QUESTION_DELAY)
