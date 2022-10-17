@@ -15,5 +15,8 @@ class Player:
     def log_result(id, msg, point):
         pass
 
+    def log_event(self, event):
+        self.events.append(event)
+
     def __str__(self):
-        return f"{self.name} ({self.url})"
+        return f"{self.name} ({self.api})"

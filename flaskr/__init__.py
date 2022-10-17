@@ -2,6 +2,7 @@ from crypt import methods
 from uuid import uuid4
 from flask import Flask, render_template, request, redirect, make_response
 from flaskr.player import Player
+from flaskr.event import Event
 from flaskr.scoreboard import Scoreboard
 from flaskr.json_encoder import JSONEncoder
 import os
@@ -34,7 +35,6 @@ def add_player():
         r = make_response(encoder.encode(players))
         r.mimetype = "application/json"
         return r
-        # return render_temp, late("add_player.html")
     else:
         player = Player(game_id, request.form["name"], api=request.form["url"])
         # scoreboard.new_player(player)
@@ -57,8 +57,8 @@ def player_page(id):
 @app.get("/withdraw/<id>")
 def remove_player(id):
     assert id in player_threads
-
     players[id].active = False
+    player_threads[id].join()
     del player_threads[id]
     del scoreboard[players[id]]
 
@@ -67,7 +67,6 @@ def remove_player(id):
     lock.release()
 
     return redirect("/")
-
 
 def sendQuestion(player):
     while player.active:
@@ -78,14 +77,18 @@ def sendQuestion(player):
             ).text
         except Exception:
             print("Connection Timeout")
-
         lock.acquire()
         if player in scoreboard:
             if r == None:
-                scoreboard[player] -= 50
+                points_gained = -50
+                response_type = 'NO_RESPONSE'
             elif r == player.name:
-                scoreboard[player] += 100
+                points_gained = +50
+                response_type = 'CORRECT'
             else:
-                scoreboard[player] -= 20
+                points_gained = -50
+                response_type = 'WRONG'
+            event = Event(player.uuid, "What is your name?", 0, points_gained, response_type)
+            player.log_event(event)
         lock.release()
         time.sleep(QUESTION_DELAY)

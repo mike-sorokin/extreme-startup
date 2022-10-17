@@ -3,6 +3,9 @@ from urllib import response
 import pytest
 import json
 
+import flaskr
+import threading
+
 
 def test_get_index(client):
     """
@@ -34,3 +37,6 @@ def test_can_get_players(client, arbitrary_player):
     player = response.json[player_id]
     assert player["name"] == "John Doe"
     assert player["api"] == "http://172.0.0.1:5050"
+    assert player["game_id"] == "dummy_game"
+    assert "score" in player
+    assert "events" in player
