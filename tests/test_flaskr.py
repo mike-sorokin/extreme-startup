@@ -33,4 +33,4 @@ def test_can_get_players(client, arbitrary_player):
     response = client.get("/players")
     player = response.json[player_id]
     assert player["name"] == "John Doe"
-    assert player["url"] == "http://172.0.0.1:5050"
+    assert player["api"] == "http://172.0.0.1:5050"

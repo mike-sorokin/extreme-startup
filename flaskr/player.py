@@ -3,12 +3,14 @@ import uuid
 
 
 class Player:
-    def __init__(self, name, url):
-        self.name = name
-        self.url = url
+    def __init__(self, game_id, name, api):
         self.uuid = str(uuid.uuid4())
-        self.log = []
-        self.active = True 
+        self.game_id = game_id
+        self.name = name
+        self.score = 0
+        self.api = api
+        self.events = []
+        self.active = True
 
     def log_result(id, msg, point):
         pass

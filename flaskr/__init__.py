@@ -1,4 +1,5 @@
 from crypt import methods
+from uuid import uuid4
 from flask import Flask, render_template, request, redirect, make_response
 from flaskr.player import Player
 from flaskr.scoreboard import Scoreboard
@@ -16,6 +17,7 @@ scoreboard = {}
 player_threads = {}
 encoder = JSONEncoder()
 lock = threading.Lock()
+game_id = str(uuid4())
 
 QUESTION_TIMEOUT = 10
 QUESTION_DELAY = 5
@@ -34,7 +36,7 @@ def add_player():
         return r
         # return render_temp, late("add_player.html")
     else:
-        player = Player(request.form["name"], request.form["url"])
+        player = Player(game_id, request.form["name"], api=request.form["url"])
         # scoreboard.new_player(player)
         scoreboard[player] = 0
         players[player.uuid] = player
@@ -72,7 +74,7 @@ def sendQuestion(player):
         r = None
         try:
             r = requests.get(
-                player.url, params={"q": "What is your name?"}, timeout=QUESTION_TIMEOUT
+                player.api, params={"q": "What is your name?"}, timeout=QUESTION_TIMEOUT
             ).text
         except Exception:
             print("Connection Timeout")
