@@ -2,6 +2,7 @@ from crypt import methods
 from flask import Flask, render_template, request, redirect, make_response
 from flaskr.player import Player
 from flaskr.scoreboard import Scoreboard
+from flaskr.json_encoder import JSONEncoder
 import os
 import threading
 import requests
@@ -13,6 +14,11 @@ players = {}
 # scoreboard = Scoreboard(os.getenv('LENIENT'))
 scoreboard = {}
 player_threads = {}
+encoder = JSONEncoder()
+lock = threading.Lock()
+
+QUESTION_TIMEOUT = 10
+QUESTION_DELAY = 5
 
 
 @app.route("/")
@@ -23,7 +29,8 @@ def index():
 @app.route("/players", methods=["GET", "POST"])
 def add_player():
     if request.method == "GET":
-        return render_template("add_player.html")
+        return encoder.encode(players)
+        #return render_temp, late("add_player.html")
     else:
         player = Player(request.form["name"], request.form["url"])
         # scoreboard.new_player(player)
@@ -46,11 +53,15 @@ def player_page(id):
 @app.get("/withdraw/<id>")
 def remove_player(id):
     assert id in player_threads
+
     players[id].active = False
-    time.sleep(5)
     del player_threads[id]
     del scoreboard[players[id]]
+
+    lock.acquire()
     del players[id]
+    lock.release()
+    
     return redirect("/")
 
 
@@ -59,14 +70,18 @@ def sendQuestion(player):
         r = None
         try:
             r = requests.get(
-                player.url, params={"q": "What is your name?"}, timeout=10
+                player.url, params={"q": "What is your name?"}, timeout=QUESTION_TIMEOUT
             ).text
         except Exception:
             print("Connection Timeout")
-        if r == None:
-            pass
-        elif r == player.name:
-            scoreboard[player] += 2
-        else:
-            scoreboard[player] -= 1
-        time.sleep(1)
+
+        lock.acquire()
+        if player in scoreboard: 
+            if r == None:
+                scoreboard[player] -= 50
+            elif r == player.name:
+                scoreboard[player] += 100
+            else:
+                scoreboard[player] -= 20
+        lock.release()
+        time.sleep(QUESTION_DELAY)
