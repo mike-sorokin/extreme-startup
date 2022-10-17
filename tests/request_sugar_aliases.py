@@ -1,11 +1,6 @@
 from utils_for_tests import *
 
 
-def response_as_dict_if_sucecssful(response):
-    assert response.status_code == 200, f"Got {response.status_code} instead of 200"
-    return response_as_dict(response)
-
-
 def create_game(cli):
     return response_as_dict_if_sucecssful(cli.post("/"))
 

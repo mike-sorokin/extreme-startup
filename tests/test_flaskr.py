@@ -1,6 +1,4 @@
-from enum import Enum
 import json
-
 
 from utils_for_tests import *
 from setups_for_tests import *
@@ -11,6 +9,14 @@ def test_index_blank_get(_, cli):
     resp = cli.get("/")
     assert resp.status_code == ALL_GOOD
     assert response_as_dict(resp) == {}
+
+
+@with_setup()
+def test_index_post_blank_game_is_initialized_empty_warmup(_, cli):
+    game_json_dict = create_game(cli)
+    assert is_valid_game_json(game_json_dict)
+    assert game_json_dict["round"] == 0
+    assert game_json_dict["players"] == []
 
 
 @with_setup(create_a_couple_of_games)
@@ -41,8 +47,13 @@ def test_index_delete_drops_all_games(_, cli):
     assert response_as_dict(get_response) == {}
 
 
+@with_setup()
+def test_game_id_get_does_not_exist(_, cli):
+    assert cli.get("/nonexistinggameid").status_code == NOT_FOUND
+
+
 @with_setup(create_a_game_with_players)
-def test_game_id_contains_players(extras, cli):
+def test_game_id_get_contains_players(extras, cli):
     game_id = extras["game"]["id"]
     resposne = cli.get(f"/{game_id}")
     assert response.status_code == ALL_GOOD
@@ -56,3 +67,33 @@ def test_game_id_contains_players(extras, cli):
     assert keyset_of(rd).only_contains_the_following_keys(*set(extras["game"]))
 
     assert set(rd["players"]) == set(extras["players"])
+
+
+@with_setup(create_a_game_with_players)
+def test_game_id_post_returns_error(extras, cli):
+    game_id = extras["game"]["id"]
+    resposne = cli.post(f"/{game_id}")
+    assert response.status_code == ERROR_501
+
+
+@with_setup(create_a_game_with_players)
+def test_game_id_put_advances_round(extras, cli):
+    ADVANCED_ROUND_NO = 1
+    game_id = extras["game"]["id"]
+
+    update_game_resp = cli.put(f"/{game_id}", data={"round": ADVANCED_ROUND_NO})
+    assert update_game_resp.status_code == ALL_GOOD
+
+    get_game_resp = cli.get(f"/{game_id}")
+
+    game_rd = response_as_dict_if_sucecssful(get_game_resp)
+    assert game_rd["round"] == ADVANCED_ROUND_NO
+
+
+@with_setup(create_a_game_with_players)
+def test_game_id_delete_removes_the_game(extras, cli):
+    game_id = extras["game"]["id"]
+    delete_response = cli.delete(f"/{game_id}")
+    rd = response_as_dict(delete_response)
+    assert keyset_of(rd).only_contains_the_following_keys("deleted")
+    assert rd["deleted"] == gmae_id

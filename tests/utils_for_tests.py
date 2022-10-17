@@ -5,6 +5,11 @@ def response_as_dict(response):
     return json.loads(response.data.decode("utf-8"))
 
 
+def response_as_dict_if_sucecssful(response):
+    assert response.status_code == 200, f"Got {response.status_code} instead of 200"
+    return response_as_dict(response)
+
+
 class KeysetMatcher:
     """Class for the sake of calling a function via dot notation"""
 
