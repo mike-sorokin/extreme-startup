@@ -1,4 +1,5 @@
 from enum import Enum
+from urllib import response
 from flaskr import app
 import json
 import pytest
@@ -9,105 +10,92 @@ PUT = 2
 DELETE = 3
 
 def setup_server_with(client, server_setup):
+    setup_responses = []
     for (r, url, data, query_str) in server_setup:
         if r == GET:
-            client.get(url, query_string=query_str)
+            setup_responses.append(
+                response_as_dict(client.get(url, query_string=query_str))
+                )
 
         elif r == POST:
-            client.post(url, data=data, query_string=query_str)
+            setup_responses.append(
+                response_as_dict(client.post(url, data=data, query_string=query_str))
+                )
 
         elif r == PUT:
-            client.put(url, data=data, query_string=query_str)
+            setup_responses.append(
+                response_as_dict(client.put(url, data=data, query_string=query_str))
+                )
 
         elif r == DELETE:
-            client.delete(url, query_string=query_str)
+            setup_responses.append(
+                response_as_dict(client.delete(url, query_string=query_str))
+                )
+    return setup_responses
 
-def with_request(
-    req_type, 
-    url,
-    expected_code,
+def response_as_dict(resp):
+    return json.loads(resp.data.decode("utf-8"))
+
+def with_setup(
     server_setup=None,
     req_body=None,
     query_str=None,
     ):
     """
-    Wrapper for testing functions. This will send a request to the Flask 
+    Wrapper for testing functions. This sends some pre-emptive "server_setup" requests
+    and does a final request, letting the test function verify the response.
+    Args:
+    - server_setup: a list of tuples corresponding to requests to be sent to server before the test one.
+        See setup_server_with
+    - req_body: request body JSON represented as python dict
+    - query_str: ?q=... string represented as python dict. 
     """
     if server_setup is None: server_setup = []
 
     def inner(test_func):
         def wrapper():
+            # Connect to our flask app.
             app.config.update({"TESTING": True})
             client = app.test_client()
 
-            setup_server_with(client, server_setup)
+            # Pre-populate with some requests
+            setup_responses = setup_server_with(client, server_setup)
 
-            response = None
-
-            if req_type == GET:
-                response = client.get(url, query_string=query_str)
-
-            elif req_type == POST:
-                response = client.post(url, data=req_body, query_string=query_str)
-
-            elif req_type == PUT:
-                response = client.put(url, data=req_body, query_string=query_str)
-
-            elif req_type == DELETE:
-                response = client.delete(url, query_string=query_str)
-            
-            assert response.status_code == expected_code
-
-            resp_string = response.data.decode("utf-8")
-            test_func(json.loads(resp_string))
+            test_func(setup_responses, client)
 
         return wrapper
     return inner
 
-@with_request(GET, "/", 200)
-def test_index_blank_get(response):
-    assert response == {}
+@with_setup()
+def test_index_blank_get(_, cli):
+    resp = cli.get("/")
+    assert resp.status_code == 200
+    assert response_as_dict(resp) == {}
 
-@with_request(GET, "/", 200, server_setup=[
+@with_setup([
     (POST, "/", None, None),
     (POST, "/", None, None)
 ])
-def test_index_can_get(response):
-    print(response)
-    assert len(response.items()) == 2
+def test_index_can_get(setups, cli):  
+    resp = cli.get("/")
+    assert resp.status_code == 200
+
+    # Expected ids
+    id_1 = setups[0]["id"]
+    id_2 = setups[1]["id"]
+
+    rd = response_as_dict(resp)
+    assert len(rd.keys()) == 1
+    assert "games" in rd
+    assert id_1 in rd["games"]
+    assert id_2 in rd["games"]
+
+
+    
 
 
 
 
 
-# @with_request("GET", "/", 200)
-# def test_get_index(clientent):
-#     """
-#     On GET request to index page, should return home page with leaderboard
-#     """
-#     response = clientent.get("/")
-#     assert response.status_code == 200
-#     assert "Leaderboard" in response.text
 
-
-# def test_get_players(clientent):
-#     """
-#     On GET request to add_player page, should return form with add player name and url
-#     """
-#     response = clientent.get("/players")
-#     assert response.status_code == 200
-#     assert "name" in response.text
-#     assert "url" in response.text
-
-
-# def test_post_players(clientent):
-#     """
-#     On POST request to add_player page, should return player_added page
-#     """
-#     response = clientent.post("/players", data={"name": "John Doe", "url": "http://172.0.0.1:5050"})
-#     player_id = response.headers.get("UUID")
-#     assert response.status_code == 200
-#     assert "player added" in response.text.lower()
-#     response2 = clientent.get(f"/withdraw/{player_id}")
-#     assert response2.status_code == 302
 
