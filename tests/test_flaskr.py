@@ -14,6 +14,11 @@ POST = 1
 PUT = 2
 DELETE = 3
 
+ALL_GOOD = 200
+FAULTY_REQUEST = 400
+NOT_FOUND = 404
+
+ERROR_501 = 501
 
 create_a_couple_of_games = ((POST, "/", None, None), (POST, "/", None, None))
 
@@ -64,14 +69,14 @@ def with_setup(server_setup=None):
 @with_setup()
 def test_index_blank_get(_, cli):
     resp = cli.get("/")
-    assert resp.status_code == 200
+    assert resp.status_code == ALL_GOOD
     assert response_as_dict(resp) == {}
 
 
 @with_setup(create_a_couple_of_games)
 def test_index_can_get(setups, cli):
     resp = cli.get("/")
-    assert resp.status_code == 200
+    assert resp.status_code == ALL_GOOD
 
     # Expected ids
     id_1 = setups[0]["id"]
@@ -86,7 +91,7 @@ def test_index_can_get(setups, cli):
 @with_setup()
 def test_index_put_throws_an_error(_, cli):
     resp = cli.put("/")
-    assert res.status_code == 501
+    assert res.status_code == ERROR_501
 
 
 @with_setup(create_a_couple_of_games)
