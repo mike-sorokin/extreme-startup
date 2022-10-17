@@ -1,33 +1,60 @@
+from enum import Enum
 from flaskr import app
 import json
 import pytest
 
-class setup_client:
-    @staticmethod
-    def default(client):
-        pass
+GET = 0
+POST = 1
+PUT = 2
+DELETE = 3
 
-    @staticmethod
-    def one_game(client):
-        client.post("/", data={})
+def setup_server_with(client, server_setup):
+    for (r, url, data, query_str) in server_setup:
+        if r == GET:
+            client.get(url, query_string=query_str)
 
-def with_request(req_type, url, expected_code, req_body=None, query_str=None, setup_fun=setup_client.default):
+        elif r == POST:
+            client.post(url, data=data, query_string=query_str)
+
+        elif r == PUT:
+            client.put(url, data=data, query_string=query_str)
+
+        elif r == DELETE:
+            client.delete(url, query_string=query_str)
+
+def with_request(
+    req_type, 
+    url,
+    expected_code,
+    server_setup=None,
+    req_body=None,
+    query_str=None,
+    ):
+    """
+    Wrapper for testing functions. This will send a request to the Flask 
+    """
+    if server_setup is None: server_setup = []
+
     def inner(test_func):
         def wrapper():
             app.config.update({"TESTING": True})
             client = app.test_client()
 
-            setup_fun(client)
+            setup_server_with(client, server_setup)
 
             response = None
-            if req_type == "GET":
+
+            if req_type == GET:
                 response = client.get(url, query_string=query_str)
-            elif req_type == "POST":
-                response == client.post(url, data=req_body, query_string=query_str)
-            elif req_type == "PUT":
-                response == client.put(url, data=req_body, query_string=query_str)
-            elif req_type == "DELETE":
-                response == client.delete(url, query_string=query_str)
+
+            elif req_type == POST:
+                response = client.post(url, data=req_body, query_string=query_str)
+
+            elif req_type == PUT:
+                response = client.put(url, data=req_body, query_string=query_str)
+
+            elif req_type == DELETE:
+                response = client.delete(url, query_string=query_str)
             
             assert response.status_code == expected_code
 
@@ -37,13 +64,17 @@ def with_request(req_type, url, expected_code, req_body=None, query_str=None, se
         return wrapper
     return inner
 
-@with_request("GET", "/", 200)
+@with_request(GET, "/", 200)
 def test_index_blank_get(response):
     assert response == {}
 
-@with_request("GET", "/", 200, setup_fun=setup_client.one_game)
+@with_request(GET, "/", 200, server_setup=[
+    (POST, "/", None, None),
+    (POST, "/", None, None)
+])
 def test_index_can_get(response):
-    assert len(response.items()) == 1
+    print(response)
+    assert len(response.items()) == 2
 
 
 
