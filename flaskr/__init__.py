@@ -29,8 +29,10 @@ def index():
 @app.route("/players", methods=["GET", "POST"])
 def add_player():
     if request.method == "GET":
-        return encoder.encode(players)
-        #return render_temp, late("add_player.html")
+        r = make_response(encoder.encode(players))
+        r.mimetype = "application/json"
+        return r
+        # return render_temp, late("add_player.html")
     else:
         player = Player(request.form["name"], request.form["url"])
         # scoreboard.new_player(player)
@@ -61,7 +63,7 @@ def remove_player(id):
     lock.acquire()
     del players[id]
     lock.release()
-    
+
     return redirect("/")
 
 
@@ -76,7 +78,7 @@ def sendQuestion(player):
             print("Connection Timeout")
 
         lock.acquire()
-        if player in scoreboard: 
+        if player in scoreboard:
             if r == None:
                 scoreboard[player] -= 50
             elif r == player.name:
