@@ -9,16 +9,20 @@ import time
 
 app = Flask(__name__)
 
+games = {}
 players = {}
 # scoreboard = Scoreboard(os.getenv('LENIENT'))
 scoreboard = {}
 player_threads = {}
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
-    return render_template("leaderboard.html", leaderboard=scoreboard)
-
+    if request.method == "GET":
+        return games
+    elif request.method == "POST":
+        games["abcdef"] = {"id": "abcdef"}
+        return {"id": "abcdef"}
 
 @app.route("/players", methods=["GET", "POST"])
 def add_player():

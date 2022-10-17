@@ -2,7 +2,7 @@ from flaskr import app
 import json
 import pytest
 
-class setup_clientent:
+class setup_client:
     @staticmethod
     def default(client):
         pass
@@ -11,7 +11,7 @@ class setup_clientent:
     def one_game(client):
         client.post("/", data={})
 
-def with_request(req_type, url, expected_code, json_req=None, query_str=None, setup_fun=setup_clientent.default):
+def with_request(req_type, url, expected_code, req_body=None, query_str=None, setup_fun=setup_client.default):
     def inner(test_func):
         def wrapper():
             app.config.update({"TESTING": True})
@@ -23,16 +23,16 @@ def with_request(req_type, url, expected_code, json_req=None, query_str=None, se
             if req_type == "GET":
                 response = client.get(url, query_string=query_str)
             elif req_type == "POST":
-                response == client.post(url, data=json_req, query_string=query_str)
+                response == client.post(url, data=req_body, query_string=query_str)
             elif req_type == "PUT":
-                response == client.put(url, data=json_req, query_string=query_str)
+                response == client.put(url, data=req_body, query_string=query_str)
             elif req_type == "DELETE":
                 response == client.delete(url, query_string=query_str)
             
             assert response.status_code == expected_code
 
-            print(response.data)
-            test_func(json.loads(response.data))
+            resp_string = response.data.decode("utf-8")
+            test_func(json.loads(resp_string))
 
         return wrapper
     return inner
@@ -40,6 +40,10 @@ def with_request(req_type, url, expected_code, json_req=None, query_str=None, se
 @with_request("GET", "/", 200)
 def test_index_blank_get(response):
     assert response == {}
+
+@with_request("GET", "/", 200, setup_fun=setup_client.one_game)
+def test_index_can_get(response):
+    assert len(response.items()) == 1
 
 
 
