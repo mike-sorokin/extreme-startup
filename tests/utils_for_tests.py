@@ -34,13 +34,13 @@ def is_valid_game_json(response):
     )
 
 
-def is_valid_game_json(response):
+def is_valid_player_json(response):
     return keyset_of(response).only_contains_the_following_keys(
         "id", "game_id", "name", "score", "api", "events"
     )
 
 
-def is_valid_game_json(response):
+def is_valid_event_json(response):
     return keyset_of(response).only_contains_the_following_keys(
         "id",
         "player_id",

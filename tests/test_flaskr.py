@@ -95,5 +95,63 @@ def test_game_id_delete_removes_the_game(extras, cli):
     game_id = extras["game"]["id"]
     delete_response = cli.delete(f"/{game_id}")
     rd = response_as_dict(delete_response)
+
     assert keyset_of(rd).only_contains_the_following_keys("deleted")
-    assert rd["deleted"] == gmae_id
+    assert rd["deleted"] == game_id
+
+
+@with_setup()
+def test_players_get_game_does_not_exist(_, cli):
+    response = cli.get("f/nonexistinggameid/players")
+    assert response.status_code == NOT_FOUND
+
+
+@with_setup(create_a_game_with_players, num_players=5)
+def test_players_get_fetches_all_players(extras, cli):
+    gid = extras["game"]["id"]
+    expected_players = extras["players"]
+    rd = response_as_dict_if_sucecssful(cli.get(f"/{gid}/players"))
+
+    assert keyset_of(rd).only_contains_the_following_keys("players")
+    actual_players = rd["players"]
+
+    # Asserting that the players are the same
+    assert set(expected_players) == set(actual_players)
+
+    # Asserting that all players reference the game
+    assert all(map(lambda player: player["game_id"] == gid, actual_players))
+
+
+@with_setup(create_a_game_with_players, num_players=5)
+def test_players_post_creates_a_new_player(extras, cli):
+    gid = extras["game"]["id"]
+    players = extras["players"]
+    initial_num_players = len(players)
+
+    response = cli.post(
+        f"/{gid}/players",
+        data={
+            "name": "John_Doe",
+            "api": "abc.com",
+        },
+    )
+    rd = response_as_dict_if_sucecssful(response)
+    assert is_valid_player_json(rd)
+    assert rd["name"] == "Johan_Doe"
+    assert rd["api"] == "abc.com"
+    assert rd["game_id"] == gid
+    assert len(players) == initial_num_players + 1
+
+
+@with_setup()
+def test_players_put_returns_error_code(_, cli):
+    assert cli.put("/nonexistinggameid/players").status_code == ERROR_501
+
+
+@with_setup(create_a_game_with_players, num_players=5)
+def test_players_delete_removes_all_players(extras, cli):
+    gid = extras["game"]["id"]
+    assert cli.delete(f"/{gid}/players").status_code == ALL_GOOD
+
+    rd = response_as_dict_if_sucecssful(cli.get(f"/{gid}/players"))
+    assert not rd["players"]
