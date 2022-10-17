@@ -21,16 +21,6 @@ def test_players_get_endpoint(client):
     assert response.status_code == 200
 
 
-@pytest.fixture
-def arbitrary_player(client):
-    arbitrary_player = client.post(
-        "/players", data={"name": "John Doe", "url": "http://172.0.0.1:5050"}
-    )
-    yield arbitrary_player
-    player_id = arbitrary_player.headers.get("UUID")
-    client.get(f"/withdraw/{player_id}")
-
-
 def test_players_post_endpoint(arbitrary_player):
     assert arbitrary_player.status_code == 200
 
