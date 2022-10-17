@@ -1,4 +1,7 @@
-// import { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Home from "./components/Home"
+import Player from "./components/Player"
+
 import './App.css';
 
 function App() {
@@ -7,18 +10,13 @@ function App() {
   // const [url, setUrl] = useState("")
 
   return (
-    <div className="App">
-      <h1>Add a new player</h1>
-        <form method="post" action="https://extreme-restartup.fly.dev/players">
-            <label htmlFor="name">Name: </label>
-            <input type="text" id="name" name="name"/>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/player/:id" element={<Player />} />
+      </Routes>
+    </Router>
 
-            <label htmlFor="url">URL: </label>
-            <input type="text" id="url" name="url" placeholder="http://...."/>
-
-            <input type="submit" value="Submit" />
-        </form>
-    </div>
   );
 }
 
