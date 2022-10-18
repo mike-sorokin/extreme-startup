@@ -5,7 +5,6 @@ import { NotificationsProvider } from '@mantine/notifications';
 import Home from "./components/Home"
 import Game from "./components/Game"
 import Player from "./components/Player"
-import AddPlayer from "./components/AddPlayer"
 import Admin from "./components/Admin"
 import Leaderboard from "./components/Leaderboard"
 
@@ -20,7 +19,6 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/:gameid" element={<Game />} >
-              <Route path="addplayer" element={<AddPlayer />} />
               <Route path="player/:id" element={<Player />} />
               <Route path="admin" element={<Admin />} />
               <Route index element={<Leaderboard />} />

@@ -5,7 +5,7 @@ import { TextInput, Button } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { IconCheck, IconX } from '@tabler/icons';
 
-function AddPlayer(setOpened) {
+function CreateGame(setOpened) {
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
 
@@ -66,4 +66,4 @@ function AddPlayer(setOpened) {
   )
 }
 
-export default AddPlayer
+export default CreateGame
