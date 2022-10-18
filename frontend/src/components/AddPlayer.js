@@ -1,6 +1,11 @@
-import React from 'react'
+import axios from 'axios';
+import React from 'react';
+import { useState } from 'react';
+import { TextInput, Button } from '@mantine/core';
+import { showNotification } from '@mantine/notifications';
+import { IconCheck, IconX } from '@tabler/icons';
 
-function AddPlayer() {
+function AddPlayer(setOpened) {
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
 
@@ -35,12 +40,13 @@ function AddPlayer() {
       })
       .catch((err) => alert(err.response.data));
     
-      // TODO: Get player id from backend and redirect to player page
-  }
+    setOpened(false)
+
+    // TODO: Get player id from backend and redirect to player page
+  };
 
   return (
-    <div className="Home">
-      <h1>Add a new player</h1>
+    <div>
         {/* <form method="post" action="https://extreme-restartup.fly.dev/players">
             <label htmlFor="name">Name: </label>
             <input type="text" id="name" name="name"/>
