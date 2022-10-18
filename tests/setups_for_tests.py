@@ -70,8 +70,6 @@ def create_a_game_with_players(cli, num_players=2):
     game = create_game(cli)
     gid = game["id"]
 
-    print("gid", gid)
-
     players = []
     for _ in range(num_players):
         players.append(create_player(cli, gid))
