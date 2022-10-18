@@ -9,8 +9,8 @@ function Leaderboard() {
 
   return (
     <div>
-      <title>Extreme Startup - Leaderboard</title>
-      <body>
+      <div>Extreme Startup - Leaderboard</div>
+      <div>
           <a href="/players">I want to play</a>
           <h1>Leaderboard</h1>
           {
@@ -25,7 +25,7 @@ function Leaderboard() {
               </table>
             */
           }
-      </body>
+      </div>
       Leaderboard
     </div>
   )
