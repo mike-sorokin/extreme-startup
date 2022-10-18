@@ -27,7 +27,6 @@ player_threads = {}
 
 encoder = JSONEncoder()
 lock = threading.Lock()
-game_id = str(uuid4())
 
 # PRODUCTION CONSTANT(S) 
 QUESTION_TIMEOUT = 10
@@ -100,8 +99,7 @@ def player(game_id, player_id):
         return encoder.encode(players[player_id])
     elif request.method == "DELETE": 
         games[game_id].players.remove(player_id)
-        remove_players(player_id)   #def remove_player(player):
-    #    if player
+        remove_players(player_id)  
         return {"deleted": player_id}
 
 def remove_players(*player_id): 
