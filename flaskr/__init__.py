@@ -12,7 +12,7 @@ import time
 
 app = Flask(__name__)
 
-# games: game_id -> game object 
+# games: game_id -> game object
 games = {}
 players = {}
 scoreboard = {}
@@ -34,36 +34,42 @@ def index():
         return games["abcdef"]
     elif request.method == "DELETE":
         games.clear()
-        return ('', 204)
+        return ("", 204)
+
 
 @app.route("/<game_id>", methods=["GET", "PUT", "DELETE"])
 def game(game_id):
     if request.method == "GET":
-        print(f"GAME ID: {game_id}")
-        return games[game_id] if game_id in games else ('NOT FOUND', 404)
+        return (
+            encoder.encode(games[game_id]) if game_id in games else ("NOT FOUND", 404)
+        )
     elif request.method == "PUT":
-        pass
-    elif request.methods == "DELETE":
+        games[game_id]["round"] += 1
+        return ("ROUNDS_INCREMENTED", 200)
+    elif request.method == "DELETE":
         del games[game_id]
         return {"deleted": game_id}
+
 
 @app.route("/<game_id>/players", methods=["GET", "POST"])
 def add_player(game_id):
     if request.method == "GET":
-        r = make_response(encoder.encode(players))
+        r = make_response({"players": games[game_id]["players"]})
         r.mimetype = "application/json"
         return r
     else:
         player = Player(game_id, request.form["name"], api=request.form["api"])
         scoreboard[player] = 0
-        games[game_id]["players"].append(player)
+        games[game_id]["players"].append(player.uuid)
         players[player.uuid] = player
         player_thread = threading.Thread(target=sendQuestion, args=(player,))
         player_threads[player.uuid] = player_thread
         player_thread.start()
-        r = make_response(render_template("player_added.html", player_id=player.uuid))
-        r.headers.set("UUID", player.uuid)
-        return r
+        # r = make_response(render_template("player_added.html", player_id=player.uuid))
+        # r.headers.set("UUID", player.uuid)
+        r = make_response(encoder.encode(player))
+        r.mimetype = "application/json"
+        return encoder.encode(player)
 
 
 @app.get("/players/<id>")

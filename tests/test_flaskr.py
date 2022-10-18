@@ -54,7 +54,6 @@ def test_game_id_get_does_not_exist(_, cli):
 
 @with_setup(create_a_game_with_players)
 def test_game_id_get_contains_players(extras, cli):
-    print('@ldkajdladjlkad')
     game_id = extras["game"]["id"]
     response = cli.get(f"/{game_id}")
     assert response.status_code == ALL_GOOD
@@ -67,14 +66,14 @@ def test_game_id_get_contains_players(extras, cli):
     # other tests coverage. Keeping it just for sanity.
     assert keyset_of(rd).only_contains_the_following_keys(*set(extras["game"]))
 
-    assert set(rd["players"]) == set(extras["players"])
+    assert set(rd["players"]) == set(extras["players"].keys())
 
-'''
+
 @with_setup(create_a_game_with_players)
 def test_game_id_post_returns_error(extras, cli):
     game_id = extras["game"]["id"]
-    resposne = cli.post(f"/{game_id}")
-    assert response.status_code == ERROR_501
+    response = cli.post(f"/{game_id}")
+    assert response.status_code == METHOD_NOT_ALLOWED
 
 
 @with_setup(create_a_game_with_players)
@@ -112,7 +111,6 @@ def test_players_get_fetches_all_players(extras, cli):
     gid = extras["game"]["id"]
     expected_players = extras["players"]
     rd = response_as_dict_if_sucecssful(cli.get(f"/{gid}/players"))
-
     assert keyset_of(rd).only_contains_the_following_keys("players")
     actual_players = rd["players"]
 
@@ -120,6 +118,8 @@ def test_players_get_fetches_all_players(extras, cli):
     assert set(expected_players) == set(actual_players)
 
     # Asserting that all players reference the game
+    print("<><><")
+    print(actual_players)
     assert all(map(lambda player: player["game_id"] == gid, actual_players))
 
 
@@ -138,12 +138,20 @@ def test_players_post_creates_a_new_player(extras, cli):
     )
     rd = response_as_dict_if_sucecssful(response)
     assert is_valid_player_json(rd)
-    assert rd["name"] == "Johan_Doe"
+    assert rd["name"] == "John_Doe"
     assert rd["api"] == "abc.com"
     assert rd["game_id"] == gid
-    assert len(players) == initial_num_players + 1
+
+    rd = response_as_dict_if_sucecssful(
+        cli.get(
+            f"/{gid}",
+        )
+    )
+    print("<><><><><")
+    assert len(rd["players"]) == initial_num_players + 1
 
 
+"""
 @with_setup()
 def test_players_put_returns_error_code(_, cli):
     assert cli.put("/nonexistinggameid/players").status_code == ERROR_501
@@ -156,4 +164,4 @@ def test_players_delete_removes_all_players(extras, cli):
 
     rd = response_as_dict_if_sucecssful(cli.get(f"/{gid}/players"))
     assert not rd["players"]
-'''
+"""

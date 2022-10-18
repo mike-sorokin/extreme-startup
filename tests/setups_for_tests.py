@@ -73,8 +73,9 @@ def create_a_game_with_players(cli, num_players=2):
 
     print("gid", gid)
 
-    players = []
+    players = {}
     for _ in range(num_players):
-        players.append(create_player(cli, gid))
+        curr_player = create_player(cli, gid)
+        players[curr_player["id"]] = curr_player
 
     return {"game": game, "players": players}
