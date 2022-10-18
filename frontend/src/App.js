@@ -21,6 +21,7 @@ function App() {
             <Route path="/:gameid" element={<Game />} >
               <Route path="player/:id" element={<Player />} />
               <Route path="admin" element={<Admin />} />
+              <Route index element={<Leaderboard />} />
             </Route>
           </Routes>
         </Router>

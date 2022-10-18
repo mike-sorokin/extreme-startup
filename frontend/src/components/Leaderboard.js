@@ -1,8 +1,11 @@
 import React from 'react'
+import { useParams } from "react-router-dom"
 
 function Leaderboard() {
-  const refresh = function() { window.location.reload() };
-  setTimeout(refresh, 10000);
+  // const refresh = function() { window.location.reload() };
+  // setTimeout(refresh, 10000);
+
+  const params = useParams()
 
   return (
     <div>

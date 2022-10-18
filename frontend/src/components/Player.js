@@ -1,5 +1,6 @@
 import React from "react"
 import { useParams } from "react-router-dom"
+import { Button } from "@mantine/core"
 
 function Player() {
 
@@ -9,17 +10,17 @@ function Player() {
     console.log("deleted player", id)
   }
 
-  const events = {
-    event1: "test1",
-    event2: "test2"
-  }
+  const events = [{id:"1", request:"request1"},
+                  {id:"2", request:"request2"}]
 
   return (
   <div>
-    <h1> Extreme Restartup Game id: </h1>
     <div> Hello {params.id}</div>
     <div> Your score is: </div>
-    <div onClick={deletePlayer(params.id)}> Withdraw</div>
+    <Button onClick={() => {deletePlayer(params.id)}}> Withdraw</Button>
+    <ul>
+      {events.map((event) => (<p key={event.id}> {event.request} </p>))}
+    </ul>
   </div>
   )
 }
