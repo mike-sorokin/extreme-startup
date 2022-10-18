@@ -14,7 +14,7 @@ DELETE = 3
 ALL_GOOD = 200
 FAULTY_REQUEST = 400
 NOT_FOUND = 404
-ERROR_501 = 501
+ERROR_405 = 405
 
 
 def setup_server_with(client, server_setup):

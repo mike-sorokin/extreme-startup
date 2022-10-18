@@ -29,15 +29,15 @@ def test_index_can_get(extras, cli):
     id_2 = extras[1]["id"]
 
     rd = response_as_dict(resp)
-    assert keyset_of(rd).only_contains_the_following_keys("games")
-    assert id_1 in rd["games"]
-    assert id_2 in rd["games"]
+    assert keyset_of(rd).only_contains_the_following_keys(id_1, id_2)
+    assert is_valid_game_json(rd[id_1])
+    assert is_valid_game_json(rd[id_2])
 
 
 @with_setup()
 def test_index_put_throws_an_error(_, cli):
     resp = cli.put("/")
-    assert resp.status_code == ERROR_501
+    assert resp.status_code == ERROR_405
 
 
 @with_setup(create_a_couple_of_games)
@@ -73,7 +73,7 @@ def test_game_id_get_contains_players(extras, cli):
 def test_game_id_post_returns_error(extras, cli):
     game_id = extras["game"]["id"]
     resposne = cli.post(f"/{game_id}")
-    assert response.status_code == ERROR_501
+    assert response.status_code == ERROR_405
 
 
 @with_setup(create_a_game_with_players)
@@ -145,7 +145,7 @@ def test_players_post_creates_a_new_player(extras, cli):
 
 @with_setup()
 def test_players_put_returns_error_code(_, cli):
-    assert cli.put("/nonexistinggameid/players").status_code == ERROR_501
+    assert cli.put("/nonexistinggameid/players").status_code == ERROR_405
 
 
 @with_setup(create_a_game_with_players, num_players=5)
