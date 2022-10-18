@@ -25,7 +25,7 @@ function Home() {
         <AddPlayer setOpened={setOpenedAddPlayer}/>
       </Modal>
 
-      <h1>Home</h1>
+      <h1>🔥 Extreme Startup 🔥</h1>
       <Button onClick = {(e) => {setOpenedCreateGame(true)}}>Create a Game!</Button>
       <Button onClick = {(e) => {setOpenedAddPlayer(true)}}>Join a Game!</Button>
     </div>
