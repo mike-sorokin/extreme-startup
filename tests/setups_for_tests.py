@@ -14,8 +14,7 @@ DELETE = 3
 ALL_GOOD = 200
 FAULTY_REQUEST = 400
 NOT_FOUND = 404
-METHOD_NOT_ALLOWED = 405
-ERROR_501 = 501
+ERROR_405 = 405
 DELETE_SUCCESS = 204
 
 
@@ -72,11 +71,10 @@ def create_a_game_with_players(cli, num_players=2):
     game = create_game(cli)
     gid = game["id"]
 
-    print("gid", gid)
-
     players = {}
     for _ in range(num_players):
         curr_player = create_player(cli, gid)
         players[curr_player["id"]] = curr_player
+        # players.append(create_player(cli, gid))
 
     return {"game": game, "players": players}
