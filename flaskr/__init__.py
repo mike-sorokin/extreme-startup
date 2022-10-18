@@ -12,9 +12,9 @@ import time
 
 app = Flask(__name__)
 
+# games: game_id -> game object 
 games = {}
 players = {}
-# scoreboard = Scoreboard(os.getenv('LENIENT'))
 scoreboard = {}
 player_threads = {}
 encoder = JSONEncoder()
@@ -25,25 +25,43 @@ QUESTION_TIMEOUT = 10
 QUESTION_DELAY = 5
 
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET", "POST", "DELETE"])
 def index():
     if request.method == "GET":
         return games
     elif request.method == "POST":
-        games["abcdef"] = {"id": "abcdef"}
-        return {"id": "abcdef"}
+        games["abcdef"] = {"id": "abcdef", "round": 0, "players": []}
+        return games["abcdef"]
+    elif request.method == "DELETE":
+        games.clear()
+        return ('', 204)
 
+@app.route("/<game_id>", methods=["GET", "PUT", "DELETE"])
+def game(game_id):
+    if request.method == "GET":
+        print(f"GAME ID: {game_id}")
+        return games[game_id] if game_id in games else ('NOT FOUND', 404)
+    elif request.method == "PUT":
+        pass
+    elif request.methods == "DELETE":
+        del games[game_id]
+        return {"deleted": game_id}
 
-@app.route("/players", methods=["GET", "POST"])
-def add_player():
+@app.route("/<game_id>/players", methods=["GET", "POST"])
+def add_player(game_id):
+    print('in players')
     if request.method == "GET":
         r = make_response(encoder.encode(players))
         r.mimetype = "application/json"
         return r
     else:
-        player = Player(game_id, request.form["name"], api=request.form["url"])
+        print('in players post')
+        player = Player(game_id, request.form["name"], api=request.form["api"])
+        print(player)
         # scoreboard.new_player(player)
         scoreboard[player] = 0
+        print(f'gahaa; {games[game_id]}')
+        games[game_id]["players"].append(player)
         players[player.uuid] = player
         player_thread = threading.Thread(target=sendQuestion, args=(player,))
         player_threads[player.uuid] = player_thread

@@ -17,7 +17,7 @@ class KeysetMatcher:
         self.keyset = set(dictionary.keys())
 
     def only_contains_the_following_keys(self, *keyset):
-        return self.keyset == set(*keyset)
+        return self.keyset == set(keyset)
 
 
 def keyset_of(response):
