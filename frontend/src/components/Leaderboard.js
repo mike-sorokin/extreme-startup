@@ -9,24 +9,19 @@ function Leaderboard() {
 
   return (
     <div>
-      <div>Extreme Startup - Leaderboard</div>
-      <div>
-          <a href="/players">I want to play</a>
-          <h1>Leaderboard</h1>
-          {
-            /* 
-              <table>
-                {% for player, score in leaderboard.items() %}
-                    <tr>
-                        <td>{{ player.name }}</td>
-                        <td>{{ score }}</td>
-                    </tr>
-                {% endfor %}
-              </table>
-            */
-          }
-      </div>
-      Leaderboard
+        <h2>Leaderboard</h2>
+        {
+          /* 
+            <table>
+              {% for player, score in leaderboard.items() %}
+                  <tr>
+                      <td>{{ player.name }}</td>
+                      <td>{{ score }}</td>
+                  </tr>
+              {% endfor %}
+            </table>
+          */
+        }
     </div>
   )
 }

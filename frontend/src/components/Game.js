@@ -7,7 +7,7 @@ function Game() {
 
   return (
     <div>
-      <div> Extreme Restartup Game {params.gameid} </div>
+      <h1> Extreme Startup - Game {params.gameid} </h1>
       <Outlet />
     </div>
   )
