@@ -49,18 +49,13 @@ def game(game_id):
 
 @app.route("/<game_id>/players", methods=["GET", "POST"])
 def add_player(game_id):
-    print('in players')
     if request.method == "GET":
         r = make_response(encoder.encode(players))
         r.mimetype = "application/json"
         return r
     else:
-        print('in players post')
         player = Player(game_id, request.form["name"], api=request.form["api"])
-        print(player)
-        # scoreboard.new_player(player)
         scoreboard[player] = 0
-        print(f'gahaa; {games[game_id]}')
         games[game_id]["players"].append(player)
         players[player.uuid] = player
         player_thread = threading.Thread(target=sendQuestion, args=(player,))
