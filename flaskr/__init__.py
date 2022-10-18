@@ -42,6 +42,7 @@ def index():
         games[new_game.id] = new_game
         return encoder.encode(new_game)
     elif request.method == "DELETE":
+        remove_players(*[p for g in games.values() for p in g.players])
         games.clear()
         return ("", 204)
 
@@ -77,6 +78,7 @@ def all_players(game_id):
         players[player.uuid] = player
         player_thread = threading.Thread(target=sendQuestion, args=(player,))
         player_threads[player.uuid] = player_thread
+        player_thread.daemon = True
         player_thread.start()
         r = make_response(encoder.encode(player))
         r.mimetype = "application/json"
@@ -126,7 +128,7 @@ def remove_players(*player_id):
     for pid in player_id:
         assert pid in player_threads
         players[pid].active = False
-        player_threads[pid].join()
+        # player_threads[pid].join()
         del player_threads[pid]
         del scoreboard[players[pid]]
 
@@ -143,7 +145,7 @@ def sendQuestion(player):
                 player.api, params={"q": "What is your name?"}, timeout=QUESTION_TIMEOUT
             ).text
         except Exception:
-            print("Connection Timeout")
+            pass
         lock.acquire()
         if player in scoreboard:
             if r == None:
