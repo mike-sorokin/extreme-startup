@@ -1,14 +1,10 @@
 import axios from 'axios';
 import React from 'react';
 import { useState } from 'react';
-import { TextInput, Button } from '@mantine/core';
-import { showNotification } from '@mantine/notifications';
-import { IconCheck, IconX } from '@tabler/icons';
+import { TextInput, Button, Modal } from '@mantine/core';
 
 function Home() {
-  return(
-    <h1>Home</h1>
-  )
+  return()
 }
 
 export default Home
