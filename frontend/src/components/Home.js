@@ -1,12 +1,10 @@
 import axios from 'axios';
 import React from 'react';
 import { useState } from 'react';
-import { TextInput, Button } from '@mantine/core';
-import { showNotification } from '@mantine/notifications';
-import { IconCheck, IconX } from '@tabler/icons';
+import { Button, Modal } from '@mantine/core';
 
 import AddPlayer from './AddPlayer';
-import CreateGame from './components/CreateGame';
+import CreateGame from './CreateGame';
 
 function Home() {
   const [openedCreateGame, setOpenedCreateGame] = useState(false);
@@ -28,6 +26,8 @@ function Home() {
       </Modal>
 
       <h1>Home</h1>
+      <Button onClick = {(e) => {setOpenedCreateGame(true)}}>Create a Game!</Button>
+      <Button onClick = {(e) => {setOpenedAddPlayer(true)}}>Join a Game!</Button>
     </div>
   )
 }
