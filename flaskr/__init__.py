@@ -51,13 +51,15 @@ def game(game_id):
         return {"deleted": game_id}
 
 
-@app.route("/<game_id>/players", methods=["GET", "POST"])
+@app.route("/<game_id>/players", methods=["GET", "POST", "DELETE"])
 def add_player(game_id):
     if request.method == "GET":
-        r = make_response({"players": games[game_id]["players"]})
+        players_ids = games[game_id]["players"]
+        players_dict = {id: players[id] for id in players_ids}
+        r = make_response(encoder.encode({"players": players_dict}))
         r.mimetype = "application/json"
         return r
-    else:
+    elif request.method == "POST":
         player = Player(game_id, request.form["name"], api=request.form["api"])
         scoreboard[player] = 0
         games[game_id]["players"].append(player.uuid)
@@ -70,6 +72,9 @@ def add_player(game_id):
         r = make_response(encoder.encode(player))
         r.mimetype = "application/json"
         return encoder.encode(player)
+    elif request.method == "DELETE":
+        games[game_id]["players"].clear()
+        return ("", 204)
 
 
 @app.get("/players/<id>")

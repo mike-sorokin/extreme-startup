@@ -16,6 +16,7 @@ FAULTY_REQUEST = 400
 NOT_FOUND = 404
 METHOD_NOT_ALLOWED = 405
 ERROR_501 = 501
+DELETE_SUCCESS = 204
 
 
 def setup_server_with(client, server_setup):
