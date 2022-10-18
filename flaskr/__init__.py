@@ -16,10 +16,10 @@ app = Flask(__name__)
 # games: game_id -> game object
 games = {}
 
-# players: player_id -> player 
+# players: player_id -> player
 players = {}
 
-# scoreboard: player_id -> score  
+# scoreboard: player_id -> score
 scoreboard = {}
 
 # player_threads: player_id -> player_thread
@@ -28,7 +28,7 @@ player_threads = {}
 encoder = JSONEncoder()
 lock = threading.Lock()
 
-# PRODUCTION CONSTANT(S) 
+# PRODUCTION CONSTANT(S)
 QUESTION_TIMEOUT = 10
 QUESTION_DELAY = 5
 
@@ -87,23 +87,43 @@ def all_players(game_id):
         games[game_id].players.clear()
         return ("", 204)
 
+
 @app.route("/<game_id>/players/<player_id>", methods=["GET", "PUT", "DELETE"])
 def player(game_id, player_id):
     if request.method == "GET":
-        return players[player_id]
-    elif request.method == "PUT":
-        new_name = request.form["name"] if (request.form["name"] is not None) else players[player_id]['name']
-        new_api = request.form["api"] if (request.form["api"] is not None) else players[player_id]['api']
-        players[player_id]['name'] = new_name
-        players[player_id]['api'] = new_api
         return encoder.encode(players[player_id])
-    elif request.method == "DELETE": 
+    elif request.method == "PUT":
+        if "name" in request.form:
+            players[player_id].name = request.form["name"]
+        if "api" in request.form:
+            players[player_id].api = request.form["api"]
+        return encoder.encode(players[player_id])
+    elif request.method == "DELETE":
         games[game_id].players.remove(player_id)
-        remove_players(player_id)  
+        remove_players(player_id)
         return {"deleted": player_id}
 
-def remove_players(*player_id): 
-    for pid in player_id: 
+
+@app.route("/<game_id>/players/<player_id>/events", methods=["GET", "DELETE"])
+def player_events(game_id, player_id):
+    if request.method == "GET":
+        pass
+    elif request.method == "DELETE":
+        pass
+
+
+@app.route(
+    "/<game_id>/players/<player_id>/events/<event_id>", methods=["GET", "DELETE"]
+)
+def player_event(game_id, player_id, event_id):
+    if request.method == "GET":
+        pass
+    elif request.method == "DELETE":
+        pass
+
+
+def remove_players(*player_id):
+    for pid in player_id:
         assert pid in player_threads
         players[pid].active = False
         player_threads[pid].join()
@@ -113,6 +133,7 @@ def remove_players(*player_id):
         lock.acquire()
         del players[pid]
         lock.release()
+
 
 def sendQuestion(player):
     while player.active:
