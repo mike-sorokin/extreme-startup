@@ -12,6 +12,7 @@ import time
 
 app = Flask(__name__)
 
+games = {}
 players = {}
 # scoreboard = Scoreboard(os.getenv('LENIENT'))
 scoreboard = {}
@@ -24,9 +25,13 @@ QUESTION_TIMEOUT = 10
 QUESTION_DELAY = 5
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
-    return render_template("leaderboard.html", leaderboard=scoreboard)
+    if request.method == "GET":
+        return games
+    elif request.method == "POST":
+        games["abcdef"] = {"id": "abcdef"}
+        return {"id": "abcdef"}
 
 
 @app.route("/players", methods=["GET", "POST"])
@@ -68,6 +73,7 @@ def remove_player(id):
 
     return redirect("/")
 
+
 def sendQuestion(player):
     while player.active:
         r = None
@@ -81,14 +87,16 @@ def sendQuestion(player):
         if player in scoreboard:
             if r == None:
                 points_gained = -50
-                response_type = 'NO_RESPONSE'
+                response_type = "NO_RESPONSE"
             elif r == player.name:
                 points_gained = +50
-                response_type = 'CORRECT'
+                response_type = "CORRECT"
             else:
                 points_gained = -50
-                response_type = 'WRONG'
-            event = Event(player.uuid, "What is your name?", 0, points_gained, response_type)
+                response_type = "WRONG"
+            event = Event(
+                player.uuid, "What is your name?", 0, points_gained, response_type
+            )
             player.log_event(event)
         lock.release()
         time.sleep(QUESTION_DELAY)
