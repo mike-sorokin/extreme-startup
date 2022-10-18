@@ -13,23 +13,22 @@ function Home() {
     e.preventDefault();
 
     if (name.trim() === "") {
-      showNotification({  
+      showNotification({
         title: "Error creating player",
         message: "You forgot to enter a name!",
-        icon: <IconX size={18} />, 
+        icon: <IconX size={18} />,
         color: "red"
       });
 
       return
     }
 
-    const playerObject = {
-      name: name.trim(),
-      url: url.trim(),
-    };
+    const playerFormData = new FormData();
+    playerFormData.append("name", name.trim());
+    playerFormData.append("url", url.trim());
 
     axios
-      .post("https://extreme-restartup.fly.dev/players", playerObject)
+      .post("http://localhost:5000/players", playerFormData)
       .then(() => {
         showNotification({
           title: "Success",
@@ -39,14 +38,14 @@ function Home() {
         });
       })
       .catch((err) => alert(err.response.data));
-    
-      // TODO: Get player id from backend and redirect to player page
+
+    // TODO: Get player id from backend and redirect to player page
   }
 
   return (
     <div className="Home">
       <h1>Add a new player</h1>
-        {/* <form method="post" action="https://extreme-restartup.fly.dev/players">
+      {/* <form method="post" action="https://extreme-restartup.fly.dev/players">
             <label htmlFor="name">Name: </label>
             <input type="text" id="name" name="name"/>
 
@@ -55,12 +54,12 @@ function Home() {
 
             <input type="submit" value="Submit" />
         </form> */}
-        
-        <form onSubmit={addPlayer}>
-          <TextInput value={name} onChange={(e) => setName(e.target.value)} placeholder="Your player name" label="Enter player name:" required/>
-          <TextInput value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Your URL (http://...)" label="Enter URL:" required/>
-          <Button type="submit">Submit</Button>
-        </form>
+
+      <form onSubmit={addPlayer}>
+        <TextInput value={name} onChange={(e) => setName(e.target.value)} placeholder="Your player name" label="Enter player name:" required />
+        <TextInput value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Your URL (http://...)" label="Enter URL:" required />
+        <Button type="submit">Submit</Button>
+      </form>
     </div>
   )
 }
