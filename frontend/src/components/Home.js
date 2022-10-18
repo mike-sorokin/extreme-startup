@@ -26,8 +26,8 @@ function Home() {
       </Modal>
 
       <h1>🔥 Extreme Startup 🔥</h1>
-      <Button onClick = {(e) => {setOpenedCreateGame(true)}}>Create a Game!</Button>
-      <Button onClick = {(e) => {setOpenedAddPlayer(true)}}>Join a Game!</Button>
+      <Button onClick = {() => {setOpenedCreateGame(true)}}>Create a Game!</Button>
+      <Button onClick = {() => {setOpenedAddPlayer(true)}}>Join a Game!</Button>
     </div>
   )
 }
