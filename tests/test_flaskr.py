@@ -155,3 +155,98 @@ def test_players_delete_removes_all_players(extras, cli):
 
     rd = response_as_dict_if_sucecssful(cli.get(f"/{gid}/players"))
     assert not rd["players"]
+
+
+@with_setup(create_a_game_with_players, num_players=1)
+def test_player_id_get_returns_player_json(extras, cli):
+    gid = extras["game"]["id"]
+    pid = extras["players"][0]["id"]
+    rd = response_as_dict_if_sucecssful(cli.get(f"/{gid}/players/{pid}"))
+    assert is_valid_player_json(rd)
+    assert rd["id"] == pid
+
+
+@with_setup()
+def test_player_id_post_throws_an_error(_, cli):
+    assert cli.post("/someid/players/someid").status_code == ERROR_405
+
+
+@with_setup(create_a_game_with_players)
+def test_player_id_put_update_name(extras, cli):
+    gid = extras["game"]["id"]
+    pid = extras["players"][0]["id"]
+
+    new_name = "John_Doe_Junior"
+    rd = response_as_dict_if_sucecssful(
+        cli.put(f"/{gid}/players/{pid}"),
+        data={
+            "name": new_name,
+        },
+    )
+    assert is_valid_player_json(rd)
+    assert rd["name"] == new_name
+
+
+@with_setup(create_a_game_with_players)
+def test_player_id_put_update_api(extras, cli):
+    gid = extras["game"]["id"]
+    pid = extras["players"][0]["id"]
+
+    new_api = "johndoejr.co.uk"
+    rd = response_as_dict_if_sucecssful(
+        cli.put(f"/{gid}/players/{pid}"),
+        data={
+            "api": new_api,
+        },
+    )
+    assert is_valid_player_json(rd)
+    assert rd["api"] == new_api
+
+
+@with_setup(create_a_game_with_players)
+def test_player_id_put_update_both_name_and_api(extras, cli):
+    gid = extras["game"]["id"]
+    pid = extras["players"][0]["id"]
+
+    new_name = "John_Doe_Junior"
+    new_api = "johndoejr.co.uk"
+    rd = response_as_dict_if_sucecssful(
+        cli.put(f"/{gid}/players/{pid}"),
+        data={
+            "name": new_name,
+            "api": new_api,
+        },
+    )
+    assert is_valid_player_json(rd)
+    assert rd["name"] == new_name
+    assert rd["api"] == new_api
+
+
+@with_setup(create_a_game_with_players)
+def test_player_id_delete_removes_the_player(extras, cli):
+    gid = extras["game"]["id"]
+    pid = extras["players"][0]["id"]
+    rd = response_as_dict_if_sucecssful(cli.delete(f"/{gid}/players/{pid}"))
+
+    assert keyset_of(rd).only_contains_the_following_keys("deleted")
+    assert rd["deleted"] == pid
+
+
+@with_setup()
+def test_events_post_throws_an_error(_, cli):
+    assert cli.post("/someid/players/someid/events").status_code == ERROR_405
+
+
+@with_setup()
+def test_events_put_throws_an_error(_, cli):
+    assert cli.put("/someid/players/someid/events").status_code == ERROR_405
+
+
+@with_setup()
+def test_event_id_post_throws_an_error(_, cli):
+    assert cli.post("/someid/players/someid/events/someid").status_code == ERROR_405
+
+
+@with_setup()
+def test_event_id_put_throws_an_error(_, cli):
+    assert cli.put("/someid/players/someid/events/someid").status_code == ERROR_405
