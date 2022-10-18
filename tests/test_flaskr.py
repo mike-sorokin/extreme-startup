@@ -32,11 +32,9 @@ def test_index_can_get(extras, cli):
     assert id_1 in rd
     assert id_2 in rd
 
-
 @with_setup()
 def test_index_put_throws_an_error(_, cli):
     resp = cli.put("/")
-    print(resp)
     assert resp.status_code == METHOD_NOT_ALLOWED
 
 
@@ -116,17 +114,10 @@ def test_players_get_fetches_all_players(extras, cli):
     actual_players = rd["players"]
 
     # Asserting that the players are the same
-    print(rd)
-    print("<><><><><>")
-    print(set(actual_players))
-    print("<><><><><>")
-    print(set(expected_players))
     assert set(expected_players) == set(actual_players)
 
     # Asserting that all players reference the game
-    print("<><><")
-    # print(actual_players)
-    # assert all(map(lambda player: player["game_id"] == gid, actual_players))
+    assert all(map(lambda player: player["game_id"] == gid, actual_players.values()))
 
 
 @with_setup(create_a_game_with_players, num_players=5)

@@ -1,6 +1,7 @@
 import json
 from flaskr.player import Player
 from flaskr.event import Event
+from flaskr.game import Game
 
 
 class JSONEncoder(json.JSONEncoder):
@@ -23,5 +24,11 @@ class JSONEncoder(json.JSONEncoder):
                 points_gained=obj.points_gained,
                 response_type=obj.response_type,
                 timestamp=obj.timestamp,
+            )
+        elif isinstance(obj, Game):
+            return dict(
+                id=obj.id,
+                round=obj.round,
+                players=obj.players
             )
         return super().default(obj)
