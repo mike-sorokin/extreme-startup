@@ -7,7 +7,7 @@ import threading
 import requests
 import time
 
-app = Flask(__name__, static_folder="../frontend/build", static_url_path="/")
+app = Flask(__name__, static_folder=".", static_url_path="/")
 
 players = {}
 # scoreboard = Scoreboard(os.getenv('LENIENT'))
