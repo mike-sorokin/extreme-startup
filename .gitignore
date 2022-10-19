@@ -1,4 +1,5 @@
-commit_formatted
+auxiliary/logs
+dontrunme
 
 # dependencies
 node_modules
