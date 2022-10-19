@@ -26,9 +26,5 @@ class JSONEncoder(json.JSONEncoder):
                 timestamp=obj.timestamp,
             )
         elif isinstance(obj, Game):
-            return dict(
-                id=obj.id,
-                round=obj.round,
-                players=obj.players
-            )
+            return dict(id=obj.id, round=obj.round, players=obj.players)
         return super().default(obj)

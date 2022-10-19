@@ -128,24 +128,14 @@ def test_players_post_creates_a_new_player(extras, cli):
     players = extras["players"]
     initial_num_players = len(players)
 
-    response = cli.post(
-        f"/{gid}/players",
-        data={
-            "name": "John_Doe",
-            "api": "abc.com",
-        },
-    )
+    response = cli.post(f"/{gid}/players", data={"name": "John_Doe", "api": "abc.com"})
     rd = response_as_dict_if_sucecssful(response)
     assert is_valid_player_json(rd)
     assert rd["name"] == "John_Doe"
     assert rd["api"] == "abc.com"
     assert rd["game_id"] == gid
 
-    rd = response_as_dict_if_sucecssful(
-        cli.get(
-            f"/{gid}",
-        )
-    )
+    rd = response_as_dict_if_sucecssful(cli.get(f"/{gid}"))
     assert len(rd["players"]) == initial_num_players + 1
 
 
@@ -184,12 +174,7 @@ def test_player_id_put_update_name(extras, cli):
 
     new_name = "John_Doe_Junior"
     rd = response_as_dict_if_sucecssful(
-        cli.put(
-            f"/{gid}/players/{pid}",
-            data={
-                "name": new_name,
-            },
-        )
+        cli.put(f"/{gid}/players/{pid}", data={"name": new_name})
     )
     assert is_valid_player_json(rd)
     assert rd["name"] == new_name
@@ -202,12 +187,7 @@ def test_player_id_put_update_api(extras, cli):
 
     new_api = "johndoejr.co.uk"
     rd = response_as_dict_if_sucecssful(
-        cli.put(
-            f"/{gid}/players/{pid}",
-            data={
-                "api": new_api,
-            },
-        )
+        cli.put(f"/{gid}/players/{pid}", data={"api": new_api})
     )
     assert is_valid_player_json(rd)
     assert rd["api"] == new_api
@@ -221,13 +201,7 @@ def test_player_id_put_update_both_name_and_api(extras, cli):
     new_name = "John_Doe_Junior"
     new_api = "johndoejr.co.uk"
     rd = response_as_dict_if_sucecssful(
-        cli.put(
-            f"/{gid}/players/{pid}",
-            data={
-                "name": new_name,
-                "api": new_api,
-            },
-        )
+        cli.put(f"/{gid}/players/{pid}", data={"name": new_name, "api": new_api})
     )
     assert is_valid_player_json(rd)
     assert rd["name"] == new_name
