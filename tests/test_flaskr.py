@@ -103,7 +103,7 @@ def test_game_id_delete_removes_the_game(extras, cli):
 
 @with_setup()
 def test_players_get_game_does_not_exist(_, cli):
-    response = cli.get("/api/f/nonexistinggameid/players")
+    response = cli.get("/api/nonexistinggameid/players")
     assert response.status_code == NOT_FOUND
 
 

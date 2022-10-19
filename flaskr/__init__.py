@@ -73,6 +73,9 @@ def game(game_id):
 @app.route("/api/<game_id>/players", methods=["GET", "POST", "DELETE"])
 def all_players(game_id):
     if request.method == "GET":
+        if game_id not in games:
+            return ("", 404)
+
         players_ids = games[game_id].players
         players_dict = {id: players[id] for id in players_ids}
         r = make_response(encoder.encode({"players": players_dict}))
