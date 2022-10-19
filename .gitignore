@@ -12,6 +12,7 @@ coverage/
 build/
 
 # node build fragments in flaskr/
+flaskr/frontend
 flaskr/static
 flaskr/asset-manifest.json
 flaskr/index.html

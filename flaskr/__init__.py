@@ -11,7 +11,7 @@ import threading
 import requests
 import time
 
-app = Flask(__name__, static_folder="./frontend", static_url_path="/")
+app = Flask(__name__, static_folder="frontend", static_url_path="/")
 
 # games: game_id -> game object
 games = {}
@@ -33,8 +33,13 @@ QUESTION_TIMEOUT = 10
 QUESTION_DELAY = 5
 
 
-@app.route("/api", methods=["GET", "POST", "DELETE"])
+@app.route("/", methods=["GET"])
 def index():
+    return app.send_static_file("index.html")
+
+
+@app.route("/api", methods=["GET", "POST", "DELETE"])
+def api_index():
     if request.method == "GET":
         return encoder.encode(games)
     elif request.method == "POST":
