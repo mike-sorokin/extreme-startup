@@ -6,6 +6,8 @@ from flaskr.event import Event
 from flaskr.game import Game
 from flaskr.scoreboard import Scoreboard
 from flaskr.json_encoder import JSONEncoder
+from flaskr.questions import *
+from flaskr.question_factory import QuestionFactory
 import os
 import threading
 import requests
@@ -26,7 +28,8 @@ scoreboard = {}
 player_threads = {}
 
 encoder = JSONEncoder()
-lock = threading.Lock()
+
+question_factory = QuestionFactory()
 
 # PRODUCTION CONSTANT(S)
 QUESTION_TIMEOUT = 10
@@ -82,7 +85,7 @@ def all_players(game_id):
         player_thread.start()
         r = make_response(encoder.encode(player))
         r.mimetype = "application/json"
-        return encoder.encode(player)
+        return r
 
     elif request.method == "DELETE":
         remove_players(*games[game_id].players)
@@ -130,36 +133,26 @@ def remove_players(*player_id):
         players[pid].active = False
         # player_threads[pid].join()
         del player_threads[pid]
-        del scoreboard[players[pid]]
-
-        lock.acquire()
+        #del scoreboard[players[pid]]
         del players[pid]
-        lock.release()
+
 
 
 def sendQuestion(player):
+    question = question_factory.next_question()
     while player.active:
-        r = None
-        try:
-            r = requests.get(
-                player.api, params={"q": "What is your name?"}, timeout=QUESTION_TIMEOUT
-            ).text
-        except Exception:
-            pass
-        lock.acquire()
-        if player in scoreboard:
-            if r == None:
-                points_gained = -50
-                response_type = "NO_RESPONSE"
-            elif r == player.name:
-                points_gained = +50
-                response_type = "CORRECT"
-            else:
-                points_gained = -50
-                response_type = "WRONG"
+        question.ask(player)
+        if question.answered_correctly():
             event = Event(
-                player.uuid, "What is your name?", 0, points_gained, response_type
+                player.uuid, question.__str__(), 0, question.points, "CORRECT"
             )
-            player.log_event(event)
-        lock.release()
+        elif question.problem is None:
+            event = Event(
+                player.uuid, question.__str__(), 0, question.points, "WRONG"
+            )
+        else:
+            event = Event(
+                player.uuid, question.__str__(), 0, question.points, "NO_RESPONSE"
+            )
+        player.log_event(event)
         time.sleep(QUESTION_DELAY)

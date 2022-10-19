@@ -1,7 +1,6 @@
 from curses import noecho
 import uuid
 
-
 class Player:
     def __init__(self, game_id, name, api):
         self.uuid = str(uuid.uuid4())
