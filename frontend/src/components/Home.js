@@ -28,7 +28,7 @@ function Home() {
     playerFormData.append("url", url.trim());
 
     axios
-      .post("http://localhost:5000/players", playerFormData)
+      .post("/players", playerFormData)
       .then(() => {
         showNotification({
           title: "Success",
