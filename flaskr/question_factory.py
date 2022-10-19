@@ -1,19 +1,22 @@
-from flaskr.questions import * 
+from flaskr.questions import *
 import random
+
 
 class QuestionFactory:
     def __init__(self, round=1):
         self.round = round
-        self.question_types = [WarmupQuestion, 
-                               AdditionQuestion, 
-                               SubtractionQuestion,
-                               PowerQuestion,
-                               AdditionAdditionQuestion,
-                               AdditionMultiplicationQuestion,
-                               MultiplicationAdditionQuestion]
+        self.question_types = [
+            WarmupQuestion,
+            AdditionQuestion,
+            SubtractionQuestion,
+            PowerQuestion,
+            AdditionAdditionQuestion,
+            AdditionMultiplicationQuestion,
+            MultiplicationAdditionQuestion,
+        ]
 
     def next_question(self):
-        window_end = self.round * 2 - 1
+        window_end = max(1, self.round * 2)
         window_start = max(0, window_end - 4)
         available_question_types = self.question_types[window_start:window_end]
         return random.choice(available_question_types)()
