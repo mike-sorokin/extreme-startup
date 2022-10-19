@@ -34,13 +34,11 @@ bot-entry-test:
     - *preamble
     - pytest test/bots/test_bot_entry.py
 
-
-# # UNCOMMENT WHEN BACKEND RESPONSES ARE IMPLEMENTED
-# flaskr-test:
-#   stage: test
-#   script:
-#     - *preamble
-#     - pytest tests/test_flaskr.py
+flaskr-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_flaskr.py
 
 
 

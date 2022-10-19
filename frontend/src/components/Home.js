@@ -6,7 +6,6 @@ import { Button, Modal } from '@mantine/core';
 import AddPlayer from './AddPlayer';
 import CreateGame from './CreateGame';
 
-<<<<<<< HEAD
 function Home() {
   const [openedCreateGame, setOpenedCreateGame] = useState(false);
   const [openedAddPlayer, setOpenedAddPlayer] = useState(false);
