@@ -24,7 +24,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "BUILD_PATH='../flaskr/frontend' react-scripts build",
+    "build": "BUILD_PATH='../flaskr/templates' react-scripts build && mv ../flaskr/templates/static ../flaskr/static",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
