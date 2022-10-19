@@ -22,8 +22,9 @@ class Question:
 
         except Exception:
             self.problem = "NO_SERVER_RESPONSE"
+        self.get_result()
 
-    def result(self):
+    def get_result(self):
         if self.answer is None:
             self.result = self.problem
         elif self.answered_correctly():
@@ -56,12 +57,12 @@ class Question:
 
 
 class WarmupQuestion(Question):
-    def __init__(self, player):
-        self.player = player
+    def __init__(self, player_name="default_name"):
+        self.player_name = player_name
         super().__init__()
     
     def correct_answer(self):
-        return self.player.name
+        return self.player_name
     
     def as_text(self):
         return "What is your name?"
@@ -119,6 +120,3 @@ class AdditionAdditionQuestion(TernaryMathsQuestion):
 
 def valid_num_arguments(arg_num, *numbers):
     return list(numbers) == arg_num and all(isinstance(num, int) for num in numbers)
-
-
-# warmup_question = Question("What is your name", 10, lambda p: p.name)

@@ -1,7 +1,12 @@
+from flaskr.event import Event 
+
 class Scoreboard:
-    def __init__(self, lenient):
+    def __init__(self, lenient=True):
         self.lenient = lenient
+
+        # scores: { player_id -> player score }
         self.scores = {}
+
         self.correct_tally = {}
         self.incorrect_tally = {}
         self.request_counts = {}
@@ -13,13 +18,16 @@ class Scoreboard:
             self.correct_tally[player.uuid] += 1
         elif increment < 0:
             self.incorrect_tally[player.uuid] += 1
-        print(f"added {increment} to player{player.name}'s' score. It is now {self.scores[player.uuid]}")
-        player.log_result(question.id, question.result, increment)
+        event = Event(player.uuid, question.as_text(), 0, increment, question.result if question.problem == "" else question.problem)
+        player.log_event(event)
 
     def record_request_for(self, player):
         self.request_counts[player.uuid] += 1
 
     def new_player(self, player):
+        self.request_counts[player.uuid] = 0
+        self.correct_tally[player.uuid] = 0
+        self.incorrect_tally[player.uuid] = 0 
         self.scores[player.uuid] = 0
 
     def delete_player(self, player):
@@ -44,15 +52,15 @@ class Scoreboard:
         return list(self.leaderboard().keys()).index(player.uuid) + 1
 
     def score(self, question, leaderboard_position):
-        res = question.result
-        if res == "correct":
+        res, problem = question.result, question.problem
+        if res == "CORRECT":
             return question.points
-        elif res == "wrong":
+        elif res == "WRONG":
             return self.allow_passes(question, leaderboard_position) if self.lenient else self.penalty(question, leaderboard_position)
-        elif res == "error_response":
+        elif problem == "ERROR_RESPONSE" or problem == "NO_SERVER_RESPONSE":
             return -50
-        else:
-            print(f"!!!!! unrecognized result '#{question.result}' from #{question.inspect} in Scoreboard#score")
+        else: 
+            print(f"!!!!! unrecognized result '#{question.result}' from #{repr(question)} in Scoreboard#score")
 
     def allow_passes(self, question, leaderboard_position):
         return 0 if question.answer == "" else self.penalty(question, leaderboard_position)

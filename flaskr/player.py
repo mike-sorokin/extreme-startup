@@ -11,9 +11,6 @@ class Player:
         self.events = []
         self.active = True
 
-    def log_result(id, msg, point):
-        pass
-
     def log_event(self, event):
         self.events.append(event)
 
