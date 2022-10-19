@@ -33,7 +33,7 @@ QUESTION_TIMEOUT = 10
 QUESTION_DELAY = 5
 
 
-@app.route("/", methods=["GET", "POST", "DELETE"])
+@app.route("/api", methods=["GET", "POST", "DELETE"])
 def index():
     if request.method == "GET":
         return encoder.encode(games)
@@ -47,7 +47,7 @@ def index():
         return ("", 204)
 
 
-@app.route("/<game_id>", methods=["GET", "PUT", "DELETE"])
+@app.route("/api/<game_id>", methods=["GET", "PUT", "DELETE"])
 def game(game_id):
     if request.method == "GET":
         return (
@@ -62,7 +62,7 @@ def game(game_id):
         return {"deleted": game_id}
 
 
-@app.route("/<game_id>/players", methods=["GET", "POST", "DELETE"])
+@app.route("/api/<game_id>/players", methods=["GET", "POST", "DELETE"])
 def all_players(game_id):
     if request.method == "GET":
         players_ids = games[game_id].players
@@ -90,7 +90,7 @@ def all_players(game_id):
         return ("", 204)
 
 
-@app.route("/<game_id>/players/<player_id>", methods=["GET", "PUT", "DELETE"])
+@app.route("/api/<game_id>/players/<player_id>", methods=["GET", "PUT", "DELETE"])
 def player(game_id, player_id):
     if request.method == "GET":
         return encoder.encode(players[player_id])
@@ -106,7 +106,7 @@ def player(game_id, player_id):
         return {"deleted": player_id}
 
 
-@app.route("/<game_id>/players/<player_id>/events", methods=["GET", "DELETE"])
+@app.route("/api/<game_id>/players/<player_id>/events", methods=["GET", "DELETE"])
 def player_events(game_id, player_id):
     if request.method == "GET":
         pass
@@ -115,7 +115,7 @@ def player_events(game_id, player_id):
 
 
 @app.route(
-    "/<game_id>/players/<player_id>/events/<event_id>", methods=["GET", "DELETE"]
+    "/api/<game_id>/players/<player_id>/events/<event_id>", methods=["GET", "DELETE"]
 )
 def player_event(game_id, player_id, event_id):
     if request.method == "GET":

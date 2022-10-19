@@ -17,6 +17,6 @@ COPY --from=node-build ./build ./flaskr
 RUN pip install --upgrade pip
 RUN pip install -r flaskr/requirements.txt
 
-EXPOSE 80
+EXPOSE 5000
 
-CMD python -m flask --app flaskr --debug run --host 0.0.0.0 --port 80
+CMD python -m flask --app flaskr --debug run --host 0.0.0.0
