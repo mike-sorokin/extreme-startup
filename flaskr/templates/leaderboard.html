@@ -6,6 +6,10 @@
     <h1>Leaderboard</h1>
 
     <table>
+        <tr>
+            <th>Player</th>
+            <th>Score</th>
+        </tr>
         {% for player, score in leaderboard.items() %}
         <tr>
             <td>{{ player.name }}</td>
