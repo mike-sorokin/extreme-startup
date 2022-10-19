@@ -11,6 +11,13 @@ coverage/
 # production
 build/
 
+# node build fragments in flaskr/
+flaskr/static
+flaskr/asset-manifest.json
+flaskr/index.html
+flaskr/manifest.json
+flaskr/robots.txt
+
 # misc
 .DS_Store
 .env.local
