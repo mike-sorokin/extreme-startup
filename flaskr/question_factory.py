@@ -4,7 +4,13 @@ import random
 class QuestionFactory:
     def __init__(self, round=1):
         self.round = round
-        self.question_types = [WarmupQuestion, AdditionQuestion, SubtractionQuestion]
+        self.question_types = [WarmupQuestion, 
+                               AdditionQuestion, 
+                               SubtractionQuestion,
+                               PowerQuestion,
+                               AdditionAdditionQuestion,
+                               AdditionMultiplicationQuestion,
+                               MultiplicationAdditionQuestion]
 
     def next_question(self):
         window_end = self.round * 2 - 1

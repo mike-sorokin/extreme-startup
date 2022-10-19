@@ -79,6 +79,7 @@ class BinaryMathsQuestion(Question):
 
 class TernaryMathsQuestion(Question):
     def __init__(self, *numbers):
+        super().__init__()
         if valid_num_arguments(3, numbers):
             self.n1, self.n2, self.n3 = numbers
         else:
@@ -107,7 +108,7 @@ class MultiplicationQuestion(BinaryMathsQuestion):
         return self.n1 * self.n2 
 
 class AdditionAdditionQuestion(TernaryMathsQuestion):
-    def __init__(self, points, *numbers):
+    def __init__(self, *numbers):
         super().__init__(numbers)    
         self.points = 30
     
@@ -117,6 +118,40 @@ class AdditionAdditionQuestion(TernaryMathsQuestion):
     def correct_answer(self):
         return self.n1 + self.n2 + self.n3
 
+class AdditionMultiplicationQuestion(TernaryMathsQuestion):
+    def __init__(self, *numbers):
+        super().__init__(numbers)    
+        self.points = 60
+    
+    def as_text(self):
+        return f"What is {self.n1} plus {self.n2} multiplied by {self.n3}"
+    
+    def correct_answer(self):
+        return self.n1 + self.n2 * self.n3
+
+class MultiplicationAdditionQuestion(TernaryMathsQuestion):
+    def __init__(self, *numbers):
+        super().__init__(numbers)    
+        self.points = 50
+    
+    def as_text(self):
+        return f"What is {self.n1} multiplied by {self.n2} plus {self.n3}"
+    
+    def correct_answer(self):
+        return self.n1 * self.n2 + self.n3
+
+class PowerQuestion(BinaryMathsQuestion):
+    def __init__(self, *numbers):
+        super().__init__(numbers)    
+        self.points = 50
+    
+    def as_text(self):
+        return f"What is {self.n1} to the power of {self.n2}"
+    
+    def correct_answer(self):
+        return self.n1 ** self.n2
+
 
 def valid_num_arguments(arg_num, *numbers):
-    return list(numbers) == arg_num and all(isinstance(num, int) for num in numbers)
+    return (list(numbers) == arg_num and 
+            all(isinstance(num, int) for num in numbers))

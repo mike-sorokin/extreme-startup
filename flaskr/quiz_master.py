@@ -17,4 +17,3 @@ class QuizMaster:
 
     def player_passed(self):
         pass 
-
