@@ -1,6 +1,7 @@
 # First we compile the node stuff
 FROM node:16-alpine as node-build
-COPY ./frontend .
+COPY ./frontend ./frontend
+WORKDIR frontend
 
 # Clean install all packages from package-lock.json, then build
 RUN npm ci
@@ -11,7 +12,7 @@ FROM python:3
 COPY ./flaskr ./flaskr
 
 # Copy pre-compiled node stuff
-COPY --from=node-build ./build ./flaskr
+COPY --from=node-build ./flaskr/frontend ./flaskr/frontend
 
 # Install reqs
 RUN pip install --upgrade pip
