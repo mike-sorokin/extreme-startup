@@ -1,3 +1,5 @@
+commit_formatted
+
 # dependencies
 node_modules
 /.pnp
@@ -8,6 +10,14 @@ coverage/
 
 # production
 build/
+
+# node build fragments in flaskr/
+flaskr/frontend
+flaskr/static
+flaskr/asset-manifest.json
+flaskr/index.html
+flaskr/manifest.json
+flaskr/robots.txt
 
 # misc
 .DS_Store
