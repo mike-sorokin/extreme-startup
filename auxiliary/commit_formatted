@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+
+git add .
+git commit -m "$@"
+sleep 1
+git add .
+git commit -m "$@"
