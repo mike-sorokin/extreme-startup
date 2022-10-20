@@ -1,36 +1,110 @@
 from flaskr.questions import *
 
+UNARY_MATH_QUESTIONS = [FibonacciQuestion]
+BINARY_MATH_QUESTIONS = [AdditionQuestion, SubtractionQuestion, MultiplicationQuestion]
+TERNRARY_MATH_QUESTIONS = [
+    AdditionAdditionQuestion,
+    AdditionMultiplicationQuestion,
+    MultiplicationAdditionQuestion,
+]
+SELECT_NUMBERS_QUESTIONS = [MaximumQuestion, SquareCubeQuestion, PrimesQuestion]
+
+
+def test_unary_math_question():
+    unary_questions = [q(23) for q in UNARY_MATH_QUESTIONS]
+    for question in unary_questions:
+        assert question.number == 23
+
+
+def test_unary_math_question_random():
+    unary_questions = [q() for q in UNARY_MATH_QUESTIONS]
+    for question in unary_questions:
+        assert type(question.number) is int
+        assert question.number in range(1, 100)
+
+
+def test_binary_math_question():
+    bin_questions = [q(23, 47) for q in BINARY_MATH_QUESTIONS]
+    for question in bin_questions:
+        assert question.n1 == 23
+        assert question.n2 == 47
+
+
+def test_binary_math_question_random():
+    bin_questions = [q() for q in BINARY_MATH_QUESTIONS]
+    for question in bin_questions:
+        assert type(question.n1) is int
+        assert type(question.n2) is int
+        assert question.n1 in range(1, 100)
+        assert question.n2 in range(1, 100)
+
+
+def test_ternary_math_question():
+    ter_questions = [q(25, 47, 49) for q in TERNRARY_MATH_QUESTIONS]
+    for question in ter_questions:
+        assert question.n1 == 25
+        assert question.n2 == 47
+        assert question.n3 == 49
+
+
+def test_ternary_math_question_random():
+    ter_questions = [q() for q in TERNRARY_MATH_QUESTIONS]
+    for question in ter_questions:
+        assert type(question.n1) is int
+        assert type(question.n2) is int
+        assert type(question.n3) is int
+        assert question.n1 in range(1, 100)
+        assert question.n2 in range(1, 100)
+        assert question.n3 in range(1, 100)
+
+
+def test_fibonacci_question():
+    fib_question = FibonacciQuestion(11)
+    assert fib_question.as_text() == "what is the 11th number in the Fibonacci sequence"
+    assert fib_question.points == 50
+    assert fib_question.correct_answer() == 89
+
 
 def test_addition_question():
+    add_question = AdditionQuestion(50, 31)
+    assert add_question.as_text() == "What is 50 plus 31"
+    assert add_question.points == 10
+    assert add_question.correct_answer() == 50 + 31
+
+
+def test_subtraction_question():
     sub_question = SubtractionQuestion(50, 31)
     assert sub_question.as_text() == "What is 50 minus 31"
     assert sub_question.points == 10
-    assert sub_question.correct_answer() == 19
+    assert sub_question.correct_answer() == 50 - 31
 
 
-def test_addition_question_random():
-    sub_question = SubtractionQuestion()
-    n1, n2 = sub_question.n1, sub_question.n2
-    assert n1 != 0 or n2 != 0
-    assert sub_question.as_text() == f"What is {n1} minus {n2}"
-    assert sub_question.points == 10
-    assert sub_question.correct_answer() == n1 - n2
-
-
-def test_addition_addition_question_random():
-    sub_question = AdditionAdditionQuestion()
-    n1, n2, n3 = sub_question.n1, sub_question.n2, sub_question.n3
-    assert n1 != 0 or n2 != 0 or n3 != 0
-    assert sub_question.as_text() == f"What is {n1} plus {n2} plus {n3}"
-    assert sub_question.points == 30
-    assert sub_question.correct_answer() == n1 + n2 + n3
+def test_multiplication_question():
+    mul_question = MultiplicationQuestion(50, 4)
+    assert mul_question.as_text() == "What is 50 multiplied by 4"
+    assert mul_question.points == 10
+    assert mul_question.correct_answer() == 50 * 4
 
 
 def test_addition_addition_question():
     sub_question = AdditionAdditionQuestion(10, 20, 30)
     assert sub_question.as_text() == "What is 10 plus 20 plus 30"
     assert sub_question.points == 30
-    assert sub_question.correct_answer() == 60
+    assert sub_question.correct_answer() == 10 + 20 + 30
+
+
+def test_addition_multiplication_question():
+    add_mul_question = AdditionMultiplicationQuestion(10, 20, 30)
+    assert add_mul_question.as_text() == "What is 10 plus 20 multiplied by 30"
+    assert add_mul_question.points == 60
+    assert add_mul_question.correct_answer() == 10 + 20 * 30
+
+
+def test_addition_multiplication_question():
+    mul_add_question = MultiplicationAdditionQuestion(10, 20, 30)
+    assert mul_add_question.as_text() == "What is 10 multiplied by 20 plus 30"
+    assert mul_add_question.points == 50
+    assert mul_add_question.correct_answer() == 10 * 20 + 30
 
 
 def test_maximum_question():
@@ -41,18 +115,6 @@ def test_maximum_question():
     )
     assert max_question.points == 40
     assert max_question.correct_answer() == 5
-
-
-def test_maximum_question_random():
-    max_question = MaximumQuestion()
-    numbers = max_question.numbers
-    assert len(numbers) != 0
-    assert (
-        max_question.as_text()
-        == f"which of the following numbers is the largest: {', '.join(map(str, numbers))}"
-    )
-    assert max_question.points == 40
-    assert max_question.correct_answer() == max(numbers)
 
 
 def test_square_cube_question():
@@ -85,23 +147,16 @@ def test_square_cube_question_no_ans():
     assert square_cube_question.correct_answer() == ""
 
 
-def test_square_cube_question_random():
-    square_cube_question = SquareCubeQuestion()
-    numbers = square_cube_question.numbers
-    is_square_cube = (
-        lambda x: round(x ** (1 / 3)) ** 3 == x and round(x ** (1 / 3)) ** 3 == x
-    )
-    assert (
-        square_cube_question.as_text()
-        == f"which of the following numbers is both a square and a cube: {', '.join(map(str, numbers))}"
-    )
-    assert square_cube_question.points == 50
-    assert square_cube_question.correct_answer() == ", ".join(
-        map(str, filter(is_square_cube, numbers))
-    )
-
-
 def test_prime_question():
+    prime_question = PrimesQuestion(2, 4, 9)
+    assert (
+        prime_question.as_text() == "which of the following numbers are primes: 2, 4, 9"
+    )
+    assert prime_question.points == 60
+    assert prime_question.correct_answer() == "2"
+
+
+def test_prime_question_multiple():
     prime_question = PrimesQuestion(2, 4, 7, 9)
     assert (
         prime_question.as_text()
@@ -111,15 +166,18 @@ def test_prime_question():
     assert prime_question.correct_answer() == "2, 7"
 
 
-def test_prime_question():
-    fib_question = FibonacciQuestion(11)
-    assert fib_question.as_text() == "what is the 11th number in the Fibonacci sequence"
-    assert fib_question.points == 50
-    assert fib_question.correct_answer() == 89
+def test_prime_question_no_ans():
+    prime_question = PrimesQuestion(1, 6, 8, 9)
+    assert (
+        prime_question.as_text()
+        == "which of the following numbers are primes: 1, 6, 8, 9"
+    )
+    assert prime_question.points == 60
+    assert prime_question.correct_answer() == ""
 
 
 def test_prime_question_random():
     fib_question = FibonacciQuestion()
     number = fib_question.number
-    assert number != 0
+    assert number in range(0, 100)
     assert fib_question.points == 50

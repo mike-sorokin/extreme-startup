@@ -140,7 +140,7 @@ class SubtractionQuestion(BinaryMathsQuestion):
 
 class MultiplicationQuestion(BinaryMathsQuestion):
     def as_text(self):
-        return f"What is {self.n1} times {self.n2}"
+        return f"What is {self.n1} multiplied by {self.n2}"
 
     def correct_answer(self):
         return self.n1 * self.n2
@@ -160,7 +160,7 @@ class AdditionAdditionQuestion(TernaryMathsQuestion):
 
 class AdditionMultiplicationQuestion(TernaryMathsQuestion):
     def __init__(self, *numbers):
-        super().__init__(numbers)
+        super().__init__(*numbers)
         self.points = 60
 
     def as_text(self):
@@ -172,7 +172,7 @@ class AdditionMultiplicationQuestion(TernaryMathsQuestion):
 
 class MultiplicationAdditionQuestion(TernaryMathsQuestion):
     def __init__(self, *numbers):
-        super().__init__(numbers)
+        super().__init__(*numbers)
         self.points = 50
 
     def as_text(self):
@@ -184,7 +184,7 @@ class MultiplicationAdditionQuestion(TernaryMathsQuestion):
 
 class PowerQuestion(BinaryMathsQuestion):
     def __init__(self, *numbers):
-        super().__init__(numbers)
+        super().__init__(*numbers)
         self.points = 50
 
     def as_text(self):
