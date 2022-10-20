@@ -8,12 +8,15 @@ class QuestionFactory:
         self.question_types = [
             WarmupQuestion,
             AdditionQuestion,
+            MaximumQuestion,
+            MultiplicationQuestion,
+            SquareCubeQuestion,
+            PrimesQuestion,
             SubtractionQuestion,
             PowerQuestion,
             AdditionAdditionQuestion,
             AdditionMultiplicationQuestion,
             MultiplicationAdditionQuestion,
-            MaximumQuestion,
         ]
 
     def next_question(self):
