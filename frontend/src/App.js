@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { MantineProvider } from '@mantine/core';
 import { NotificationsProvider } from '@mantine/notifications';

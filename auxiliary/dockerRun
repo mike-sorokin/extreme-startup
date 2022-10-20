@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+
+# Attempt to speed up by cleaning up node_modules
+# so that not everything is copied to docker :)
+rm -rf frontend/node_modules
+
+rm -rf flaskr/static flaskr/templates
+
+docker build -t se-xp . && docker run -i -t -p80:5000 se-xp

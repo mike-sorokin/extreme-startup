@@ -1,4 +1,3 @@
-import axios from 'axios';
 import React from 'react';
 import { useState } from 'react';
 import { Button, Modal } from '@mantine/core';

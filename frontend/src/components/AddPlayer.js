@@ -60,20 +60,6 @@ function AddPlayer(setOpened) {
 
   return (
     <div>
-      {
-        /* 
-          <form method="post" action="https://extreme-restartup.fly.dev/players">
-            <label htmlFor="name">Name: </label>
-            <input type="text" id="name" name="name"/>
-
-            <label htmlFor="url">URL: </label>
-            <input type="text" id="url" name="url" placeholder="http://...."/>
-
-            <input type="submit" value="Submit" />
-          </form> 
-        */
-      }
-
       <form onSubmit={addPlayer}>
         <TextInput value={id} onChange={(e) => setId(e.target.value)} placeholder="Game id (e.g. abc123)" label="Enter game id:" required />
         <TextInput value={name} onChange={(e) => setName(e.target.value)} placeholder="Your player name" label="Enter player name:" required />
