@@ -51,7 +51,7 @@ def serve_frontend(path):
 def api_index():
     if request.method == "GET":
         return encoder.encode(games)
-    elif request.method == "POST": # create new game -- initially no players 
+    elif request.method == "POST": # create new game -- initially no players
         new_game = Game()
         gid = new_game.id
         scoreboards[gid] = Scoreboard()
@@ -59,7 +59,7 @@ def api_index():
         return encoder.encode(new_game)
     elif request.method == "DELETE": # delete all games
         remove_players(*[p for g in games.values() for p in g.players])
-        # garbage collect each game's question_factory 
+        # garbage collect each game's question_factory
         games.clear()
         return ("", 204)
 
@@ -69,15 +69,15 @@ def game(game_id):
     if game_id not in games:
         return ("NOT FOUND", 404)
 
-    if request.method == "GET": # fetch game with <game_id> 
+    if request.method == "GET": # fetch game with <game_id>
         return encoder.encode(games[game_id])
-    elif request.method == "PUT": # update game (advance round) 
+    elif request.method == "PUT": # update game (advance round)
         games[game_id].question_factory.advance_round()
         games[game_id].round += 1
         return ("ROUND_INCREMENTED", 200)
-    elif request.method == "DELETE": # delete game with <game_id> 
+    elif request.method == "DELETE": # delete game with <game_id>
         remove_players(*games[game_id].players)
-        # garbage collect the question_factory 
+        # garbage collect the question_factory
         del games[game_id]
         return {"deleted": game_id}
 
@@ -96,7 +96,7 @@ def all_players(game_id):
 
     elif request.method == "POST":
         player = Player(game_id, request.json["name"], api=request.json["api"])
-        scoreboard[player] = 0
+        scoreboards[player] = 0
         games[game_id].players.append(player.uuid)
         players[player.uuid] = player
         quiz_master = QuizMaster(player, games[game_id].question_factory, scoreboards[game_id])
@@ -107,7 +107,7 @@ def all_players(game_id):
         r = make_response(encoder.encode(player))
         r.mimetype = "application/json"
         return r
-    elif request.method == "DELETE": # deletes all players in <game_id> game instance 
+    elif request.method == "DELETE": # deletes all players in <game_id> game instance
         remove_players(*games[game_id].players)
         games[game_id].players.clear()
         return ("", 204)
@@ -118,7 +118,7 @@ def player(game_id, player_id):
     if game_id not in games or player_id not in players:
         return ("NOT FOUND", 404)
 
-    if request.method == "GET": # fetch player with <player_id> 
+    if request.method == "GET": # fetch player with <player_id>
         return encoder.encode(players[player_id])
     elif request.method == "PUT": # update player (change name/api, NOT event management)
         if "name" in request.form:
@@ -126,7 +126,7 @@ def player(game_id, player_id):
         if "api" in request.form:
             players[player_id].api = request.form["api"]
         return encoder.encode(players[player_id])
-    elif request.method == "DELETE": # delete player with id 
+    elif request.method == "DELETE": # delete player with id
         games[game_id].players.remove(player_id)
         remove_players(player_id)
         return {"deleted": player_id}
@@ -138,8 +138,8 @@ def player_events(game_id, player_id):
         return ("NOT FOUND", 404)
 
     if request.method == "GET": # fetch all events for <game_id> player <player_id>
-        return encoder.encode({"events": players[player_id].events}) 
-    elif request.method == "DELETE": # delets all events for <player_id> 
+        return encoder.encode({"events": players[player_id].events})
+    elif request.method == "DELETE": # delets all events for <player_id>
         players[player_id].events.clear()
         return ("", 204)
 
@@ -151,7 +151,7 @@ def player_event(game_id, player_id, event_id):
         player_id not in players or
         event_id not in map(lambda e : e.event_id, players[player_id].events)):
         return ("NOT FOUND", 404)
-        
+
     event = filter(lambda e: e.id == event_id, players[player_id].events)[0]
 
     if request.method == "GET": # fetch event with <event_id>
