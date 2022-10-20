@@ -11,6 +11,9 @@ import threading
 import requests
 import time
 
+# todo remove later
+import pprint
+
 app = Flask(__name__)
 
 # games: game_id -> game object
@@ -34,8 +37,8 @@ QUESTION_DELAY = 5
 
 
 # This is a catch-all function that will redirect anything not caught by the other rules
-# to the react webpages 
-@app.route("/", defaults={"path":""})
+# to the react webpages
+@app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def serve_frontend(path):
     return make_response(render_template("index.html", path=path))
@@ -174,3 +177,33 @@ def sendQuestion(player):
             player.log_event(event)
         lock.release()
         time.sleep(QUESTION_DELAY)
+
+
+# FORGIVE ME
+pp = pprint.PrettyPrinter(indent=4)
+bot_responses = {1: "Hello world!"}
+
+# /2/hi  style links, these update the response
+@app.route("/api/bot/<int:bot_id>/<string:resp>", methods=["GET"])
+def _update_response(bot_id, resp):
+    print(f"Updated {bot_id} to {resp}")
+    bot_responses[bot_id] = resp
+    return redirect(url_for("api_response", bot_id=bot_id))
+
+
+# Get a response
+@app.route("/api/bot/<int:bot_id>", methods=["GET"])
+def _api_response(bot_id):
+    print(f"Received GET for {bot_id}\nResponding with {bot_responses[bot_id]}\n\n")
+    return bot_responses[bot_id]
+
+
+@app.route("/api/bot/cleanup", methods=["GET"])
+def _cleanup():
+    bot_responses = {}
+    return "Restored bots"
+
+
+@app.route("/api/bot/", methods=["GET"])
+def _main_view():
+    return pp.pformat(bot_responses)

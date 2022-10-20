@@ -2,7 +2,7 @@ const API_URL_PREFIX = "/api/"
 const rootUrl = () => API_URL_PREFIX
 
 export function gameCreationUrl() {
-  return rootUrl
+  return rootUrl()
 }
 
 export function gameUrl(gameId) {
