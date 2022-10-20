@@ -58,28 +58,7 @@ function Player() {
       <Card>
         <ul>
           {events.map((event) => (
-            <Card key={event.id} shadow="sm" radius="md" withBorder>
-              <Group>
-                <div>id: {event.id}</div>
-                <div>difficulty: {event.difficulty}</div>
-                <div>{event.points_gained} points </div>
-                {event.response_type == "NO_RESPONSE" && (
-                  <div>
-                    <Badge color="red"> NO RESPONSE </Badge>
-                  </div>
-                )}
-                {event.response_type == "WRONG" && (
-                  <div>
-                    <Badge color="orange"> INCORRECT </Badge>
-                  </div>
-                )}
-                {event.response_type == "CORRECT" && (
-                  <div>
-                    <Badge color="green"> CORRECT </Badge>
-                  </div>
-                )}
-              </Group>
-            </Card>
+            <PlayerEventCard key={event.id} event={event} />
           ))}
         </ul>
       </Card>
