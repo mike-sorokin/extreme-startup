@@ -1,19 +1,18 @@
 from uuid import uuid4
 import random
 
-class Question: 
+
+class Question:
     def __init__(self, points=10):
         self.uuid = str(uuid4())
         self.points = points
         self.answer = None
         self.result = ""
-        self.problem =  ""
+        self.problem = ""
 
     def ask(self, player):
         try:
-            response = requests.get(
-                player.api, params={"q": self.as_text()}
-            )
+            response = requests.get(player.api, params={"q": self.as_text()})
 
             if response.status_code == 200:
                 self.answer = response.text.strip().lower()
@@ -31,13 +30,13 @@ class Question:
             self.result = "CORRECT"
         else:
             self.result = "WRONG"
-    
+
     def delay_before_next(self):
         if self.result == "CORRECT":
             return 5
         elif self.result == "WRONG":
             return 10
-        else: 
+        else:
             return 20
 
     def display_result(self):
@@ -45,7 +44,7 @@ class Question:
 
     def __str__(self):
         return f"{self.uuid}: {self.as_text()}"
-    
+
     def as_text(self):
         return "Basic Question Class"
 
@@ -53,29 +52,32 @@ class Question:
         return self.answer == self.correct_answer()
 
     def correct_answer(self):
-        pass 
+        pass
 
 
 class WarmupQuestion(Question):
     def __init__(self, player_name="default_name"):
         self.player_name = player_name
         super().__init__()
-    
+
     def correct_answer(self):
         return self.player_name
-    
+
     def as_text(self):
         return "What is your name?"
 
+
 class BinaryMathsQuestion(Question):
     def __init__(self, *numbers):
+        print(numbers)
         super().__init__()
         if valid_num_arguments(2, numbers):
             self.n1 = numbers[0]
             self.n2 = numbers[1]
         else:
-            self.n1 = random.randint(1,100)
-            self.n2 = random.randint(1,100)
+            self.n1 = random.randint(1, 100)
+            self.n2 = random.randint(1, 100)
+
 
 class TernaryMathsQuestion(Question):
     def __init__(self, *numbers):
@@ -85,73 +87,102 @@ class TernaryMathsQuestion(Question):
         else:
             self.n1, self.n2, self.n3 = random.sample(range(1, 100), 3)
 
+
+class SelectFromListOfNumbersQuestion(Question):
+    def __init__(self, *numbers):
+        super().__init__()
+        if valid_num_arguments(len(numbers), numbers):
+            self.numbers = numbers
+        else:
+            size = random.randint(0, 5)
+            self.numbers = random.sample(range(1, 100), size)
+
+
+class MaximumQuestion(SelectFromListOfNumbersQuestion):
+    def __init__(self, *numbers):
+        super().__init__(*numbers)
+        self.points = 40
+
+    def as_text(self):
+        return f"which of the following numbers is the largest: {', '.join(map(str, self.numbers))}"
+
+    def correct_answer(self):
+        return max(self.numbers)
+
+
 class AdditionQuestion(BinaryMathsQuestion):
     def as_text(self):
         return f"What is {self.n1} plus {self.n2}"
 
     def correct_answer(self):
-        return self.n1 + self.n2 
+        return self.n1 + self.n2
+
 
 class SubtractionQuestion(BinaryMathsQuestion):
     def as_text(self):
         return f"What is {self.n1} minus {self.n2}"
-    
+
     def correct_answer(self):
-        return self.n1 - self.n2 
+        return self.n1 - self.n2
 
 
 class MultiplicationQuestion(BinaryMathsQuestion):
     def as_text(self):
         return f"What is {self.n1} times {self.n2}"
-    
+
     def correct_answer(self):
-        return self.n1 * self.n2 
+        return self.n1 * self.n2
+
 
 class AdditionAdditionQuestion(TernaryMathsQuestion):
     def __init__(self, *numbers):
-        super().__init__(numbers)    
+        super().__init__(*numbers)
         self.points = 30
-    
+
     def as_text(self):
         return f"What is {self.n1} plus {self.n2} plus {self.n3}"
-    
+
     def correct_answer(self):
         return self.n1 + self.n2 + self.n3
 
+
 class AdditionMultiplicationQuestion(TernaryMathsQuestion):
     def __init__(self, *numbers):
-        super().__init__(numbers)    
+        super().__init__(numbers)
         self.points = 60
-    
+
     def as_text(self):
         return f"What is {self.n1} plus {self.n2} multiplied by {self.n3}"
-    
+
     def correct_answer(self):
         return self.n1 + self.n2 * self.n3
 
+
 class MultiplicationAdditionQuestion(TernaryMathsQuestion):
     def __init__(self, *numbers):
-        super().__init__(numbers)    
+        super().__init__(numbers)
         self.points = 50
-    
+
     def as_text(self):
         return f"What is {self.n1} multiplied by {self.n2} plus {self.n3}"
-    
+
     def correct_answer(self):
         return self.n1 * self.n2 + self.n3
 
+
 class PowerQuestion(BinaryMathsQuestion):
     def __init__(self, *numbers):
-        super().__init__(numbers)    
+        super().__init__(numbers)
         self.points = 50
-    
+
     def as_text(self):
         return f"What is {self.n1} to the power of {self.n2}"
-    
+
     def correct_answer(self):
-        return self.n1 ** self.n2
+        return self.n1**self.n2
 
 
-def valid_num_arguments(arg_num, *numbers):
-    return (list(numbers) == arg_num and 
-            all(isinstance(num, int) for num in numbers))
+def valid_num_arguments(arg_num, numbers):
+    return len(list(numbers)) == arg_num and all(
+        isinstance(num, int) for num in numbers
+    )

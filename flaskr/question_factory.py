@@ -13,6 +13,7 @@ class QuestionFactory:
             AdditionAdditionQuestion,
             AdditionMultiplicationQuestion,
             MultiplicationAdditionQuestion,
+            MaximumQuestion,
         ]
 
     def next_question(self):
