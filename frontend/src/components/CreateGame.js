@@ -1,13 +1,12 @@
 import { gamePageUrl } from '../utils/urls'
-import { requestGameCreation, requestPlayerCreation, playerCreationData } from '../utils/requests'
+import { requestGameCreation } from '../utils/requests'
+import { showSuccessfulNotification } from '../utils/utils'
 import axios from 'axios';
 import React from 'react';
 import { useState } from 'react';
 import { TextInput, Button } from '@mantine/core';
-import { showNotification } from '@mantine/notifications';
 import { IconCheck, IconX } from '@tabler/icons';
 import { useNavigate } from 'react-router-dom'
-
 
 function CreateGame(setOpened) {
 
@@ -17,7 +16,7 @@ function CreateGame(setOpened) {
     event.preventDefault()
     return requestGameCreation()
       .then(game => {
-        // setOpened(false)
+        showSuccessfulNotification("Successfully Created Game!")
         navigate(gamePageUrl(game.id))
       })
   }
