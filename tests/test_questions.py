@@ -1,8 +1,9 @@
 from flaskr.questions import *
+import pytest
 
 UNARY_MATH_QUESTIONS = [FibonacciQuestion]
 BINARY_MATH_QUESTIONS = [AdditionQuestion, SubtractionQuestion, MultiplicationQuestion]
-TERNRARY_MATH_QUESTIONS = [
+TERNARY_MATH_QUESTIONS = [
     AdditionAdditionQuestion,
     AdditionMultiplicationQuestion,
     MultiplicationAdditionQuestion,
@@ -10,66 +11,66 @@ TERNRARY_MATH_QUESTIONS = [
 SELECT_NUMBERS_QUESTIONS = [MaximumQuestion, SquareCubeQuestion, PrimesQuestion]
 
 
-def test_unary_math_question():
-    unary_questions = [q(23) for q in UNARY_MATH_QUESTIONS]
-    for question in unary_questions:
-        assert question.number == 23
+@pytest.mark.parametrize("q", UNARY_MATH_QUESTIONS)
+def test_unary_math_question(q):
+    question = q(23)
+    assert question.number == 23
 
 
-def test_unary_math_question_random():
-    unary_questions = [q() for q in UNARY_MATH_QUESTIONS]
-    for question in unary_questions:
-        assert type(question.number) is int
-        assert question.number in range(1, 100)
+@pytest.mark.parametrize("q", UNARY_MATH_QUESTIONS)
+def test_unary_math_question_random(q):
+    question = q()
+    assert type(question.number) is int
+    assert question.number in range(1, 100)
 
 
-def test_binary_math_question():
-    bin_questions = [q(23, 47) for q in BINARY_MATH_QUESTIONS]
-    for question in bin_questions:
-        assert question.n1 == 23
-        assert question.n2 == 47
+@pytest.mark.parametrize("q", BINARY_MATH_QUESTIONS)
+def test_binary_math_question(q):
+    question = q(23, 47)
+    assert question.n1 == 23
+    assert question.n2 == 47
 
 
-def test_binary_math_question_random():
-    bin_questions = [q() for q in BINARY_MATH_QUESTIONS]
-    for question in bin_questions:
-        assert type(question.n1) is int
-        assert type(question.n2) is int
-        assert question.n1 in range(1, 100)
-        assert question.n2 in range(1, 100)
+@pytest.mark.parametrize("q", BINARY_MATH_QUESTIONS)
+def test_binary_math_question_random(q):
+    question = q()
+    assert type(question.n1) is int
+    assert type(question.n2) is int
+    assert question.n1 in range(1, 100)
+    assert question.n2 in range(1, 100)
 
 
-def test_ternary_math_question():
-    ter_questions = [q(25, 47, 49) for q in TERNRARY_MATH_QUESTIONS]
-    for question in ter_questions:
-        assert question.n1 == 25
-        assert question.n2 == 47
-        assert question.n3 == 49
+@pytest.mark.parametrize("q", TERNARY_MATH_QUESTIONS)
+def test_ternary_math_question(q):
+    question = q(25, 47, 49)
+    assert question.n1 == 25
+    assert question.n2 == 47
+    assert question.n3 == 49
 
 
-def test_ternary_math_question_random():
-    ter_questions = [q() for q in TERNRARY_MATH_QUESTIONS]
-    for question in ter_questions:
-        assert type(question.n1) is int
-        assert type(question.n2) is int
-        assert type(question.n3) is int
-        assert question.n1 in range(1, 100)
-        assert question.n2 in range(1, 100)
-        assert question.n3 in range(1, 100)
+@pytest.mark.parametrize("q", TERNARY_MATH_QUESTIONS)
+def test_ternary_math_question_random(q):
+    question = q()
+    assert type(question.n1) is int
+    assert type(question.n2) is int
+    assert type(question.n3) is int
+    assert question.n1 in range(1, 100)
+    assert question.n2 in range(1, 100)
+    assert question.n3 in range(1, 100)
 
 
-def test_select_numbers_question():
-    select_questions = [q(25, 47, 49, 58) for q in SELECT_NUMBERS_QUESTIONS]
-    for question in select_questions:
-        assert question.numbers == [25, 47, 49, 58]
+@pytest.mark.parametrize("q", SELECT_NUMBERS_QUESTIONS)
+def test_select_numbers_question(q):
+    question = q(25, 47, 49, 58)
+    assert question.numbers == [25, 47, 49, 58]
 
 
-def test_select_numbers_question_random():
-    select_questions = [q() for q in SELECT_NUMBERS_QUESTIONS]
-    for question in select_questions:
-        assert type(question.numbers) is list
-        assert len(question.numbers) in range(1, 10)
-        assert all([1 <= i < 100 for i in question.numbers])
+@pytest.mark.parametrize("q", SELECT_NUMBERS_QUESTIONS)
+def test_select_numbers_question_random(q):
+    question = q()
+    assert type(question.numbers) is list
+    assert len(question.numbers) in range(1, 10)
+    assert all([1 <= i < 100 for i in question.numbers])
 
 
 def test_fibonacci_question():
