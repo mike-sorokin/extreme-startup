@@ -1,4 +1,4 @@
-import { playerPageUrl } from '../utils/urls'
+import { gamePageUrl } from '../utils/urls'
 import { requestGameCreation, requestPlayerCreation, playerCreationData } from '../utils/requests'
 import axios from 'axios';
 import React from 'react';
@@ -6,7 +6,8 @@ import { useState } from 'react';
 import { TextInput, Button } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { IconCheck, IconX } from '@tabler/icons';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'
+
 
 // TODO: Create a game! This code currently is just a duplicate of AddPlayer
 // UPDATE: it is in progress
@@ -14,6 +15,8 @@ import { Navigate } from 'react-router-dom';
 function CreateGame(setOpened) {
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
+
+  const navigate = useNavigate();
 
   const submission = event => {
     event.preventDefault()
@@ -24,7 +27,7 @@ function CreateGame(setOpened) {
       })
       .then(player => {
         // setOpened(false)
-        return (<Navigate to={playerPageUrl(player.game_id, player.id)} />)
+        navigate(gamePageUrl(player.game_id))
       })
   }
 
