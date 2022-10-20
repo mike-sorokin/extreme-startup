@@ -95,7 +95,9 @@ def all_players(game_id):
         return r
 
     elif request.method == "POST":  # create a new player -- initialise thread
-        player = Player(game_id, request.form["name"], api=request.form["api"])
+        # player = Player(game_id, request.form["name"], api=request.form["api"])
+        print(request.is_json, request.json, request.get_json())
+        player = Player(game_id, request.get_json()["name"], api=request.get_json()["api"])
         games[game_id].new_player(player.uuid)
         scoreboards[game_id].new_player(player)
         players[player.uuid] = player
@@ -126,10 +128,10 @@ def player(game_id, player_id):
     elif (
         request.method == "PUT"
     ):  # update player (change name/api, NOT event management)
-        if "name" in request.form:
-            players[player_id].name = request.form["name"]
-        if "api" in request.form:
-            players[player_id].api = request.form["api"]
+        if "name" in request.json:
+            players[player_id].name = request.json["name"]
+        if "api" in request.json:
+            players[player_id].api = request.json["api"]
         return encoder.encode(players[player_id])
     elif request.method == "DELETE":  # delete player with id
         games[game_id].players.remove(player_id)
