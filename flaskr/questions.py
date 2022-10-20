@@ -103,7 +103,7 @@ class SelectFromListOfNumbersQuestion(Question):
     def __init__(self, *numbers):
         super().__init__()
         if len(numbers) != 0 and valid_num_arguments(len(numbers), numbers):
-            self.numbers = numbers
+            self.numbers = list(numbers)
         else:
             size = random.randint(1, 5)
             self.numbers = random.sample(range(1, 100), size)

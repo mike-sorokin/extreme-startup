@@ -58,6 +58,20 @@ def test_ternary_math_question_random():
         assert question.n3 in range(1, 100)
 
 
+def test_select_numbers_question():
+    select_questions = [q(25, 47, 49, 58) for q in SELECT_NUMBERS_QUESTIONS]
+    for question in select_questions:
+        assert question.numbers == [25, 47, 49, 58]
+
+
+def test_select_numbers_question_random():
+    select_questions = [q() for q in SELECT_NUMBERS_QUESTIONS]
+    for question in select_questions:
+        assert type(question.numbers) is list
+        assert 1 <= len(question.numbers) <= 5
+        assert all([1 <= i < 100 for i in question.numbers])
+
+
 def test_fibonacci_question():
     fib_question = FibonacciQuestion(11)
     assert fib_question.as_text() == "what is the 11th number in the Fibonacci sequence"
