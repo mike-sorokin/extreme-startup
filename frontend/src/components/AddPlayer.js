@@ -13,9 +13,9 @@ function AddPlayer(setOpened) {
   const addPlayer = (e) => {
     e.preventDefault();
 
-    gameId = id.trim()
-    playerName = name.trim()
-    playerUrl = url.trim()
+    let gameId = id.trim()
+    let playerName = name.trim()
+    let playerUrl = url.trim()
 
     if (gameId === "") {
       showNotification({
