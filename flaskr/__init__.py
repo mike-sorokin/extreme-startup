@@ -41,11 +41,13 @@ QUESTION_DELAY = 5
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def serve_frontend(path):
+    print("path is", path)
     return make_response(render_template("index.html", path=path))
 
 
 @app.route("/api", methods=["GET", "POST", "DELETE"])
 def api_index():
+    print(request.method, request, request.json, sep="\n")
     if request.method == "GET":
         return encoder.encode(games)
     elif request.method == "POST":

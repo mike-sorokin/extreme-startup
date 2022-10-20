@@ -1,4 +1,4 @@
-const API_URL_PREFIX = "/api/"
+const API_URL_PREFIX = "/api"
 const rootUrl = () => API_URL_PREFIX
 
 export function gameCreationUrl() {
@@ -6,17 +6,17 @@ export function gameCreationUrl() {
 }
 
 export function gameUrl(gameId) {
-  return `${rootUrl()}${gameId}/`
+  return `${rootUrl()}/${gameId}`
 }
 
 export function playerCreationUrl(gameId) {
-  return `${playerCreationUrl(gameId)}players/`
+  return `${playerCreationUrl(gameId)}/players`
 }
 
 export function gamePageUrl(gameId) {
-  return `/${gameId}/`
+  return `/${gameId}`
 }
 
 export function playerPageUrl(gameId, playerId) {
-  return `${gamePageUrl()}players/${playerId}/`
+  return `${gamePageUrl()}/players/${playerId}`
 }

@@ -15,7 +15,7 @@ export function justJsonHeaders() {
 */
 export async function requestGameCreation() {
   return await axios
-    .post(gameCreationUrl(), null, justJsonHeaders())
+    .post(gameCreationUrl(), {}, justJsonHeaders())
     .then(game => {
       return {
         wasCreated: true,
