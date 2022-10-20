@@ -1,21 +1,16 @@
 #!/usr/bin/bash
+set -e
+# Clean up
+rm -rf env frontend/node_modules
+rm -rf flaskr/static flaskr/templates
 
-rlf=auxiliary/logs/react_log.log
-flf=auxiliary/logs/flask_log.log
+cd frontend
+npm ci
+npm run build
 
+# Launch flask server
+cd ..
 python3 -m venv env
 source env/bin/activate
 pip install -r flaskr/requirements.txt
-
-rm $rlf $flf
-
-touch $rlf
-touch $flf
-
-tail -vf $rlf | grep -v "truncated" | awk 'BEGIN{pr1="REACT: \n";suf1="\n"}{print pr1,$0,suf1}' &
-tail -vf $flf | grep -v "truncated" | awk 'BEGIN{pr2="FLASK: \n";suf2="\n"}{print pr2,$0,suf2}' &
-
-export FLASK_APP=flaskr
-export FLASK_ENV=development
-
-python3 auxiliary/servers_runs.py
+flask --app flaskr --debug run

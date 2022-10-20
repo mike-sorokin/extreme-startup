@@ -1,4 +1,0 @@
-#!/usr/bin/bash
-
-rm -rf env frontend/node_modules
-rm auxiliary/logs/*
