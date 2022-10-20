@@ -5,6 +5,7 @@ import axios from "axios";
 
 import PlayerEventCard from "./PlayerEventCard";
 
+// For testing only:
 // const api = axios.create({
 //   baseURL: "https://extreme-restartup.fly.dev/",
 // });

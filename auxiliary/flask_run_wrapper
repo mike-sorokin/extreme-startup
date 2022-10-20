@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+
+cat auxiliary/app_wrapper.txt | python3 -c "exec(input())"

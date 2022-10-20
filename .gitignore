@@ -1,3 +1,6 @@
+auxiliary/logs
+dontrunme
+
 # dependencies
 node_modules
 /.pnp
@@ -8,6 +11,15 @@ coverage/
 
 # production
 build/
+
+# node build fragments in flaskr/
+flaskr/templates
+flaskr/frontend
+flaskr/static
+flaskr/asset-manifest.json
+flaskr/index.html
+flaskr/manifest.json
+flaskr/robots.txt
 
 # misc
 .DS_Store

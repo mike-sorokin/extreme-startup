@@ -5,6 +5,8 @@ import { TextInput, Button } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { IconCheck, IconX } from '@tabler/icons';
 
+// TODO: Create a game! This code currently is just a duplicate of AddPlayer
+
 function CreateGame(setOpened) {
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
@@ -13,10 +15,10 @@ function CreateGame(setOpened) {
     e.preventDefault();
 
     if (name.trim() === "") {
-      showNotification({  
+      showNotification({
         title: "Error creating player",
         message: "You forgot to enter a name!",
-        icon: <IconX size={18} />, 
+        icon: <IconX size={18} />,
         color: "red"
       });
 
@@ -29,7 +31,7 @@ function CreateGame(setOpened) {
     };
 
     axios
-      .post("https://extreme-restartup.fly.dev/players", playerObject)
+      .post("/api/players", playerObject)
       .then(() => {
         showNotification({
           title: "Success",
@@ -39,7 +41,7 @@ function CreateGame(setOpened) {
         });
       })
       .catch((err) => alert(err.response.data));
-    
+
     setOpened(false)
 
     // TODO: Get player id from backend and redirect to player page
@@ -47,21 +49,11 @@ function CreateGame(setOpened) {
 
   return (
     <div>
-        {/* <form method="post" action="https://extreme-restartup.fly.dev/players">
-            <label htmlFor="name">Name: </label>
-            <input type="text" id="name" name="name"/>
-
-            <label htmlFor="url">URL: </label>
-            <input type="text" id="url" name="url" placeholder="http://...."/>
-
-            <input type="submit" value="Submit" />
-        </form> */}
-        
-        <form onSubmit={addPlayer}>
-          <TextInput value={name} onChange={(e) => setName(e.target.value)} placeholder="Your player name" label="Enter player name:" required/>
-          <TextInput value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Your URL (http://...)" label="Enter URL:" required/>
-          <Button type="submit">Submit</Button>
-        </form>
+      <form onSubmit={addPlayer}>
+        <TextInput value={name} onChange={(e) => setName(e.target.value)} placeholder="Your player name" label="Enter player name:" required />
+        <TextInput value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Your URL (http://...)" label="Enter URL:" required />
+        <Button type="submit">Submit</Button>
+      </form>
     </div>
   )
 }
