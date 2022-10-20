@@ -1,4 +1,5 @@
 from flaskr.questions import *
+import os
 
 UNARY_MATH_QUESTIONS = [FibonacciQuestion]
 BINARY_MATH_QUESTIONS = [AdditionQuestion, SubtractionQuestion, MultiplicationQuestion]
@@ -194,3 +195,29 @@ def test_scrabble_question():
     assert scrabble_question.as_text() == "what is the scrabble score of helix"
     assert scrabble_question.points == 10
     assert scrabble_question.correct_answer() == 4 + 1 + 1 + 1 + 8
+
+
+def test_general_knowledge_question_random_initialised():
+    general_question = GeneralKnowledgeQuestion()
+    with open("flaskr/general_knowledge.yaml", "r") as infile:
+        ques_ans_list = yaml.safe_load(infile)
+    assert general_question.question in map(lambda i: i["question"], ques_ans_list)
+    assert general_question.answer in map(lambda i: i["answer"], ques_ans_list)
+    assert (
+        general_question.correct_answer()
+        == list(
+            filter(lambda i: i["question"] == general_question.question, ques_ans_list)
+        )[0]["answer"]
+    )
+
+
+def test_general_knowledge_question():
+    general_question = GeneralKnowledgeQuestion(
+        "who was the shortest-serving prime minister in the UK", "lizz truss"
+    )
+    assert (
+        general_question.question
+        == "who was the shortest-serving prime minister in the UK"
+    )
+    assert general_question.answer == "lizz truss"
+    assert general_question.correct_answer() == "lizz truss"

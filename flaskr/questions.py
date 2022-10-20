@@ -1,6 +1,8 @@
 import numbers
 from uuid import uuid4
 import random
+import yaml
+import os
 
 
 class Question:
@@ -245,25 +247,34 @@ class FibonacciQuestion(UnaryyMathsQuestion):
     def as_text(self):
         return f"what is the {str(self.number) + self.ordinal(11)} number in the Fibonacci sequence"
 
-    def correct_answer(self):
-        def fib(n):
-            a, b = 0, 1
-            for i in range(n):
-                a, b = b, a + b
-            return a
+    def fib(n):
+        a, b = 0, 1
+        for i in range(n):
+            a, b = b, a + b
+        return a
 
-        return fib(self.number)
+    def correct_answer(self):
+        return FibonacciQuestion.fib(self.number)
 
 
 class GeneralKnowledgeQuestion(Question):
-    def __init__(self, *words):
-        pass
+    def __init__(self, question="", answer=""):
+        super().__init__
+        if question == "" or answer == "":
+            with open("flaskr/general_knowledge.yaml", "r") as infile:
+                quiz_cards = yaml.safe_load(infile)
+            card = random.choice(quiz_cards)
+            self.question = card["question"]
+            self.answer = card["answer"]
+        else:
+            self.question = question
+            self.answer = answer
 
     def as_text(self):
-        pass
+        return self.quesion
 
     def correct_answer(self):
-        pass
+        return self.answer
 
 
 class AnagramQuestion(Question):
@@ -283,27 +294,27 @@ class ScrabbleQuestion(Question):
     def as_text(self):
         return f"what is the scrabble score of {self.word}"
 
-    def correct_answer(self):
-        def score(word):
-            score = 0
-            for c in word:
-                if c in "eaionrtlsu":
-                    score += 1
-                elif c in "dg":
-                    score += 2
-                elif c in "bcmp":
-                    score += 3
-                elif c in "fhvw":
-                    score += 4
-                elif c in "k":
-                    score += 5
-                elif c in "jx":
-                    score += 8
-                elif c in "qz":
-                    score += 0
-            return score
+    def score(word):
+        score = 0
+        for c in word:
+            if c in "eaionrtlsu":
+                score += 1
+            elif c in "dg":
+                score += 2
+            elif c in "bcmp":
+                score += 3
+            elif c in "fhvw":
+                score += 4
+            elif c in "k":
+                score += 5
+            elif c in "jx":
+                score += 8
+            elif c in "qz":
+                score += 0
+        return score
 
-        return score(self.word)
+    def correct_answer(self):
+        return ScrabbleQuestion.score(self.word)
 
 
 def valid_num_arguments(arg_num, numbers):
