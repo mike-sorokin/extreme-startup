@@ -278,7 +278,22 @@ class GeneralKnowledgeQuestion(Question):
 
 
 class AnagramQuestion(Question):
-    pass
+    def __init__(self, anagram="", correct="", incorrect=[]):
+        super().__init__
+        if anagram == "" or correct == "" or len(incorrect) == 0:
+            with open("flaskr/anagrams.yaml", "r") as infile:
+                anagrams = yaml.safe_load(infile)
+            anagram = random.choice(anagrams)
+            self.anagram, self.correct, self.incorrect = anagram.values()
+        else:
+            self.anagram, self.correct, self.incorrect = anagram, correct, incorrect
+
+    def as_text(self):
+        possible_words = [self.correct] + self.incorrect
+        return f"which of the following is an anagram of {anagram}: {', '.join(random.shuffle(possible_words))}"
+
+    def correct_answer(self):
+        return self.correct
 
 
 class ScrabbleQuestion(Question):

@@ -1,5 +1,4 @@
 from flaskr.questions import *
-import os
 
 UNARY_MATH_QUESTIONS = [FibonacciQuestion]
 BINARY_MATH_QUESTIONS = [AdditionQuestion, SubtractionQuestion, MultiplicationQuestion]
@@ -221,3 +220,32 @@ def test_general_knowledge_question():
     )
     assert general_question.answer == "lizz truss"
     assert general_question.correct_answer() == "lizz truss"
+
+
+def test_anagram_question_random_initialised():
+    anagram_question = AnagramQuestion()
+    with open("flaskr/anagrams.yaml", "r") as infile:
+        anagrams = yaml.safe_load(infile)
+    assert anagram_question.anagram in map(lambda i: i["anagram"], anagrams)
+    assert anagram_question.correct in map(lambda i: i["correct"], anagrams)
+    assert anagram_question.incorrect in map(lambda i: i["incorrect"], anagrams)
+    assert (
+        anagram_question.correct_answer()
+        == list(
+            filter(
+                lambda i: i["anagram"] == anagram_question.anagram
+                and i["correct"] == anagram_question.correct,
+                anagrams,
+            )
+        )[0]["correct"]
+    )
+
+
+def test_anagram_question():
+    anagram_question = AnagramQuestion(
+        "a decimal point", "im a dot in place", ["random question", "not an anagram"]
+    )
+    assert anagram_question.anagram == "a decimal point"
+    assert anagram_question.correct == "im a dot in place"
+    assert anagram_question.incorrect == ["random question", "not an anagram"]
+    assert anagram_question.correct_answer() == "im a dot in place"
