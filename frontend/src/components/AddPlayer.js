@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom'
 
 
 function AddPlayer(setOpened) {
-  const [gameId, setGameIdd] = useState("");
+  const [gameId, setGameId] = useState("");
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
 
@@ -21,14 +21,14 @@ function AddPlayer(setOpened) {
     return requestPlayerCreation(gameId, playerData)
       .then(player => {
         showSuccessfulNotification("Successfully Created Player")
-        navigate(playerPageUrl(gameId, player.id))
+        navigate(playerPageUrl(player.game_id, player.id))
       })
   }
 
   return (
     <div>
       <form onSubmit={submission}>
-        <TextInput value={gameId} onChange={(e) => setGameIdd(e.target.value)} placeholder="Game id (e.g. abc123)" label="Enter game id:" required />
+        <TextInput value={gameId} onChange={(e) => setGameId(e.target.value)} placeholder="Game id (e.g. abc123)" label="Enter game id:" required />
         <TextInput value={name} onChange={(e) => setName(e.target.value)} placeholder="Your player name" label="Enter player name:" required />
         <TextInput value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Your URL (http://...)" label="Enter URL:" required />
         <Button type="submit">Submit</Button>
