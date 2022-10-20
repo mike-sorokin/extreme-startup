@@ -4,6 +4,7 @@ MIN_REQUEST_INTERVAL_SECS = 1
 MAX_REQUEST_INTERVAL_SECS = 20 
 AVG_REQUEST_INTERVAL = 10
 REQUEST_DELTA = 0.1 
+SLASHDOT_THRESHOLD_SCORE = 2000
 
 class RateController():
 
@@ -25,14 +26,14 @@ class RateController():
         else: # Error case
             print(f"!!!!! unrecognized result '#{question.result}' from #{repr(question)} in Scoreboard#score")
             return MAX_REQUEST_INTERVAL_SECS
-            
+
         return self.delay 
 
     def wait_for_next_request(self, question):
         time.sleep(self.delay_before_next_request(question))
 
     def update_algorithm_based_on_score(self, score):
-        pass
+        return self
 
 class SlashdotRateController(RateController):
     pass 
