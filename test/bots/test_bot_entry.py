@@ -17,14 +17,8 @@ def with_bot_server(bot_type, bot_name="default"):
             # Running server and waiting for successfull response
             # before running the actual test
             process = subprocess.Popen(
-                [
-                    "python3",
-                    "bot_entry.py",
-                    bot_name,
-                    bot_type,
-                    str(SOME_PORT)
-                ],
-                cwd=BOT_CWD
+                ["python3", "bot_entry.py", bot_name, bot_type, str(SOME_PORT)],
+                cwd=BOT_CWD,
             )
             count = 0
             while True:
@@ -51,9 +45,7 @@ def with_bot_server(bot_type, bot_name="default"):
 
 
 def query_bot(query):
-    response = requests.get(
-        f"http://localhost:{SOME_PORT}", params={"q": query}
-    )
+    response = requests.get(f"http://localhost:{SOME_PORT}", params={"q": query})
     return response.text
 
 

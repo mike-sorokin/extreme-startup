@@ -14,6 +14,9 @@ import threading
 import requests
 import time
 
+# todo remove later
+import pprint
+
 app = Flask(__name__)
 
 # games: game_id -> game object
@@ -34,10 +37,19 @@ encoder = JSONEncoder()
 QUESTION_TIMEOUT = 10
 QUESTION_DELAY = 5
 
-# Game Management 
-@app.route("/", methods=["GET", "POST", "DELETE"])
-def index():
-    if request.method == "GET": # fetch all games
+
+# This is a catch-all function that will redirect anything not caught by the other rules
+# to the react webpages
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve_frontend(path):
+    print("path is", path)
+    return make_response(render_template("index.html", path=path))
+
+
+@app.route("/api", methods=["GET", "POST", "DELETE"])
+def api_index():
+    if request.method == "GET":
         return encoder.encode(games)
     elif request.method == "POST": # create new game -- initially no players 
         new_game = Game()
@@ -51,8 +63,8 @@ def index():
         games.clear()
         return ("", 204)
 
-# Managing a specific game 
-@app.route("/<game_id>", methods=["GET", "PUT", "DELETE"])
+
+@app.route("/api/<game_id>", methods=["GET", "PUT", "DELETE"])
 def game(game_id):
     if game_id not in games:
         return ("NOT FOUND", 404)
@@ -69,23 +81,23 @@ def game(game_id):
         del games[game_id]
         return {"deleted": game_id}
 
-# Managing all players 
-@app.route("/<game_id>/players", methods=["GET", "POST", "DELETE"])
-def all_players(game_id):
-    if game_id not in games:
-        return ("NOT FOUND", 404)
 
-    if request.method == "GET": # fetch game players 
+@app.route("/api/<game_id>/players", methods=["GET", "POST", "DELETE"])
+def all_players(game_id):
+    if request.method == "GET":
+        if game_id not in games:
+            return ("", 404)
+
         players_ids = games[game_id].players
         players_dict = {id: players[id] for id in players_ids}
         r = make_response(encoder.encode({"players": players_dict}))
         r.mimetype = "application/json"
         return r
 
-    elif request.method == "POST": # create a new player -- initialise thread 
-        player = Player(game_id, request.form["name"], api=request.form["api"])
-        games[game_id].new_player(player.uuid)
-        scoreboards[game_id].new_player(player)
+    elif request.method == "POST":
+        player = Player(game_id, request.json["name"], api=request.json["api"])
+        scoreboard[player] = 0
+        games[game_id].players.append(player.uuid)
         players[player.uuid] = player
         quiz_master = QuizMaster(player, games[game_id].question_factory, scoreboards[game_id])
         player_thread = threading.Thread(target=quiz_master.start)
@@ -100,8 +112,8 @@ def all_players(game_id):
         games[game_id].players.clear()
         return ("", 204)
 
-# Managing <player_id> player 
-@app.route("/<game_id>/players/<player_id>", methods=["GET", "PUT", "DELETE"])
+
+@app.route("/api/<game_id>/players/<player_id>", methods=["GET", "PUT", "DELETE"])
 def player(game_id, player_id):
     if game_id not in games or player_id not in players:
         return ("NOT FOUND", 404)
@@ -119,8 +131,8 @@ def player(game_id, player_id):
         remove_players(player_id)
         return {"deleted": player_id}
 
-# Managing events for <player_id> 
-@app.route("/<game_id>/players/<player_id>/events", methods=["GET", "DELETE"])
+
+@app.route("/api/<game_id>/players/<player_id>/events", methods=["GET", "DELETE"])
 def player_events(game_id, player_id):
     if game_id not in games or player_id not in players:
         return ("NOT FOUND", 404)
@@ -131,8 +143,9 @@ def player_events(game_id, player_id):
         players[player_id].events.clear()
         return ("", 204)
 
-# Managing one event
-@app.route("/<game_id>/players/<player_id>/events/<event_id>", methods=["GET", "DELETE"])
+@app.route(
+    "/api/<game_id>/players/<player_id>/events/<event_id>", methods=["GET", "DELETE"]
+)
 def player_event(game_id, player_id, event_id):
     if (game_id not in games or
         player_id not in players or
@@ -153,4 +166,66 @@ def remove_players(*player_id):
         assert pid in player_threads
         players[pid].active = False
         del player_threads[pid]
+        del scoreboard[players[pid]]
+
+        lock.acquire()
         del players[pid]
+        lock.release()
+
+
+def sendQuestion(player):
+    while player.active:
+        r = None
+        try:
+            r = requests.get(
+                player.api, params={"q": "What is your name?"}, timeout=QUESTION_TIMEOUT
+            ).text
+        except Exception:
+            pass
+        lock.acquire()
+        if player in scoreboard:
+            if r == None:
+                points_gained = -50
+                response_type = "NO_RESPONSE"
+            elif r == player.name:
+                points_gained = +50
+                response_type = "CORRECT"
+            else:
+                points_gained = -50
+                response_type = "WRONG"
+            event = Event(
+                player.uuid, "What is your name?", 0, points_gained, response_type
+            )
+            player.log_event(event)
+        lock.release()
+        time.sleep(QUESTION_DELAY)
+
+
+# FORGIVE ME
+pp = pprint.PrettyPrinter(indent=4)
+bot_responses = {1: "Hello world!"}
+
+# /2/hi  style links, these update the response
+@app.route("/api/bot/<int:bot_id>/<string:resp>", methods=["GET"])
+def _update_response(bot_id, resp):
+    print(f"Updated {bot_id} to {resp}")
+    bot_responses[bot_id] = resp
+    return redirect(url_for("api_response", bot_id=bot_id))
+
+
+# Get a response
+@app.route("/api/bot/<int:bot_id>", methods=["GET"])
+def _api_response(bot_id):
+    print(f"Received GET for {bot_id}\nResponding with {bot_responses[bot_id]}\n\n")
+    return bot_responses[bot_id]
+
+
+@app.route("/api/bot/cleanup", methods=["GET"])
+def _cleanup():
+    bot_responses = {}
+    return "Restored bots"
+
+
+@app.route("/api/bot/", methods=["GET"])
+def _main_view():
+    return pp.pformat(bot_responses)

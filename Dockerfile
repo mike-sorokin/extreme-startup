@@ -1,14 +1,24 @@
+# First we compile the node stuff
+FROM node:16-alpine as node-build
+COPY ./frontend ./frontend
+WORKDIR frontend
+
+# Clean install all packages from package-lock.json, then build
+RUN npm ci
+RUN npm run build
+
+# Then we run the python stuff
 FROM python:3
+COPY ./flaskr ./flaskr
 
-# Update packages
-RUN apt-get -y update
-RUN apt-get -y upgrade
+# Copy pre-compiled node stuff
+COPY --from=node-build ./flaskr/static ./flaskr/static
+COPY --from=node-build ./flaskr/templates ./flaskr/templates
 
-# Install flask, set environment variables for our app
-RUN apt-get -y install python3-flask
-ENV FLASK_APP=simpleFlask.py
-ENV FLASK_ENV=development
+# Install reqs
+RUN pip install --upgrade pip
+RUN pip install -r flaskr/requirements.txt
 
-COPY . .
+EXPOSE 5000
 
-CMD flask run --host=0.0.0.0
+CMD python -m flask --app flaskr --debug run --host 0.0.0.0

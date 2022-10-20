@@ -64,7 +64,7 @@ def with_setup(server_setup=None, **callable_setup_kwargs):
     return inner
 
 
-create_a_couple_of_games = ((POST, "/", None, None), (POST, "/", None, None))
+create_a_couple_of_games = ((POST, "/api", None, None), (POST, "/api", None, None))
 
 
 def create_a_game_with_players(cli, num_players=2):

@@ -46,7 +46,7 @@ class Scoreboard:
         return self.request_counts[player.uuid]
 
     def leaderboard(self):
-        return {k: v for k, v in sorted(self.scores.items(), key=lambda item : item[1])}
+        return {k: v for k, v in sorted(self.scores.items(), key=lambda item: item[1])}
 
     def leaderboard_position(self, player):
         return list(self.leaderboard().keys()).index(player.uuid) + 1
@@ -63,7 +63,9 @@ class Scoreboard:
             print(f"!!!!! unrecognized result '#{question.result}' from #{repr(question)} in Scoreboard#score")
 
     def allow_passes(self, question, leaderboard_position):
-        return 0 if question.answer == "" else self.penalty(question, leaderboard_position)
+        return (
+            0 if question.answer == "" else self.penalty(question, leaderboard_position)
+        )
 
     def penalty(self, question, leaderboard_position):
         return -1 * question.points / leaderboard_position
