@@ -1,25 +1,16 @@
 #!/usr/bin/bash
-
+set -e
 # Clean up
-echo "> REMOVING NODE MODULES..."
 rm -rf env frontend/node_modules
+rm -rf flaskr/static flaskr/templates
 
-echo "> SETTING UP FRONTEND..."
 cd frontend
 npm ci
-if [ $1="rebuild" ]
-then
-  echo "> REBUILDING JAVASCRIPT..."
-  rm -rf flaskr/static flaskr/templates
-  npm run build
-fi
-cd ..
+npm run build
 
-echo "> BUILDING VIRTUAL ENVIRONMENT..."
+# Launch flask server
+cd ..
 python3 -m venv env
 source env/bin/activate
 pip install -r flaskr/requirements.txt
-
-export FLASK_APP=flaskr
-
-python3 auxiliary/servers_runs.py
+flask --app flaskr --debug run

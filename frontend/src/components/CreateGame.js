@@ -17,18 +17,15 @@ function CreateGame(setOpened) {
 
   const submission = event => {
     event.preventDefault()
-    const game = requestGameCreation()
-    if (!game.wasCreated) {
-      return
-    }
-    const playerData = playerCreationData(name, url)
-    const playerWrapper = requestPlayerCreation(game.id, playerData)
-    if (!playerWrapper.wasCreated) {
-      return
-    }
-    setOpened(false)
-    const player = playerData.player
-    return (<Navigate to={playerPageUrl(game.id, player.id)} />)
+    return requestGameCreation()
+      .then(game => {
+        const playerData = playerCreationData(name, url)
+        return requestPlayerCreation(game.id, playerData)
+      })
+      .then(player => {
+        // setOpened(false)
+        return (<Navigate to={playerPageUrl(player.game_id, player.id)} />)
+      })
   }
 
   return (

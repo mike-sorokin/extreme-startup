@@ -10,7 +10,7 @@ export function gameUrl(gameId) {
 }
 
 export function playerCreationUrl(gameId) {
-  return `${playerCreationUrl(gameId)}/players`
+  return `${gameUrl(gameId)}/players`
 }
 
 export function gamePageUrl(gameId) {

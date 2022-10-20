@@ -47,7 +47,6 @@ def serve_frontend(path):
 
 @app.route("/api", methods=["GET", "POST", "DELETE"])
 def api_index():
-    print(request.method, request, request.json, sep="\n")
     if request.method == "GET":
         return encoder.encode(games)
     elif request.method == "POST":
@@ -88,7 +87,7 @@ def all_players(game_id):
         return r
 
     elif request.method == "POST":
-        player = Player(game_id, request.form["name"], api=request.form["api"])
+        player = Player(game_id, request.json["name"], api=request.json["api"])
         scoreboard[player] = 0
         games[game_id].players.append(player.uuid)
         players[player.uuid] = player

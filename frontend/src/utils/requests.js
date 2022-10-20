@@ -13,21 +13,16 @@ export function justJsonHeaders() {
 /*
   todo doc
 */
-export async function requestGameCreation() {
-  return await axios
+export function requestGameCreation() {
+  return axios
     .post(gameCreationUrl(), {}, justJsonHeaders())
-    .then(game => {
+    .then(request => {
+      console.log(request)
       return {
-        wasCreated: true,
-        id: game.id
+        id: request.data.id
       }
     })
-    .catch(error => {
-      alertError(error)
-      return {
-        wasCreated: false
-      }
-    })
+    .catch(alertError)
 }
 
 /*
@@ -41,19 +36,12 @@ export function playerCreationData(name, api) {
   }
 }
 
-export async function requestPlayerCreation(gameId, playerData) {
-  return await axios
-    .post(playerCreationUrl(), playerData, justJsonHeaders())
-    .then(player => {
-      return {
-        wasCreated: true,
-        player: player
-      }
+export function requestPlayerCreation(gameId, playerData) {
+  return axios
+    .post(playerCreationUrl(gameId), playerData, justJsonHeaders())
+    .then(request => {
+      console.log(request)
+      return request.data
     })
-    .catch(error => {
-      alertError(error)
-      return {
-        wasCreated: false
-      }
-    })
+    .catch(alertError)
 }
