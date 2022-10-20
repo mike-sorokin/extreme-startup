@@ -31,7 +31,7 @@ encoder = JSONEncoder()
 # PRODUCTION CONSTANT(S)
 QUESTION_TIMEOUT = 10
 QUESTION_DELAY = 5
-DELETE_SUCCESSFIUL = ("Successfully deleted", 204)
+DELETE_SUCCESSFUL = ("Successfully deleted", 204)
 NOT_ACCEPTABLE = ("Requested resource not found", 406)
 
 
