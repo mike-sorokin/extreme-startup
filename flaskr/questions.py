@@ -1,3 +1,4 @@
+import numbers
 from uuid import uuid4
 import random
 
@@ -67,9 +68,17 @@ class WarmupQuestion(Question):
         return "What is your name?"
 
 
+class UnaryyMathsQuestion(Question):
+    def __init__(self, *number):
+        super().__init__()
+        if valid_num_arguments(1, number):
+            self.number = number[0]
+        else:
+            self.number = random.randint(1, 100)
+
+
 class BinaryMathsQuestion(Question):
     def __init__(self, *numbers):
-        print(numbers)
         super().__init__()
         if valid_num_arguments(2, numbers):
             self.n1 = numbers[0]
@@ -91,11 +100,14 @@ class TernaryMathsQuestion(Question):
 class SelectFromListOfNumbersQuestion(Question):
     def __init__(self, *numbers):
         super().__init__()
-        if valid_num_arguments(len(numbers), numbers):
+        if len(numbers) != 0 and valid_num_arguments(len(numbers), numbers):
             self.numbers = numbers
         else:
-            size = random.randint(0, 5)
+            size = random.randint(1, 5)
             self.numbers = random.sample(range(1, 100), size)
+
+    def correct_answer(self):
+        return super().correct_answer()
 
 
 class MaximumQuestion(SelectFromListOfNumbersQuestion):
@@ -180,6 +192,79 @@ class PowerQuestion(BinaryMathsQuestion):
 
     def correct_answer(self):
         return self.n1**self.n2
+
+
+class SquareCubeQuestion(SelectFromListOfNumbersQuestion):
+    def __init__(self, *numbers):
+        super().__init__(*numbers)
+        self.points = 50
+
+    def as_text(self):
+        return f"which of the following numbers is both a square and a cube: {', '.join(map(str, self.numbers))}"
+
+    def correct_answer(self):
+        is_square_cube = (
+            lambda x: round(x ** (1 / 3)) ** 3 == x and round(x ** (1 / 3)) ** 3 == x
+        )
+        return ", ".join(map(str, filter(is_square_cube, self.numbers)))
+
+
+class PrimesQuestion(SelectFromListOfNumbersQuestion):
+    def __init__(self, *numbers):
+        super().__init__(*numbers)
+        self.points = 60
+
+    def as_text(self):
+        return f"which of the following numbers are primes: {', '.join(map(str, self.numbers))}"
+
+    def correct_answer(self):
+        is_prime = (
+            lambda x: all([(x % j) for j in range(2, int(x**0.5) + 1)]) and x > 1
+        )
+        return ", ".join(map(str, filter(is_prime, self.numbers)))
+
+
+class FibonacciQuestion(UnaryyMathsQuestion):
+    def __init__(self, *numbers):
+        super().__init__(*numbers)
+        self.points = 50
+
+    def ordinal(self, number):
+        last_digit = number % 10
+        if number in [11, 12, 13]:
+            return "th"
+        if last_digit == 1:
+            return "st"
+        elif last_digit == 2:
+            return "nd"
+        elif last_digit == 3:
+            return "rd"
+        else:
+            return "th"
+
+    def as_text(self):
+        return f"what is the {str(self.number) + self.ordinal(11)} number in the Fibonacci sequence"
+
+    def correct_answer(self):
+        def fib(n):
+            a, b = 0, 1
+            for i in range(n):
+                a, b = b, a + b
+            return a
+
+        return fib(self.number)
+
+
+class GeneralKnowledgeQuestion(Question):
+    pass
+
+
+class AnagramQuestion(Question):
+    pass
+
+
+class ScrableQuestion(Question):
+    pass
 
 
 def valid_num_arguments(arg_num, numbers):
