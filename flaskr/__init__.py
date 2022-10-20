@@ -11,7 +11,7 @@ import threading
 import requests
 import time
 
-app = Flask(__name__, static_folder="frontend", static_url_path="/")
+app = Flask(__name__)
 
 # games: game_id -> game object
 games = {}
@@ -33,9 +33,12 @@ QUESTION_TIMEOUT = 10
 QUESTION_DELAY = 5
 
 
-@app.route("/", methods=["GET"])
-def index():
-    return app.send_static_file("index.html")
+# This is a catch-all function that will redirect anything not caught by the other rules
+# to the react webpages 
+@app.route("/", defaults={"path":""})
+@app.route("/<path:path>")
+def serve_frontend(path):
+    return make_response(render_template("index.html", path=path))
 
 
 @app.route("/api", methods=["GET", "POST", "DELETE"])
@@ -70,6 +73,9 @@ def game(game_id):
 @app.route("/api/<game_id>/players", methods=["GET", "POST", "DELETE"])
 def all_players(game_id):
     if request.method == "GET":
+        if game_id not in games:
+            return ("", 404)
+
         players_ids = games[game_id].players
         players_dict = {id: players[id] for id in players_ids}
         r = make_response(encoder.encode({"players": players_dict}))
