@@ -3,5 +3,6 @@ export function str(obj) {
 }
 
 export function alertError(error) {
-  alert(str(error))
+  console.log(error)
+  // alert(str(error))
 }

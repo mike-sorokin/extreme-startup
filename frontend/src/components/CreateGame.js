@@ -1,5 +1,5 @@
-import { alertError } from '../utils/utils'
-import { gameCreationUrl, playerCreationUrl, playerPageUrl } from '../utils/urls'
+import { playerPageUrl } from '../utils/urls'
+import { requestGameCreation, requestPlayerCreation, playerCreationData } from '../utils/requests'
 import axios from 'axios';
 import React from 'react';
 import { useState } from 'react';
@@ -9,86 +9,11 @@ import { IconCheck, IconX } from '@tabler/icons';
 import { Navigate } from 'react-router-dom';
 
 // TODO: Create a game! This code currently is just a duplicate of AddPlayer
-/*
-  todo doc
-*/
-function requestGameCreation() {
-  const resultGame = {
-    wasCreated: false,
-    id: null
-  }
-  axios.post(gameCreationUrl())
-    .then(game => {
-      resultGame.wasCreated = true
-      resultGame.id = game.id
-    })
-    .catch(alertError)
-  return resultGame
-}
-
-/*
-  todo
-  pre: validation done outside
-*/
-function playerCreationData(name, api) {
-  return {
-    name: name,
-    api: api
-  }
-}
-
-function requestPlayerCreation(gameId, playerData) {
-  const resultPlayerWrapper = {
-    wasCreated: false,
-    player: null
-  }
-  axios.post(playerCreationUrl(), playerData)
-    .then(player => {
-      resultPlayerWrapper.wasCreated = true
-      resultPlayerWrapper.player = player
-    })
-    .catch(alertError)
-  return resultPlayerWrapper
-}
+// UPDATE: it is in progress
 
 function CreateGame(setOpened) {
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
-
-  // const addPlayer = (e) => {
-  //   e.preventDefault();
-  //
-  //   if (name.trim() === "") {
-  //     showNotification({
-  //       title: "Error creating player",
-  //       message: "You forgot to enter a name!",
-  //       icon: <IconX size={18} />,
-  //       color: "red"
-  //     });
-  //
-  //     return
-  //   }
-  //
-  //   const playerObject = {
-  //     name: name.trim(),
-  //     url: url.trim(),
-  //   };
-  //
-  //   axios
-  //     .post("/api/players", playerObject)
-  //     .then(() => {
-  //       showNotification({
-  //         title: "Success",
-  //         message: "Player successfully created!",
-  //         icon: <IconCheck size={18} />,
-  //         color: "teal"
-  //       });
-  //     })
-  //     .catch((err) => alert(err.response.data));
-  //   setOpened(false)
-  //
-  //   // TODO: Get player id from backend and redirect to player page
-  // };
 
   const submission = event => {
     event.preventDefault()
@@ -118,3 +43,39 @@ function CreateGame(setOpened) {
 }
 
 export default CreateGame
+
+
+// const addPlayer = (e) => {
+//   e.preventDefault();
+//
+//   if (name.trim() === "") {
+//     showNotification({
+//       title: "Error creating player",
+//       message: "You forgot to enter a name!",
+//       icon: <IconX size={18} />,
+//       color: "red"
+//     });
+//
+//     return
+//   }
+//
+//   const playerObject = {
+//     name: name.trim(),
+//     url: url.trim(),
+//   };
+//
+//   axios
+//     .post("/api/players", playerObject)
+//     .then(() => {
+//       showNotification({
+//         title: "Success",
+//         message: "Player successfully created!",
+//         icon: <IconCheck size={18} />,
+//         color: "teal"
+//       });
+//     })
+//     .catch((err) => alert(err.response.data));
+//   setOpened(false)
+//
+//   // TODO: Get player id from backend and redirect to player page
+// };
