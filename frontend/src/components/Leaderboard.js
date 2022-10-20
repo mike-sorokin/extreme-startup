@@ -11,7 +11,7 @@ function Leaderboard() {
     <div>
       <h2>Leaderboard</h2>
       {
-        /* 
+        /*
           <table>
             {% for player, score in leaderboard.items() %}
                 <tr>
