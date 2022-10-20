@@ -1,11 +1,14 @@
 from crypt import methods
 from uuid import uuid4
-from flask import Flask, render_template, request, redirect, make_response
+from flask import Flask, render_template, request, redirect, make_response, url_for
 from flaskr.player import Player
 from flaskr.event import Event
 from flaskr.game import Game
 from flaskr.scoreboard import Scoreboard
+from flaskr.quiz_master import QuizMaster
 from flaskr.json_encoder import JSONEncoder
+from flaskr.questions import *
+from flaskr.question_factory import QuestionFactory
 import os
 import threading
 import requests
@@ -19,17 +22,19 @@ app = Flask(__name__)
 # games: game_id -> game object
 games = {}
 
-# players: player_id -> player
+# players: player_id -> Player
 players = {}
 
-# scoreboard: player_id -> score
-scoreboard = {}
+# Scoreboard lock
+lock = threading.Lock()
+
+# scoreboards: game_id -> Scoreboard
+scoreboards = {}
 
 # player_threads: player_id -> player_thread
 player_threads = {}
 
 encoder = JSONEncoder()
-lock = threading.Lock()
 
 # PRODUCTION CONSTANT(S)
 QUESTION_TIMEOUT = 10
@@ -45,31 +50,45 @@ def serve_frontend(path):
     return make_response(render_template("index.html", path=path))
 
 
+# This forces the server to terminate all player threads and shut down
+@app.route("/api/kill_all_players")
+def kill_all_players():
+    # Kill all player threads
+    PLAYERS_EXIT = True
+    return ""
+
+
 @app.route("/api", methods=["GET", "POST", "DELETE"])
 def api_index():
     if request.method == "GET":
         return encoder.encode(games)
-    elif request.method == "POST":
+    elif request.method == "POST":  # create new game -- initially no players
         new_game = Game()
-        games[new_game.id] = new_game
+        gid = new_game.id
+        scoreboards[gid] = Scoreboard()
+        games[gid] = new_game
         return encoder.encode(new_game)
-    elif request.method == "DELETE":
+    elif request.method == "DELETE":  # delete all games
         remove_players(*[p for g in games.values() for p in g.players])
+        # garbage collect each game's question_factory
         games.clear()
         return ("", 204)
 
 
 @app.route("/api/<game_id>", methods=["GET", "PUT", "DELETE"])
 def game(game_id):
-    if request.method == "GET":
-        return (
-            encoder.encode(games[game_id]) if game_id in games else ("NOT FOUND", 404)
-        )
-    elif request.method == "PUT":
+    if game_id not in games:
+        return ("NOT FOUND", 404)
+
+    if request.method == "GET":  # fetch game with <game_id>
+        return encoder.encode(games[game_id])
+    elif request.method == "PUT":  # update game (advance round)
+        games[game_id].question_factory.advance_round()
         games[game_id].round += 1
-        return ("ROUNDS_INCREMENTED", 200)
-    elif request.method == "DELETE":
+        return ("ROUND_INCREMENTED", 200)
+    elif request.method == "DELETE":  # delete game with <game_id>
         remove_players(*games[game_id].players)
+        # garbage collect the question_factory
         del games[game_id]
         return {"deleted": game_id}
 
@@ -79,7 +98,6 @@ def all_players(game_id):
     if request.method == "GET":
         if game_id not in games:
             return ("", 404)
-
         players_ids = games[game_id].players
         players_dict = {id: players[id] for id in players_ids}
         r = make_response(encoder.encode({"players": players_dict}))
@@ -87,19 +105,21 @@ def all_players(game_id):
         return r
 
     elif request.method == "POST":
-        player = Player(game_id, request.json["name"], api=request.json["api"])
-        scoreboard[player] = 0
+        player = Player(game_id, request.form["name"], api=request.form["api"])
+        scoreboards[game_id].new_player(player)
         games[game_id].players.append(player.uuid)
         players[player.uuid] = player
-        player_thread = threading.Thread(target=sendQuestion, args=(player,))
+        quiz_master = QuizMaster(
+            player, games[game_id].question_factory, scoreboards[game_id]
+        )
+        player_thread = threading.Thread(target=quiz_master.start)
         player_threads[player.uuid] = player_thread
         player_thread.daemon = True
         player_thread.start()
         r = make_response(encoder.encode(player))
         r.mimetype = "application/json"
-        return encoder.encode(player)
-
-    elif request.method == "DELETE":
+        return r
+    elif request.method == "DELETE":  # deletes all players in <game_id> game instance
         remove_players(*games[game_id].players)
         games[game_id].players.clear()
         return ("", 204)
@@ -107,15 +127,20 @@ def all_players(game_id):
 
 @app.route("/api/<game_id>/players/<player_id>", methods=["GET", "PUT", "DELETE"])
 def player(game_id, player_id):
-    if request.method == "GET":
+    if game_id not in games or player_id not in players:
+        return ("NOT FOUND", 404)
+
+    if request.method == "GET":  # fetch player with <player_id>
         return encoder.encode(players[player_id])
-    elif request.method == "PUT":
+    elif (
+        request.method == "PUT"
+    ):  # update player (change name/api, NOT event management)
         if "name" in request.form:
             players[player_id].name = request.form["name"]
         if "api" in request.form:
             players[player_id].api = request.form["api"]
         return encoder.encode(players[player_id])
-    elif request.method == "DELETE":
+    elif request.method == "DELETE":  # delete player with id
         games[game_id].players.remove(player_id)
         remove_players(player_id)
         return {"deleted": player_id}
@@ -123,29 +148,42 @@ def player(game_id, player_id):
 
 @app.route("/api/<game_id>/players/<player_id>/events", methods=["GET", "DELETE"])
 def player_events(game_id, player_id):
-    if request.method == "GET":
-        pass
-    elif request.method == "DELETE":
-        pass
+    if game_id not in games or player_id not in players:
+        return ("NOT FOUND", 404)
+
+    if request.method == "GET":  # fetch all events for <game_id> player <player_id>
+        return encoder.encode({"events": players[player_id].events})
+    elif request.method == "DELETE":  # delets all events for <player_id>
+        players[player_id].events.clear()
+        return ("", 204)
 
 
 @app.route(
     "/api/<game_id>/players/<player_id>/events/<event_id>", methods=["GET", "DELETE"]
 )
 def player_event(game_id, player_id, event_id):
-    if request.method == "GET":
-        pass
-    elif request.method == "DELETE":
-        pass
+    if (
+        game_id not in games
+        or player_id not in players
+        or event_id not in map(lambda e: e.event_id, players[player_id].events)
+    ):
+        return ("NOT FOUND", 404)
+
+    event = filter(lambda e: e.id == event_id, players[player_id].events)[0]
+
+    if request.method == "GET":  # fetch event with <event_id>
+        return encoder.encode(event)
+    elif request.method == "DELETE":  # delete event with <event_id>
+        players[player_id].events.remove(event)
+        return ("", 204)
 
 
+# Mark player as inactive, removes thread from player_threads dict
 def remove_players(*player_id):
     for pid in player_id:
         assert pid in player_threads
         players[pid].active = False
-        # player_threads[pid].join()
         del player_threads[pid]
-        del scoreboard[players[pid]]
 
         lock.acquire()
         del players[pid]
@@ -162,7 +200,7 @@ def sendQuestion(player):
         except Exception:
             pass
         lock.acquire()
-        if player in scoreboard:
+        if player in scoreboards:
             if r == None:
                 points_gained = -50
                 response_type = "NO_RESPONSE"

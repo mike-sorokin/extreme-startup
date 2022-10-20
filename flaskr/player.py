@@ -1,7 +1,6 @@
 from curses import noecho
 import uuid
 
-
 class Player:
     def __init__(self, game_id, name, api):
         self.uuid = str(uuid.uuid4())
@@ -11,9 +10,6 @@ class Player:
         self.api = api
         self.events = []
         self.active = True
-
-    def log_result(id, msg, point):
-        pass
 
     def log_event(self, event):
         self.events.append(event)
