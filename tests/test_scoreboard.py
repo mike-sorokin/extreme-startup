@@ -1,5 +1,5 @@
 from flaskr.scoreboard import Scoreboard 
-from unittest.mock import MagicMock, Mock
+from unittest.mock import Mock
 import pytest
 
 PROBLEM_DECREMENT = 50 
