@@ -51,7 +51,7 @@ def test_index_delete_drops_all_games(_, cli):
 
 @with_setup()
 def test_game_id_get_does_not_exist(_, cli):
-    assert cli.get("/api/nonexistinggameid").status_code == NOT_FOUND
+    assert cli.get("/api/nonexistinggameid").status_code == NOT_ACCEPTED
 
 
 @with_setup(create_a_game_with_players)
@@ -104,7 +104,7 @@ def test_game_id_delete_removes_the_game(extras, cli):
 @with_setup()
 def test_players_get_game_does_not_exist(_, cli):
     response = cli.get("/api/nonexistinggameid/players")
-    assert response.status_code == NOT_FOUND
+    assert response.status_code == NOT_ACCEPTED
 
 
 @with_setup(create_a_game_with_players, num_players=5)
