@@ -34,7 +34,7 @@ def run_app(app, cmd, **kwargs):
 
 
 def run_flask():
-    run_app(FLASK_APP, "./auxiliary/another_wrapper_lmao")
+    run_app(FLASK_APP, "./auxiliary/flask_run_wrapper")
 
 
 def run_react():
