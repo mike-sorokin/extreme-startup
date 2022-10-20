@@ -31,6 +31,8 @@ encoder = JSONEncoder()
 # PRODUCTION CONSTANT(S)
 QUESTION_TIMEOUT = 10
 QUESTION_DELAY = 5
+DELETE_SUCCESSFIUL = ("Successfully deleted", 204)
+NOT_ACCEPTABLE = ("Requested resource not found", 406)
 
 
 # This is a catch-all function that will redirect anything not caught by the other rules
@@ -57,14 +59,14 @@ def api_index():
         remove_players(*[p for g in games.values() for p in g.players])
         # garbage collect each game's question_factory
         games.clear()
-        return ("", 204)
+        return DELETE_SUCCESSFUL
 
 
 # Managing a specific game
 @app.route("/api/<game_id>", methods=["GET", "PUT", "DELETE"])
 def game(game_id):
     if game_id not in games:
-        return ("NOT FOUND", 404)
+        return NOT_ACCEPTABLE
 
     if request.method == "GET":  # fetch game with <game_id>
         return encoder.encode(games[game_id])
@@ -83,7 +85,7 @@ def game(game_id):
 @app.route("/api/<game_id>/players", methods=["GET", "POST", "DELETE"])
 def all_players(game_id):
     if game_id not in games:
-        return ("", 404)
+        return NOT_ACCEPTABLE
 
     if request.method == "GET":  # fetch game players
         players_ids = games[game_id].players
@@ -110,14 +112,14 @@ def all_players(game_id):
     elif request.method == "DELETE":  # deletes all players in <game_id> game instance
         remove_players(*games[game_id].players)
         games[game_id].players.clear()
-        return ("", 204)
+        return DELETE_SUCCESSFUL
 
 
 # Managing <player_id> player
 @app.route("/api/<game_id>/players/<player_id>", methods=["GET", "PUT", "DELETE"])
 def player(game_id, player_id):
     if game_id not in games or player_id not in players:
-        return ("NOT FOUND", 404)
+        return NOT_ACCEPTABLE
 
     if request.method == "GET":  # fetch player with <player_id>
         return encoder.encode(players[player_id])
@@ -139,13 +141,13 @@ def player(game_id, player_id):
 @app.route("/api/<game_id>/players/<player_id>/events", methods=["GET", "DELETE"])
 def player_events(game_id, player_id):
     if game_id not in games or player_id not in players:
-        return ("NOT FOUND", 404)
+        return NOT_ACCEPTABLE
 
     if request.method == "GET":  # fetch all events for <game_id> player <player_id>
         return encoder.encode({"events": players[player_id].events})
     elif request.method == "DELETE":  # delets all events for <player_id>
         players[player_id].events.clear()
-        return ("", 204)
+        return DELETE_SUCCESSFUL
 
 
 # Managing one event
@@ -158,7 +160,7 @@ def player_event(game_id, player_id, event_id):
         or player_id not in players
         or event_id not in map(lambda e: e.event_id, players[player_id].events)
     ):
-        return ("NOT FOUND", 404)
+        return NOT_ACCEPTABLE
 
     event = filter(lambda e: e.id == event_id, players[player_id].events)[0]
 
@@ -166,7 +168,7 @@ def player_event(game_id, player_id, event_id):
         return encoder.encode(event)
     elif request.method == "DELETE":  # delete event with <event_id>
         players[player_id].events.remove(event)
-        return ("", 204)
+        return DELETE_SUCCESSFUL
 
 
 # Mark player as inactive, removes thread from player_threads dict
