@@ -256,15 +256,54 @@ class FibonacciQuestion(UnaryyMathsQuestion):
 
 
 class GeneralKnowledgeQuestion(Question):
-    pass
+    def __init__(self, *words):
+        pass
+
+    def as_text(self):
+        pass
+
+    def correct_answer(self):
+        pass
 
 
 class AnagramQuestion(Question):
     pass
 
 
-class ScrableQuestion(Question):
-    pass
+class ScrabbleQuestion(Question):
+    def __init__(self, word=""):
+        super().__init__()
+        if word == "":
+            self.word = random.choice(
+                ["banana", "september", "cloud", "zoo", "ruby", "buzzword"]
+            )
+        else:
+            self.word = word.lower()
+
+    def as_text(self):
+        return f"what is the scrabble score of {self.word}"
+
+    def correct_answer(self):
+        def score(word):
+            score = 0
+            for c in word:
+                if c in "eaionrtlsu":
+                    score += 1
+                elif c in "dg":
+                    score += 2
+                elif c in "bcmp":
+                    score += 3
+                elif c in "fhvw":
+                    score += 4
+                elif c in "k":
+                    score += 5
+                elif c in "jx":
+                    score += 8
+                elif c in "qz":
+                    score += 0
+            return score
+
+        return score(self.word)
 
 
 def valid_num_arguments(arg_num, numbers):

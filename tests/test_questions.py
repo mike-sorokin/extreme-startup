@@ -176,8 +176,21 @@ def test_prime_question_no_ans():
     assert prime_question.correct_answer() == ""
 
 
-def test_prime_question_random():
-    fib_question = FibonacciQuestion()
-    number = fib_question.number
-    assert number in range(0, 100)
-    assert fib_question.points == 50
+def test_scrabble_question_random_initialised():
+    scrabble_question = ScrabbleQuestion()
+    assert scrabble_question.word in [
+        "banana",
+        "september",
+        "cloud",
+        "zoo",
+        "ruby",
+        "buzzword",
+    ]
+
+
+def test_scrabble_question():
+    scrabble_question = ScrabbleQuestion("Helix")
+    assert scrabble_question.word == "helix"
+    assert scrabble_question.as_text() == "what is the scrabble score of helix"
+    assert scrabble_question.points == 10
+    assert scrabble_question.correct_answer() == 4 + 1 + 1 + 1 + 8
