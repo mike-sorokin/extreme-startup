@@ -13,7 +13,11 @@ function AddPlayer(setOpened) {
   const addPlayer = (e) => {
     e.preventDefault();
 
-    if (id.trim() === "") {
+    gameId = id.trim()
+    playerName = name.trim()
+    playerUrl = url.trim()
+
+    if (gameId === "") {
       showNotification({
         title: "Error creating player",
         message: "You forgot to enter a game id!",
@@ -24,7 +28,7 @@ function AddPlayer(setOpened) {
       return
     }
 
-    if (name.trim() === "") {
+    if (playerName === "") {
       showNotification({
         title: "Error creating player",
         message: "You forgot to enter a name!",
@@ -36,13 +40,14 @@ function AddPlayer(setOpened) {
     }
 
     const playerObject = {
-      id: id.trim(),
-      name: name.trim(),
-      url: url.trim(),
+      name: playerName,
+      url: playerUrl,
     };
 
+    const json = "/api/" + gameId + "/players";
+
     axios
-      .post("/api/players", playerObject)
+      .post(json, playerObject)
       .then(() => {
         showNotification({
           title: "Success",
