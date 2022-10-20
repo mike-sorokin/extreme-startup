@@ -76,7 +76,7 @@ class UnaryyMathsQuestion(Question):
         if valid_num_arguments(1, number):
             self.number = number[0]
         else:
-            self.number = random.randint(1, 100)
+            self.number = random.randrange(1, 100)
 
 
 class BinaryMathsQuestion(Question):
@@ -86,8 +86,8 @@ class BinaryMathsQuestion(Question):
             self.n1 = numbers[0]
             self.n2 = numbers[1]
         else:
-            self.n1 = random.randint(1, 100)
-            self.n2 = random.randint(1, 100)
+            self.n1 = random.randrange(1, 100)
+            self.n2 = random.randrange(1, 100)
 
 
 class TernaryMathsQuestion(Question):
@@ -105,7 +105,7 @@ class SelectFromListOfNumbersQuestion(Question):
         if len(numbers) != 0 and valid_num_arguments(len(numbers), numbers):
             self.numbers = list(numbers)
         else:
-            size = random.randint(1, 5)
+            size = random.randrange(1, 10)
             self.numbers = random.sample(range(1, 100), size)
 
     def correct_answer(self):

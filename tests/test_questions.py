@@ -68,7 +68,7 @@ def test_select_numbers_question_random():
     select_questions = [q() for q in SELECT_NUMBERS_QUESTIONS]
     for question in select_questions:
         assert type(question.numbers) is list
-        assert 1 <= len(question.numbers) <= 5
+        assert len(question.numbers) in range(1, 10)
         assert all([1 <= i < 100 for i in question.numbers])
 
 
