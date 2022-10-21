@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom"
 import Container from "react-bootstrap/Container"
 import Table from "react-bootstrap/Table"
 import axios from 'axios'
+import { gameUrl } from '../utils/urls'
+
 
 
 function Leaderboard() {
@@ -16,7 +18,7 @@ function Leaderboard() {
   }, [refreshTimer]);
 
   function getLeaderboard() {
-      axios.get("http://127.0.0.1:5000/api/" + params.gameid + '/leaderboard')
+      axios.get(gameUrl(params.gameid) + '/leaderboard')
       .then(function (response) {
         console.log(response);
         setLeaderboard(response.data)

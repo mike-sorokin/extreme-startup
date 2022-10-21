@@ -5,6 +5,8 @@ import Button from 'react-bootstrap/Button'
 import Stack from 'react-bootstrap/Stack'
 import axios from 'axios'
 import { requestGameCreation } from '../utils/requests'
+import { gameUrl } from '../utils/urls'
+
 
 function Admin() {
   const params = useParams();
@@ -13,7 +15,7 @@ function Admin() {
   const [refreshTimer, setRefreshTimer] = useState(0)
 
   useEffect(() => {
-    axios.get("http://127.0.0.1:5000/api/" + params.gameid)
+    axios.get(gameUrl(params.gameid))
     .then(function (response) {
       console.log(response);
       setRound(response.data.round == 0 ? 'Warmup' : response.data.round)
@@ -27,7 +29,7 @@ function Admin() {
   }, [refreshTimer]);
 
   function advanceRound() {
-    axios.put("http://127.0.0.1:5000/api/" + params.gameid)
+    axios.put(gameUrl(params.gameid))
     .then(function (response) {
       console.log(response);
       setRound(round == 'Warmup' ? 1 :  (round + 1))

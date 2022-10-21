@@ -6,6 +6,7 @@ import Table from "react-bootstrap/Table"
 
 
 import PlayerEventCard from "./PlayerEventCard";
+import { playerPageUrl } from "../utils/urls";
 
 // For testing only:
 // const api = axios.create({
@@ -22,7 +23,7 @@ function Player() {
   }, []);
 
   function getPlayer(playerId) {
-    axios.get("http://127.0.0.1:5000/api/" + params.gameid + '/players/' + params.id)
+    axios.get(playerPageUrl(params.gameid, params.id))
         .then(function (response) {
           console.log(response);
           setPlayerDetail(response.data)

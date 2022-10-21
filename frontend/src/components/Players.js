@@ -8,6 +8,7 @@ import Modal from 'react-bootstrap/Modal'
 import Form from 'react-bootstrap/Form'
 import axios from 'axios'
 import { useNavigate } from "react-router-dom";
+import { playerPageUrl, playerCreationUrl } from '../utils/urls'
 
 function Players() {
     const params = useParams();
@@ -25,7 +26,7 @@ function Players() {
       }, [refreshTimer]);
 
     function getPlayers() {
-        axios.get("http://127.0.0.1:5000/api/" + params.gameid + '/players')
+        axios.get(playerCreationUrl(params.gameid))
         .then(function (response) {
           console.log(response);
           const temp = []
@@ -42,7 +43,7 @@ function Players() {
     }
 
     function withdrawPlayer(playerid) {
-        axios.delete("http://127.0.0.1:5000/api/" + params.gameid + '/players/' + playerid)
+        axios.delete(playerPageUrl(params.gameid, playerid))
         .then(function (response) {
           console.log(response);
         })
@@ -52,7 +53,7 @@ function Players() {
     }
 
     function withdrawPlayers() {
-        axios.delete("http://127.0.0.1:5000/api/" + params.gameid + '/players')
+        axios.delete(playerCreationUrl(params.gameid))
         .then(function (response) {
           console.log(response);
         })
@@ -65,7 +66,7 @@ function Players() {
         var bodyData = new FormData()
         bodyData.append('name', modalName)
         bodyData.append('api', modalAPI)
-        axios.post("http://127.0.0.1:5000/api/" + params.gameid + '/players', bodyData)
+        axios.post(playerPageUrl(params.gameid, bodyData))
         .then(function (response) {
           console.log(response);
         })

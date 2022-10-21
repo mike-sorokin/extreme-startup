@@ -10,13 +10,14 @@ import AddPlayer from './AddPlayer';
 import CreateGame from './CreateGame';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import { gameCreationUrl } from '../utils/urls';
 
 function Home() {
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const navigate = useNavigate();
 
   function createNewGame() {
-    axios.post('http://127.0.0.1:5000/api')
+    axios.post(gameCreationUrl())
     .then(function (response) {
       console.log(response);
       const game_id_path = '/' + response.data.id;
