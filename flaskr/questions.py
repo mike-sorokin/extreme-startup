@@ -1,8 +1,7 @@
 import numbers
 from uuid import uuid4
-import random
 import requests
-
+import random
 
 class Question:
     def __init__(self, points=10):
