@@ -1,3 +1,6 @@
+import sys
+sys.path.append(".")
+
 from flaskr.game import Game
 import pytest
 
