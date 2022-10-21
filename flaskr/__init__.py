@@ -200,22 +200,20 @@ def remove_players(*player_id):
 
 
 # FORGIVE ME
-pp = pprint.PrettyPrinter(indent=4)
-bot_responses = {1: "Hello world!"}
+bot_responses = {n: (f"Bot{n}", 0) for n in range(100)}
 
 # /2/hi  style links, these update the response
 @app.route("/api/bot/<int:bot_id>/<string:resp>", methods=["GET"])
 def _update_response(bot_id, resp):
-    print(f"Updated {bot_id} to {resp}")
-    bot_responses[bot_id] = resp
+    bot_responses[bot_id][0] = resp
+    bot_responses[bot_id][1] += 1
     return redirect(url_for("api_response", bot_id=bot_id))
 
 
 # Get a response
 @app.route("/api/bot/<int:bot_id>", methods=["GET"])
 def _api_response(bot_id):
-    print(f"Received GET for {bot_id}\nResponding with {bot_responses[bot_id]}\n\n")
-    return bot_responses[bot_id]
+    return bot_responses[bot_id][0]
 
 
 @app.route("/api/bot/cleanup", methods=["GET"])
@@ -226,4 +224,4 @@ def _cleanup():
 
 @app.route("/api/bot/", methods=["GET"])
 def _main_view():
-    return pp.pformat(bot_responses)
+    return "<br>".join(list(str(x) for x in bot_responses.values()))
