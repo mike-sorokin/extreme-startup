@@ -1,6 +1,6 @@
 from crypt import methods
 from uuid import uuid4
-from flask import Flask, render_template, request, redirect, make_response
+from flask import Flask, render_template, request, redirect, make_response, url_for
 from flaskr.player import Player
 from flaskr.game import Game
 from flaskr.scoreboard import Scoreboard
@@ -19,6 +19,9 @@ games = {}
 
 # players: player_id -> Player
 players = {}
+
+# Scoreboard lock
+lock = threading.Lock()
 
 # scoreboards: game_id -> Scoreboard
 scoreboards = {}
@@ -171,6 +174,7 @@ def player_event(game_id, player_id, event_id):
     elif request.method == "DELETE":  # delete event with <event_id>
         players[player_id].events.remove(event)
         return DELETE_SUCCESSFUL
+
 
 
 # Mark player as inactive, removes thread from player_threads dict
