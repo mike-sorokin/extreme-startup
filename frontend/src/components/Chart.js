@@ -9,6 +9,8 @@ function Chart({ gameid }) {
     const [players, setPlayers] = useState([])
     const [scores, setScores] = useState([])
 
+    // Currently runs only once, when the component is first mounted
+    // Need to use sockets instead
     useEffect(() => {
         const getScores = async () => {
             const [playerData, scoreData] = await fetchScores()
@@ -19,6 +21,9 @@ function Chart({ gameid }) {
         getScores();
     }, [])
 
+    // Gets list of players objects and returns list of players
+    // and an object with key-value pairs, where the keys are all the player id's
+    // and the values are the player's scores 
     const fetchScores = async () => {
 
         try {
