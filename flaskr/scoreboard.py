@@ -19,13 +19,7 @@ class Scoreboard:
             self.correct_tally[player.uuid] += 1
         elif increment < 0:
             self.incorrect_tally[player.uuid] += 1
-        event = Event(
-            player.uuid,
-            question.as_text(),
-            0,
-            increment,
-            question.result if question.problem == "" else question.problem,
-        )
+        event = Event(player.uuid, player.game_id, question.as_text(), 0, increment, question.result if question.problem == "" else question.problem)
         player.log_event(event)
 
     def record_request_for(self, player):
