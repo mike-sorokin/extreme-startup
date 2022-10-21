@@ -3,19 +3,33 @@ import { useState } from 'react';
 import { Button, Modal } from '@mantine/core';
 
 import AddPlayer from './AddPlayer';
-import CreateGame from './CreateGame';
+import GoToGame from './GoToGame';
+
+import { requestGameCreation } from '../utils/requests'
+import { showSuccessfulNotification } from '../utils/utils'
+
 
 function Home() {
   const [openedCreateGame, setOpenedCreateGame] = useState(false);
   const [openedAddPlayer, setOpenedAddPlayer] = useState(false);
+  const [newGameId, setNewGameId] = useState("")
+
+  const createGameButtonAction = () => {
+    return requestGameCreation()
+      .then(game => {
+        showSuccessfulNotification("Successfully Created Game!")
+        setNewGameId(game.id)
+        setOpenedCreateGame(true)
+      })
+  }
 
   return (
     <div className="Home">
       <Modal
         opened={openedCreateGame}
         onClose={() => setOpenedCreateGame(false)}
-        title="Create a Game!">
-        <CreateGame setOpened={setOpenedCreateGame} />
+        title="Your game is ready!">
+        <GoToGame getGameId={() => newGameId} />
       </Modal>
       <Modal
         opened={openedAddPlayer}
@@ -25,7 +39,7 @@ function Home() {
       </Modal>
 
       <h1>🔥 Extreme Startup 🔥</h1>
-      <Button onClick={() => { setOpenedCreateGame(true) }}>Create a Game!</Button>
+      <Button onClick={createGameButtonAction}>Create a Game!</Button>
       <Button onClick={() => { setOpenedAddPlayer(true) }}>Join a Game!</Button>
     </div>
   )
