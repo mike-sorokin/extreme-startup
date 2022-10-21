@@ -1,7 +1,6 @@
 import { requestPlayerCreation, playerCreationData, validPlayerData } from '../utils/requests'
 import { showSuccessfulNotification, showFailureNotification } from '../utils/utils'
 import { playerPageUrl } from '../utils/urls'
-import axios from 'axios';
 import React from 'react';
 import { useState } from 'react';
 import { TextInput, Button } from '@mantine/core';
@@ -24,7 +23,7 @@ function AddPlayer(setOpened) {
       const playerData = playerCreationData(name, url)
       return requestPlayerCreation(gameId, playerData)
         .then(player => {
-          showSuccessfulNotification("Successfully Created Player")
+          showSuccessfulNotification("Successfully Created Player!")
           navigate(playerPageUrl(player.game_id, player.id))
         })
     }

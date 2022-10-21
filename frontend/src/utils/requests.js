@@ -38,7 +38,7 @@ export function validPlayerData(gameId, name, url) {
   if (player in players)
     return 3
 
-  if (url.substring(0, 8) === "http://" || url.substring(0, 9) === "https://")
+  if (url.substring(0, 7) === "http://" || url.substring(0, 8) === "https://")
     return 0
 
   return 4
