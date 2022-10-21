@@ -26,6 +26,17 @@ function Admin() {
     setTimeout(() => setRefreshTimer(prevState => prevState + 1), 1000)
   }, [refreshTimer]);
 
+  function advanceRound() {
+    axios.put("http://127.0.0.1:5000/api/" + params.gameid)
+    .then(function (response) {
+      console.log(response);
+      setRound(round + 1)
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+
 
   return (
     <Container>
@@ -41,7 +52,7 @@ function Admin() {
         <h3>Rounds</h3>
         <h4 style={{color: 'grey'}}>{round}</h4>
       </Stack>
-      <Button variant="outline-secondary">Advance Round</Button>
+      <Button variant="outline-secondary" onClick={() => advanceRound()}>Advance Round</Button>
     </Stack>
 
     </Container>
