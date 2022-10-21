@@ -1,6 +1,8 @@
 import React from 'react'
 import { useParams } from "react-router-dom"
 
+import Chart from "./Chart"
+
 function Leaderboard() {
   // const refresh = function() { window.location.reload() };
   // setTimeout(refresh, 10000);
@@ -10,6 +12,7 @@ function Leaderboard() {
   return (
     <div>
       <h2>Leaderboard</h2>
+      <Chart gameid={params.gameid} />
       {
         /*
           <table>
