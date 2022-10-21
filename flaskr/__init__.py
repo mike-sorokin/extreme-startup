@@ -50,14 +50,6 @@ def serve_frontend(path):
 def favicon():
     return send_from_directory(app.root_path, "favicon.ico")
 
-# This forces the server to terminate all player threads and shut down
-@app.route("/api/kill_all_players")
-def kill_all_players():
-    # Kill all player threads
-    PLAYERS_EXIT = True
-    return ""
-
-
 # Game Management
 @app.route("/api", methods=["GET", "POST", "DELETE"])
 def api_index():
