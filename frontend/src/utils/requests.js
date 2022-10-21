@@ -1,4 +1,4 @@
-import { gameCreationUrl, playerCreationUrl } from '../utils/urls';
+import { gameCreationUrl, gameUrl, getPlayersFromGameId, playerCreationUrl } from '../utils/urls';
 import { alertError } from '../utils/utils'
 import axios from 'axios';
 
@@ -25,13 +25,35 @@ export function requestGameCreation() {
     .catch(alertError)
 }
 
-/*
-  todo
-  pre: validation done outside
-*/
+export function validPlayerData(gameId, name, url) {
+  let player = name.trim()
+
+  if (player === "")
+    return 2
+
+  try {
+    const response = axios.get(gameUrl(gameId))
+    console.log(response)
+  }
+  catch (err) {
+    alertError(err)
+    return 1
+  }
+
+  let players = getPlayersFromGameId(gameId)
+
+  if (player in players)
+    return 3
+
+  if (url.substring(0, 7) === "http://" || url.substring(0, 8) === "https://")
+    return 0
+
+  return 4
+}
+
 export function playerCreationData(name, api) {
   return {
-    name: name,
+    name: name.trim(),
     api: api
   }
 }

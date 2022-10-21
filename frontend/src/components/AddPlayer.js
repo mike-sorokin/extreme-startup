@@ -1,7 +1,6 @@
-import { requestPlayerCreation, playerCreationData } from '../utils/requests'
-import { showSuccessfulNotification } from '../utils/utils'
+import { requestPlayerCreation, playerCreationData, validPlayerData } from '../utils/requests'
+import { showSuccessfulNotification, showFailureNotification } from '../utils/utils'
 import { playerPageUrl } from '../utils/urls'
-import axios from 'axios';
 import React from 'react';
 import { useState } from 'react';
 import { TextInput, Button } from '@mantine/core';
@@ -17,12 +16,32 @@ function AddPlayer(setOpened) {
 
   const submission = event => {
     event.preventDefault()
-    const playerData = playerCreationData(name, url)
-    return requestPlayerCreation(gameId, playerData)
-      .then(player => {
-        showSuccessfulNotification("Successfully Created Player")
-        navigate(playerPageUrl(player.game_id, player.id))
-      })
+
+    let validStatus = validPlayerData(gameId, name, url)
+
+    if (validStatus === 0) {
+      const playerData = playerCreationData(name, url)
+      return requestPlayerCreation(gameId, playerData)
+        .then(player => {
+          showSuccessfulNotification("Successfully Created Player!")
+          navigate(playerPageUrl(player.game_id, player.id))
+        })
+    }
+
+    if (validStatus === 1) {
+      showFailureNotification("Error creating player", "Game id does not exist!")
+    }
+    else if (validStatus === 2) {
+      showFailureNotification("Error creating player", "Your name cannot be empty!")
+    }
+    else if (validStatus === 3) {
+      showFailureNotification("Error creating player", "Your name already exists in the game!")
+    }
+    else {
+      showFailureNotification("Error creating player", "You entered an invalid URL!")
+    }
+
+    return
   }
 
   return (
