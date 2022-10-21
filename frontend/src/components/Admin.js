@@ -18,7 +18,7 @@ function Admin() {
     axios.get(gameUrl(params.gameid))
     .then(function (response) {
       console.log(response);
-      setRound(response.data.round == 0 ? 'Warmup' : response.data.round)
+      setRound(response.data.round === 0 ? 'Warmup' : response.data.round)
       setPlayerNo(response.data.players.length)
     })
     .catch(function (error) {
@@ -32,7 +32,7 @@ function Admin() {
     axios.put(gameUrl(params.gameid))
     .then(function (response) {
       console.log(response);
-      setRound(round == 'Warmup' ? 1 :  (round + 1))
+      setRound(round === 'Warmup' ? 1 :  (round + 1))
     })
     .catch(function (error) {
       console.log(error);

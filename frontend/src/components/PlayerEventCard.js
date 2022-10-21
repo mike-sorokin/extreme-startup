@@ -8,17 +8,17 @@ function PlayerEventCard({ event }) {
         <div>id: {event.id}</div>
         <div>difficulty: {event.difficulty}</div>
         <div>{event.points_gained} points </div>
-        {event.response_type == "NO_RESPONSE" && (
+        {event.response_type === "NO_RESPONSE" && (
           <div>
             <Badge color="red"> NO RESPONSE </Badge>
           </div>
         )}
-        {event.response_type == "WRONG" && (
+        {event.response_type === "WRONG" && (
           <div>
             <Badge color="orange"> INCORRECT </Badge>
           </div>
         )}
-        {event.response_type == "CORRECT" && (
+        {event.response_type === "CORRECT" && (
           <div>
             <Badge color="green"> CORRECT </Badge>
           </div>
