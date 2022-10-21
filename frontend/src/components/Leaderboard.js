@@ -7,6 +7,8 @@ import { gameUrl } from '../utils/urls'
 
 
 
+import Chart from "./Chart"
+
 function Leaderboard() {
   const params = useParams()
   const [refreshTimer, setRefreshTimer] = useState(0)
@@ -32,6 +34,7 @@ function Leaderboard() {
   return (
     <Container className="p-5">
       <h2>Leaderboard</h2>
+      <Chart gameid={params.gameid} />
       {
           <Table>
             <thead>

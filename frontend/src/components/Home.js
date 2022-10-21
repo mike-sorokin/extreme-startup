@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
-import { Modal, Button } from '@mantine/core';
+import { Button, Modal } from '@mantine/core';
+
 import AddPlayer from './AddPlayer';
 import GoToGame from './GoToGame';
 
@@ -41,23 +42,6 @@ function Home() {
       <Button onClick={createGameButtonAction}>Create a Game!</Button>
       <Button onClick={() => { setOpenedAddPlayer(true) }}>Join a Game!</Button>
     </div>
-
-    // <>
-
-    //   <Modal show={showAddPlayer} onHide={() => setShowAddPlayer(false)}>
-    //     <Modal.Header closeButton>
-    //       <Modal.Title>Join A Game</Modal.Title>
-    //     </Modal.Header>
-    //     <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
-    //     <Modal.Footer>
-    //       <Button variant="secondary">
-    //         Submit
-    //       </Button>
-    //     </Modal.Footer>
-    //   </Modal>
-
-      
-    // </>
   )
 }
 
