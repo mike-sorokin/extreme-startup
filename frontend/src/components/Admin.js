@@ -16,7 +16,7 @@ function Admin() {
     .then(function (response) {
       console.log(response);
       setRound(response.data.round == 0 ? 'Warmup' : response.data.round)
-      setPlayerNo(response.data.players.length())
+      setPlayerNo(response.data.players.length)
     })
     .catch(function (error) {
       console.log(error);
@@ -33,13 +33,13 @@ function Admin() {
       <h3>Number of Players</h3>
       <h4 style={{color: 'grey'}}>{playerNo}</h4>
       <br />
-      <Stack direction="horizontal" gap={2}>
+    <Stack direction="horizontal" gap={2}>
       <Stack>
         <h3>Rounds</h3>
         <h4 style={{color: 'grey'}}>{round}</h4>
       </Stack>
       <Button variant="outline-secondary">Advance Round</Button>
-      </Stack>
+    </Stack>
 
     </Container>
     </Container>
