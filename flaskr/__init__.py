@@ -1,6 +1,6 @@
 from crypt import methods
 from uuid import uuid4
-from flask import Flask, render_template, request, redirect, make_response, url_for
+from flask import Flask, render_template, request, redirect, make_response, url_for, send_from_directory
 from flaskr.player import Player
 from flaskr.event import Event
 from flaskr.game import Game
@@ -49,6 +49,9 @@ def serve_frontend(path):
     print("path is", path)
     return make_response(render_template("index.html", path=path))
 
+@app.route("/favicon.ico")
+def favicon():
+    return send_from_directory(app.root_path, "favicon.ico")
 
 # This forces the server to terminate all player threads and shut down
 @app.route("/api/kill_all_players")
