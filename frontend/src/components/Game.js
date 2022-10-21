@@ -14,7 +14,7 @@ function Game() {
     <>
     <Navbar collapseOnSelect bg="light" expand="lg" variant="light" activeKey="/leaderboard">
         <Container>
-          <Navbar.Brand href="#home">Extreme Startup</Navbar.Brand>
+          <Navbar.Brand href="/">Extreme Startup</Navbar.Brand>
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">

@@ -10,11 +10,38 @@ import AddPlayer from './AddPlayer';
 import CreateGame from './CreateGame';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
-import { gameCreationUrl } from '../utils/urls';
+import { gameCreationUrl, playerCreationUrl } from '../utils/urls';
 
 function Home() {
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const navigate = useNavigate();
+
+
+  const [modalGameId, setModalGameId] = useState('')
+  const [modalName, setModalName] = useState('')
+  const [modalAPI, setModalAPI] = useState('')
+
+  function handleSubmit(event) {
+    addPlayer();
+    setShowAddPlayer(false);
+    setModalName('')
+    setModalAPI('')
+    navigate(`/${modalGameId}/players`)
+  };
+
+  function addPlayer() {
+    var bodyData = new FormData()
+    bodyData.append('name', modalName)
+    bodyData.append('api', modalAPI)
+    axios.post(playerCreationUrl(modalGameId), bodyData)
+    .then(function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+}
+  
 
   function createNewGame() {
     axios.post(gameCreationUrl())
@@ -52,9 +79,36 @@ function Home() {
 
       <Modal show={showAddPlayer} onHide={() => setShowAddPlayer(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Join A Game</Modal.Title>
+          <Modal.Title>Join a game!</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
+        <Container>
+                <Form noValidate validated={validated} onSubmit={handleSubmit}>
+
+                <Form.Group className="mb-3">
+                        <Form.Label>Game ID</Form.Label>
+                        <Form.Control type="text" value={modalGameId} onChange={(e) => setModalGameId(e.target.value)} required/>
+                        <Form.Control.Feedback type="invalid">
+                        Please enter a game ID
+                        </Form.Control.Feedback>
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                        <Form.Label>Name</Form.Label>
+                        <Form.Control type="text" placeholder="Your Name" value={modalName} onChange={e => setModalName(e.target.value)} required/>
+                        <Form.Control.Feedback type="invalid">
+                        Please enter a name.
+                        </Form.Control.Feedback>
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                        <Form.Label>Api</Form.Label>
+                        <Form.Control type="text" placeholder="http://...." value={modalAPI} onChange={(e) => setModalAPI(e.target.value)} required/>
+                        <Form.Control.Feedback type="invalid">
+                        Please enter an API.
+                        </Form.Control.Feedback>
+                    </Form.Group>
+                    </Form>
+                </Container>
         <Modal.Footer>
           <Button variant="secondary">
             Submit
