@@ -1,6 +1,9 @@
 from flaskr.event import Event
 
 
+PROBLEM_DECREMENT = 50
+
+
 class Scoreboard:
     def __init__(self, lenient=True):
         self.lenient = lenient
@@ -19,7 +22,14 @@ class Scoreboard:
             self.correct_tally[player.uuid] += 1
         elif increment < 0:
             self.incorrect_tally[player.uuid] += 1
-        event = Event(player.uuid, player.game_id, question.as_text(), 0, increment, question.result if question.problem == "" else question.problem)
+        event = Event(
+            player.uuid,
+            player.game_id,
+            question.as_text(),
+            0,
+            increment,
+            question.result if question.problem == "" else question.problem,
+        )
         player.log_event(event)
 
     def record_request_for(self, player):
@@ -33,6 +43,9 @@ class Scoreboard:
 
     def delete_player(self, player):
         del self.scores[player.uuid]
+        del self.incorrect_tally[player.uuid]
+        del self.correct_tally[player.uuid]
+        del self.request_counts[player.uuid]
 
     def current_score(self, player):
         return self.scores[player.uuid]
@@ -47,7 +60,12 @@ class Scoreboard:
         return self.request_counts[player.uuid]
 
     def leaderboard(self):
-        return {k: v for k, v in sorted(self.scores.items(), key=lambda item: item[1])}
+        return {
+            k: v
+            for k, v in sorted(
+                self.scores.items(), key=lambda item: item[1], reverse=True
+            )
+        }
 
     def leaderboard_position(self, player):
         return list(self.leaderboard().keys()).index(player.uuid) + 1
@@ -63,7 +81,7 @@ class Scoreboard:
                 else self.penalty(question, leaderboard_position)
             )
         elif problem == "ERROR_RESPONSE" or problem == "NO_SERVER_RESPONSE":
-            return -50
+            return -1 * PROBLEM_DECREMENT
         else:
             print(
                 f"!!!!! unrecognized result '#{question.result}' from #{repr(question)} in Scoreboard#score"
