@@ -82,7 +82,7 @@ def test_game_id_put_advances_round(extras, cli):
     ADVANCED_ROUND_NO = 1
     game_id = extras["game"]["id"]
 
-    update_game_resp = cli.put(f"/api/{game_id}", data={"round": ADVANCED_ROUND_NO})
+    update_game_resp = cli.put(f"/api/{game_id}", json={"round": ADVANCED_ROUND_NO})
     assert update_game_resp.status_code == ALL_GOOD
 
     get_game_resp = cli.get(f"/api/{game_id}")
@@ -130,7 +130,7 @@ def test_players_post_creates_a_new_player(extras, cli):
 
     response = cli.post(
         f"/api/{gid}/players",
-        data={"name": "John_Doe", "api": "abc.com"}
+        json={"name": "John_Doe", "api": "abc.com"}
     )
     rd = response_as_dict_if_sucecssful(response)
     assert is_valid_player_json(rd)

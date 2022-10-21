@@ -1,3 +1,6 @@
+import sys
+sys.path.append(".")
+
 from flaskr.rate_controller import RateController
 from unittest.mock import Mock
 import pytest
@@ -28,7 +31,7 @@ def test_decreases_delay_by_delta_when_correct_answer(basic_rate_controller):
 
 def test_sets_delay_to_avg_rate_on_problem_if_current_delay_less_than_avg(basic_rate_controller):
     question = Mock()
-    question.problem = "problem_detected" 
+    question.problem = "problem_detected"
     question.answered_correctly.return_value = False
 
     basic_rate_controller.delay_before_next_request(question)
@@ -38,7 +41,7 @@ def test_sets_delay_to_avg_rate_on_problem_if_current_delay_less_than_avg(basic_
 def test_maintains_delay_on_problem_if_current_delay_less_than_avg():
     delayed_controller = RateController(AVG_DELAY + 5)
     question = Mock()
-    question.problem = "problem_detected" 
+    question.problem = "problem_detected"
     question.answered_correctly.return_value = False
 
     delayed_controller.delay_before_next_request(question)

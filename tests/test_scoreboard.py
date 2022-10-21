@@ -1,8 +1,11 @@
-from flaskr.scoreboard import Scoreboard 
+import sys
+sys.path.append(".")
+
+from flaskr.scoreboard import Scoreboard
 from unittest.mock import Mock
 import pytest
 
-PROBLEM_DECREMENT = 50 
+PROBLEM_DECREMENT = 50
 
 @pytest.fixture()
 def game_setup(): # (scoreboard, player, question)
@@ -99,7 +102,7 @@ def test_leaderboard_orders_players_by_decreasing_socre(full_game_setup):
     scoreboard, player1, question = full_game_setup
     player2 = Mock()
     scoreboard.new_player(player2)
-    question.result, question.points = "CORRECT", 10 
+    question.result, question.points = "CORRECT", 10
 
     scoreboard.increment_score_for(player1, question)
     scoreboard.increment_score_for(player1, question)
@@ -121,7 +124,7 @@ def test_scoreboard_penalises_higher_ranking_players_more(full_game_setup):
     scoreboard.new_player(worse_player)
     question.result, question.points = "CORRECT", points
 
-    # better_player gets out in front of worse_player 
+    # better_player gets out in front of worse_player
     scoreboard.increment_score_for(better_player, question)
     question.result = "WRONG"
     scoreboard.increment_score_for(worse_player, question)
