@@ -22,7 +22,7 @@
     "react-redux": "^8.0.4",
     "react-router-dom": "^6.4.2",
     "react-scripts": "4.0.3",
-    "rechart": "^0.0.1",
+    "recharts": "^2.1.15",
     "socket.io-client": "^4.5.3"
   },
   "scripts": {
