@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Card, Badge, Group } from "@mantine/core";
+import { Card, Badge, Group } from "@mantine/core";
 
 function PlayerEventCard({ event }) {
   return (
