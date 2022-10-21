@@ -50,6 +50,7 @@ def serve_frontend(path):
 def favicon():
     return send_from_directory(app.root_path, "favicon.ico")
 
+# Game Management
 @app.route("/api", methods=["GET", "POST", "DELETE"])
 def api_index():
     if request.method == "GET":  # fetch all games
@@ -101,8 +102,7 @@ def all_players(game_id):
 
     elif request.method == "POST":  # create a new player -- initialise thread
         # player = Player(game_id, request.form["name"], api=request.form["api"])
-        print(request.is_json, request.json, request.get_json())
-        player = Player(game_id, request.get_json()["name"], api=request.get_json()["api"])
+        player = Player(game_id, request.form["name"], api=request.form["api"])
         games[game_id].new_player(player.uuid)
         scoreboards[game_id].new_player(player)
         players[player.uuid] = player
@@ -177,6 +177,17 @@ def player_event(game_id, player_id, event_id):
         players[player_id].events.remove(event)
         return DELETE_SUCCESSFUL
 
+
+@app.get("/api/<game_id>/leaderboard")
+def leaderboard(game_id):
+    if game_id not in scoreboards:
+        return NOT_ACCEPTABLE
+
+    score_dict = scoreboards[game_id].leaderboard()
+    res = []
+    for k, s in score_dict.items():
+        res.append({"name": players[k].name, "id": k, "score": s})
+    return encoder.encode(res)
 
 
 # Mark player as inactive, removes thread from player_threads dict
