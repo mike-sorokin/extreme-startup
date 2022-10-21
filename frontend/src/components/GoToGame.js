@@ -17,6 +17,7 @@ function GoToGame(gameIdGetter) {
 
   return (
     <div>
+      <p>Your game id is: {gameIdGetter.getGameId()}</p>
       <Button type="button" onClick={goToGamePage}>To Game Page</Button>
     </div>
   )
