@@ -51,7 +51,7 @@ def test_index_delete_drops_all_games(_, cli):
 
 @with_setup()
 def test_game_id_get_does_not_exist(_, cli):
-    assert cli.get("/api/nonexistinggameid").status_code == NOT_FOUND
+    assert cli.get("/api/nonexistinggameid").status_code == NOT_ACCEPTED
 
 
 @with_setup(create_a_game_with_players)
@@ -104,7 +104,7 @@ def test_game_id_delete_removes_the_game(extras, cli):
 @with_setup()
 def test_players_get_game_does_not_exist(_, cli):
     response = cli.get("/api/nonexistinggameid/players")
-    assert response.status_code == NOT_FOUND
+    assert response.status_code == NOT_ACCEPTED
 
 
 @with_setup(create_a_game_with_players, num_players=5)
@@ -129,7 +129,8 @@ def test_players_post_creates_a_new_player(extras, cli):
     initial_num_players = len(players)
 
     response = cli.post(
-        f"/api/{gid}/players", data={"name": "John_Doe", "api": "abc.com"}
+        f"/api/{gid}/players",
+        json={"name": "John_Doe", "api": "abc.com"}
     )
     rd = response_as_dict_if_sucecssful(response)
     assert is_valid_player_json(rd)
@@ -176,7 +177,7 @@ def test_player_id_put_update_name(extras, cli):
 
     new_name = "John_Doe_Junior"
     rd = response_as_dict_if_sucecssful(
-        cli.put(f"/api/{gid}/players/{pid}", data={"name": new_name})
+        cli.put(f"/api/{gid}/players/{pid}", json={"name": new_name})
     )
     assert is_valid_player_json(rd)
     assert rd["name"] == new_name
@@ -189,7 +190,7 @@ def test_player_id_put_update_api(extras, cli):
 
     new_api = "johndoejr.co.uk"
     rd = response_as_dict_if_sucecssful(
-        cli.put(f"/api/{gid}/players/{pid}", data={"api": new_api})
+        cli.put(f"/api/{gid}/players/{pid}", json={"api": new_api})
     )
     assert is_valid_player_json(rd)
     assert rd["api"] == new_api
@@ -203,7 +204,7 @@ def test_player_id_put_update_both_name_and_api(extras, cli):
     new_name = "John_Doe_Junior"
     new_api = "johndoejr.co.uk"
     rd = response_as_dict_if_sucecssful(
-        cli.put(f"/api/{gid}/players/{pid}", data={"name": new_name, "api": new_api})
+        cli.put(f"/api/{gid}/players/{pid}", json={"name": new_name, "api": new_api})
     )
     assert is_valid_player_json(rd)
     assert rd["name"] == new_name

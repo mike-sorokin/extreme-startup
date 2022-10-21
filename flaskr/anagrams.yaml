@@ -1,0 +1,30 @@
+---
+-
+  anagram: listen
+  correct: inlets
+  incorrect:
+  - enlists
+  - google
+  - banana
+-
+  anagram: listen
+  correct: silent
+  incorrect:
+  - enlists
+  - google
+  - banana
+-
+  anagram: dictionary
+  correct: indicatory
+  incorrect:
+  - abdication
+  - incendiary
+  - butterfly
+-
+  anagram: admirer
+  correct: married
+  incorrect:
+  - dairy
+  - random
+  - border
+  - forgot

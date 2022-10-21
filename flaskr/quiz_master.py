@@ -1,9 +1,10 @@
 import time
+from flaskr.rate_controller import RateController
 
 class QuizMaster:
     def __init__(self, player, question_factory, scoreboard):
         self.player = player
-        # self.rate_controller = RateController()
+        self.rate_controller = RateController()
         self.question_factory = question_factory
         self.scoreboard = scoreboard 
     
@@ -13,7 +14,8 @@ class QuizMaster:
             question.ask(self.player)
             self.scoreboard.record_request_for(self.player)
             self.scoreboard.increment_score_for(self.player, question)
-            time.sleep(5) # question_delay
+            self.rate_controller.wait_for_next_request(question)
+            self.rate_controller = self.rate_controller.update_algorithm_based_on_score(self.scoreboard.current_score(self.player))
 
     def player_passed(self):
         pass 
