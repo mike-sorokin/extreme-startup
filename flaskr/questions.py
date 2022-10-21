@@ -5,7 +5,6 @@ import yaml
 import os
 import requests
 
-
 class Question:
     def __init__(self, points=10):
         self.uuid = str(uuid4())
