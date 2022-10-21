@@ -102,7 +102,7 @@ def all_players(game_id):
 
     elif request.method == "POST":  # create a new player -- initialise thread
         # player = Player(game_id, request.form["name"], api=request.form["api"])
-        player = Player(game_id, request.form["name"], api=request.form["api"])
+        player = Player(game_id, request.json["name"], api=request.json["api"])
         games[game_id].new_player(player.uuid)
         scoreboards[game_id].new_player(player)
         players[player.uuid] = player

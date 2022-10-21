@@ -23,6 +23,8 @@ function AddPlayer(setOpened) {
       return requestPlayerCreation(gameId, playerData)
         .then(player => {
           showSuccessfulNotification("Successfully Created Player!")
+          console.log("player")
+          console.log(player)
           navigate(playerPageUrl(player.game_id, player.id))
         })
     }

@@ -1,3 +1,6 @@
+import sys
+sys.path.append(".")
+
 from flaskr.questions import *
 import pytest
 

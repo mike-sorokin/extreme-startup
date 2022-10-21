@@ -1,3 +1,6 @@
+import sys
+sys.path.append(".")
+
 from flaskr.event import Event
 
 PLAYER_ID = "dummy_id"
