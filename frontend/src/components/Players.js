@@ -43,7 +43,7 @@ function Players() {
     }
 
     function withdrawPlayer(playerid) {
-        axios.delete(playerPageUrl(params.gameid, playerid))
+        axios.delete("/api" + playerPageUrl(params.gameid, playerid))
         .then(function (response) {
           console.log(response);
         })
@@ -66,7 +66,7 @@ function Players() {
         var bodyData = new FormData()
         bodyData.append('name', modalName)
         bodyData.append('api', modalAPI)
-        axios.post(playerPageUrl(params.gameid, bodyData))
+        axios.post(playerCreationUrl(params.gameid), bodyData)
         .then(function (response) {
           console.log(response);
         })

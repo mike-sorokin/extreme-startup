@@ -23,7 +23,7 @@ function Player() {
   }, []);
 
   function getPlayer(playerId) {
-    axios.get(playerPageUrl(params.gameid, params.id))
+    axios.get("/api" + playerPageUrl(params.gameid, params.id))
         .then(function (response) {
           console.log(response);
           setPlayerDetail(response.data)
