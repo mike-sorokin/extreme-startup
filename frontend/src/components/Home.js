@@ -84,7 +84,7 @@ function Home() {
           <Modal.Title>Join a game!</Modal.Title>
         </Modal.Header>
         <Container>
-                <Form noValidate validated={validated} onSubmit={handleSubmit}>
+                <Form noValidate onSubmit={handleSubmit}>
 
                 <Form.Group className="mb-3">
                         <Form.Label>Game ID</Form.Label>
