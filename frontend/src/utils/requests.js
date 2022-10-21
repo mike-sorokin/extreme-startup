@@ -31,7 +31,14 @@ export function validPlayerData(gameId, name, url) {
   if (player === "")
     return 2
 
-  axios.get(gameUrl(gameId)).then().catch(_ => {return 1})
+  try {
+    const response = axios.get(gameUrl(gameId))
+    console.log(response)
+  }
+  catch (err) {
+    alertError(err)
+    return 1
+  }
 
   let players = getPlayersFromGameId(gameId)
 
