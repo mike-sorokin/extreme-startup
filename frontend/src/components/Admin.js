@@ -10,6 +10,7 @@ function Admin() {
   const params = useParams();
   const [playerNo, setPlayerNo] = useState(0);
   const [round, setRound] = useState('Warmup')
+  const [refreshTimer, setRefreshTimer] = useState(0)
 
   useEffect(() => {
     axios.get("http://127.0.0.1:5000/api/" + params.gameid)
@@ -21,7 +22,9 @@ function Admin() {
     .catch(function (error) {
       console.log(error);
     });
-  });
+
+    setTimeout(() => setRefreshTimer(prevState => prevState + 1), 1000)
+  }, [refreshTimer]);
 
 
   return (
