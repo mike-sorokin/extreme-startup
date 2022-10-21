@@ -50,7 +50,11 @@ def serve_frontend(path):
 def favicon():
     return send_from_directory(app.root_path, "favicon.ico")
 
-# Game Management
+
+@app.route("/api/<game_id>/dump_players")
+def dump_players(game_id):
+    return "<br>".join([f"{v.name:>15} - {scoreboards[game_id].scores[k]:>-4}" for k,v in players.items()])
+
 @app.route("/api", methods=["GET", "POST", "DELETE"])
 def api_index():
     if request.method == "GET":  # fetch all games

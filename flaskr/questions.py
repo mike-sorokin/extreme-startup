@@ -1,8 +1,7 @@
 import numbers
 from uuid import uuid4
 import random
-import yaml
-import os
+import requests
 
 
 class Question:
