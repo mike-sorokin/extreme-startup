@@ -16,8 +16,8 @@ class Question:
 
     def ask(self, player):
         if isinstance(self, WarmupQuestion): 
-            self.player_name = player.name
-            
+            self.player_name = player.name.strip().lower()
+
         try:
             response = requests.get(player.api, params={"q": self.as_text()})
 
