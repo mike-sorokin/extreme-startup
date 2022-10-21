@@ -1,5 +1,10 @@
+import numbers
 from uuid import uuid4
+import requests
 import random
+import yaml
+import os
+import requests
 
 
 class Question:
@@ -67,16 +72,24 @@ class WarmupQuestion(Question):
         return "What is your name?"
 
 
+class UnaryyMathsQuestion(Question):
+    def __init__(self, *number):
+        super().__init__()
+        if valid_num_arguments(1, number):
+            self.number = number[0]
+        else:
+            self.number = random.randrange(1, 100)
+
+
 class BinaryMathsQuestion(Question):
     def __init__(self, *numbers):
-        print(numbers)
         super().__init__()
         if valid_num_arguments(2, numbers):
             self.n1 = numbers[0]
             self.n2 = numbers[1]
         else:
-            self.n1 = random.randint(1, 100)
-            self.n2 = random.randint(1, 100)
+            self.n1 = random.randrange(1, 100)
+            self.n2 = random.randrange(1, 100)
 
 
 class TernaryMathsQuestion(Question):
@@ -91,11 +104,14 @@ class TernaryMathsQuestion(Question):
 class SelectFromListOfNumbersQuestion(Question):
     def __init__(self, *numbers):
         super().__init__()
-        if valid_num_arguments(len(numbers), numbers):
-            self.numbers = numbers
+        if len(numbers) != 0 and valid_num_arguments(len(numbers), numbers):
+            self.numbers = list(numbers)
         else:
-            size = random.randint(0, 5)
+            size = random.randrange(1, 10)
             self.numbers = random.sample(range(1, 100), size)
+
+    def correct_answer(self):
+        return super().correct_answer()
 
 
 class MaximumQuestion(SelectFromListOfNumbersQuestion):
@@ -128,7 +144,7 @@ class SubtractionQuestion(BinaryMathsQuestion):
 
 class MultiplicationQuestion(BinaryMathsQuestion):
     def as_text(self):
-        return f"What is {self.n1} times {self.n2}"
+        return f"What is {self.n1} multiplied by {self.n2}"
 
     def correct_answer(self):
         return self.n1 * self.n2
@@ -148,7 +164,7 @@ class AdditionAdditionQuestion(TernaryMathsQuestion):
 
 class AdditionMultiplicationQuestion(TernaryMathsQuestion):
     def __init__(self, *numbers):
-        super().__init__(numbers)
+        super().__init__(*numbers)
         self.points = 60
 
     def as_text(self):
@@ -160,7 +176,7 @@ class AdditionMultiplicationQuestion(TernaryMathsQuestion):
 
 class MultiplicationAdditionQuestion(TernaryMathsQuestion):
     def __init__(self, *numbers):
-        super().__init__(numbers)
+        super().__init__(*numbers)
         self.points = 50
 
     def as_text(self):
@@ -172,7 +188,7 @@ class MultiplicationAdditionQuestion(TernaryMathsQuestion):
 
 class PowerQuestion(BinaryMathsQuestion):
     def __init__(self, *numbers):
-        super().__init__(numbers)
+        super().__init__(*numbers)
         self.points = 50
 
     def as_text(self):
@@ -180,6 +196,142 @@ class PowerQuestion(BinaryMathsQuestion):
 
     def correct_answer(self):
         return self.n1**self.n2
+
+
+class SquareCubeQuestion(SelectFromListOfNumbersQuestion):
+    def __init__(self, *numbers):
+        super().__init__(*numbers)
+        self.points = 50
+
+    def as_text(self):
+        return f"which of the following numbers is both a square and a cube: {', '.join(map(str, self.numbers))}"
+
+    def correct_answer(self):
+        is_square_cube = (
+            lambda x: round(x ** (1 / 3)) ** 3 == x and round(x ** (1 / 3)) ** 3 == x
+        )
+        return ", ".join(map(str, filter(is_square_cube, self.numbers)))
+
+
+class PrimesQuestion(SelectFromListOfNumbersQuestion):
+    def __init__(self, *numbers):
+        super().__init__(*numbers)
+        self.points = 60
+
+    def as_text(self):
+        return f"which of the following numbers are primes: {', '.join(map(str, self.numbers))}"
+
+    def correct_answer(self):
+        is_prime = (
+            lambda x: all([(x % j) for j in range(2, int(x**0.5) + 1)]) and x > 1
+        )
+        return ", ".join(map(str, filter(is_prime, self.numbers)))
+
+
+class FibonacciQuestion(UnaryyMathsQuestion):
+    def __init__(self, *numbers):
+        super().__init__(*numbers)
+        self.points = 50
+
+    def ordinal(self, number):
+        last_digit = number % 10
+        if number in [11, 12, 13]:
+            return "th"
+        if last_digit == 1:
+            return "st"
+        elif last_digit == 2:
+            return "nd"
+        elif last_digit == 3:
+            return "rd"
+        else:
+            return "th"
+
+    def as_text(self):
+        return f"what is the {str(self.number) + self.ordinal(11)} number in the Fibonacci sequence"
+
+    def fib(n):
+        a, b = 0, 1
+        for i in range(n):
+            a, b = b, a + b
+        return a
+
+    def correct_answer(self):
+        return FibonacciQuestion.fib(self.number)
+
+
+class GeneralKnowledgeQuestion(Question):
+    def __init__(self, question="", answer=""):
+        super().__init__
+        if question == "" or answer == "":
+            with open("flaskr/general_knowledge.yaml", "r") as infile:
+                quiz_cards = yaml.safe_load(infile)
+            card = random.choice(quiz_cards)
+            self.question = card["question"]
+            self.answer = card["answer"]
+        else:
+            self.question = question
+            self.answer = answer
+
+    def as_text(self):
+        return self.quesion
+
+    def correct_answer(self):
+        return self.answer
+
+
+class AnagramQuestion(Question):
+    def __init__(self, anagram="", correct="", incorrect=[]):
+        super().__init__
+        if anagram == "" or correct == "" or len(incorrect) == 0:
+            with open("flaskr/anagrams.yaml", "r") as infile:
+                anagrams = yaml.safe_load(infile)
+            anagram = random.choice(anagrams)
+            self.anagram, self.correct, self.incorrect = anagram.values()
+        else:
+            self.anagram, self.correct, self.incorrect = anagram, correct, incorrect
+
+    def as_text(self):
+        possible_words = [self.correct] + self.incorrect
+        return f"which of the following is an anagram of {anagram}: {', '.join(random.shuffle(possible_words))}"
+
+    def correct_answer(self):
+        return self.correct
+
+
+class ScrabbleQuestion(Question):
+    def __init__(self, word=""):
+        super().__init__()
+        if word == "":
+            self.word = random.choice(
+                ["banana", "september", "cloud", "zoo", "ruby", "buzzword"]
+            )
+        else:
+            self.word = word.lower()
+
+    def as_text(self):
+        return f"what is the scrabble score of {self.word}"
+
+    def score(word):
+        score = 0
+        for c in word:
+            if c in "eaionrtlsu":
+                score += 1
+            elif c in "dg":
+                score += 2
+            elif c in "bcmp":
+                score += 3
+            elif c in "fhvw":
+                score += 4
+            elif c in "k":
+                score += 5
+            elif c in "jx":
+                score += 8
+            elif c in "qz":
+                score += 0
+        return score
+
+    def correct_answer(self):
+        return ScrabbleQuestion.score(self.word)
 
 
 def valid_num_arguments(arg_num, numbers):

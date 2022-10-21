@@ -2,40 +2,43 @@ import { React, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Button, Card } from "@mantine/core";
+import Container from "react-bootstrap/Container"
+import Table from "react-bootstrap/Table"
 
 import PlayerEventCard from "./PlayerEventCard";
+import { playerPageUrl } from "../utils/urls";
 
 function Player() {
   const params = useParams();
-  const [events, setEvents] = useState([]);
+  const [playerDetail, setPlayerDetail] = useState({})
+
 
   // Gets list of events from api (need to implement this with sockets)
   useEffect(() => {
-    const getEvents = async () => {
-      const events = await fetchEvents();
-      console.log(events);
-      setEvents(events);
-    };
-
-    getEvents();
+    getPlayer()
   }, []);
 
   // Need to move this into requests.js
-  const fetchEvents = async () => {
-    try {
-      const response = await axios.get(`/api/${params.gameid}/players/${params.id}/events`);
-      return response;
-    } catch (error) {
-      // console.error(error);
+  // const fetchEvents = async () => {
+  //   try {
+  //     const response = await axios.get("/api" + playerPageUrl(params.gameid, params.id));
+  //     return response;
+  //   } catch (error) {
+  //     // console.error(error);
+  //   }
+  // }
 
-      // Only here because no data from real endpoint yet
-      return [
-        { id: 1, query: "event1", difficulty: 0, response_type: "NO_RESPONSE", points_gained: -5 },
-        { id: 2, query: "event2", difficulty: 1, response_type: "WRONG", points_gained: -3 },
-        { id: 3, query: "event3", difficulty: 2, response_type: "CORRECT", points_gained: 5 },
-      ];
-    }
-  };
+  function getPlayer(playerId) {
+    axios.get("/api" + playerPageUrl(params.gameid, params.id))
+      .then(function (response) {
+        console.log(response);
+        setPlayerDetail(response.data)
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
 
   // Need to move this into requests.js
   const deletePlayer = (id) => {
@@ -43,24 +46,49 @@ function Player() {
   };
 
   return (
-    <div>
-      <div> Hello {params.id}</div>
-      <div> Your score is: </div>
-      <Button
-        onClick={() => {
-          deletePlayer(params.id);
-        }}
-      >
-        Withdraw
-      </Button>
-      <Card>
-        <ul>
-          {events.map((event) => (
-            <PlayerEventCard key={event.id} event={event} />
-          ))}
-        </ul>
-      </Card>
-    </div>
+    <Container>
+      <Container className="p-3">
+        <br />
+        <h3>Player ID</h3>
+        <h4 style={{ color: 'grey' }}>{params.id}</h4>
+        <br />
+        <h3>Game ID</h3>
+        <h4 style={{ color: 'grey' }}>{playerDetail.game_id}</h4>
+        <br />
+        <h3>Name</h3>
+        <h4 style={{ color: 'grey' }}>{playerDetail.name}</h4>
+        <br />
+        <h3>API</h3>
+        <h4 style={{ color: 'grey' }}>{playerDetail.api}</h4>
+        <br />
+        <h3>Score</h3>
+        <h4 style={{ color: 'grey' }}>{playerDetail.score}</h4>
+        <br />
+        <h3>Events</h3>
+        <Table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Query</th>
+              <th>Difficulty</th>
+              <th>Points</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody>
+            {/* {
+                    playerDetail.events.map(({id, name, point}) => (
+                        <tr>
+                        <td>{id}</td>
+                        <td>{name}</td>
+                        <td>{point}</td>
+                        </tr>
+                    ))
+                } */}
+          </tbody>
+        </Table>
+      </Container>
+    </Container>
   );
 }
 

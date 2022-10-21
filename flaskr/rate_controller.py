@@ -6,10 +6,12 @@ AVG_REQUEST_INTERVAL = 10
 REQUEST_DELTA = 0.1 
 SLASHDOT_THRESHOLD_SCORE = 2000
 
+# Controller that regulates frequency of requests sent to players
+# based on the result of the previous question response
 class RateController():
 
     def __init__(self, delay=5):
-        self.delay = delay
+        self.delay = min(delay, MAX_REQUEST_INTERVAL_SECS)
     
     def delay_before_next_request(self, question):
         error_problem = question.problem != ""
@@ -35,5 +37,6 @@ class RateController():
     def update_algorithm_based_on_score(self, score):
         return self
 
+# TODO: Implement Slashdot and other more specialised RateControllers
 class SlashdotRateController(RateController):
     pass 

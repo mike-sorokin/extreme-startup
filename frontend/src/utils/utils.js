@@ -18,3 +18,12 @@ export function showSuccessfulNotification(msg) {
     color: "teal"
   });
 }
+
+export function showFailureNotification(header, msg) {
+  showNotification({
+    title: header,
+    message: msg,
+    icon: <IconX size={18} />,
+    color: "red"
+  });
+}

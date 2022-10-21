@@ -1,7 +1,6 @@
 from uuid import uuid4
 from flaskr.question_factory import QuestionFactory
 
-
 class Game:
     def __init__(self, round=0):
         self.id = str(uuid4())
