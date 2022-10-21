@@ -175,6 +175,14 @@ def player_event(game_id, player_id, event_id):
         return DELETE_SUCCESSFUL
 
 
+@app.get("/api/<game_id>/leaderboard")
+def leaderboard(game_id):
+    if game_id not in scoreboards:
+        return NOT_ACCEPTABLE
+
+    return scoreboards[game_id].leaderboard()
+
+
 # Mark player as inactive, removes thread from player_threads dict
 def remove_players(*player_id):
     for pid in player_id:
