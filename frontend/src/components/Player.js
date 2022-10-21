@@ -1,19 +1,15 @@
 import { React, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Button, Card, Badge, Group } from "@mantine/core";
 import axios from "axios";
+import { Button, Card } from "@mantine/core";
 
 import PlayerEventCard from "./PlayerEventCard";
-
-// For testing only:
-// const api = axios.create({
-//   baseURL: "https://extreme-restartup.fly.dev/",
-// });
 
 function Player() {
   const params = useParams();
   const [events, setEvents] = useState([]);
 
+  // Gets list of events from api (need to implement this with sockets)
   useEffect(() => {
     const getEvents = async () => {
       const events = await fetchEvents();
@@ -24,6 +20,7 @@ function Player() {
     getEvents();
   }, []);
 
+  // Need to move this into requests.js
   const fetchEvents = async () => {
     try {
       const response = await axios.get(`/api/${params.gameid}/players/${params.id}/events`);
@@ -40,6 +37,7 @@ function Player() {
     }
   };
 
+  // Need to move this into requests.js
   const deletePlayer = (id) => {
     console.log("deleted player", id);
   };
