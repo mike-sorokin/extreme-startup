@@ -30,7 +30,7 @@ function Admin() {
     axios.put("http://127.0.0.1:5000/api/" + params.gameid)
     .then(function (response) {
       console.log(response);
-      setRound(round + 1)
+      setRound(round == 'Warmup' ? 1 :  (round + 1))
     })
     .catch(function (error) {
       console.log(error);

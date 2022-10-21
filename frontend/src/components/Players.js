@@ -7,7 +7,7 @@ import Table from 'react-bootstrap/Table'
 import Modal from 'react-bootstrap/Modal'
 import Form from 'react-bootstrap/Form'
 import axios from 'axios'
-import { requestGameCreation } from '../utils/requests'
+import { useNavigate } from "react-router-dom";
 
 function Players() {
     const params = useParams();
@@ -17,6 +17,7 @@ function Players() {
     const [modalName, setModalName] = useState('')
     const [modalAPI, setModalAPI] = useState('')
     const [validated, setValidated] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         getPlayers()
@@ -134,7 +135,7 @@ function Players() {
           </Stack>
           <hr/>
 
-          <Table>
+          <Table hover>
             <thead>
                 <tr>
                 <th>ID</th>
@@ -146,11 +147,13 @@ function Players() {
             <tbody>
                 {
                     players.map(({name, api, id}) => (
-                        <tr>
+                        <tr onClick={() => navigate(id)}>
                         <td>{id}</td>
                         <td>{name}</td>
                         <td>{api}</td>
-                        <td><Button variant="outline-danger" onClick={() => withdrawPlayer(id)}>Withdraw</Button></td>
+                        <td>
+                            <Button variant="outline-danger"  onClick={() => withdrawPlayer("./" + id)}>Withdraw</Button>
+                        </td>
                         </tr>
                     ))
                 }

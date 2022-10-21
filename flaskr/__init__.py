@@ -180,7 +180,11 @@ def leaderboard(game_id):
     if game_id not in scoreboards:
         return NOT_ACCEPTABLE
 
-    return scoreboards[game_id].leaderboard()
+    score_dict = scoreboards[game_id].leaderboard()
+    res = []
+    for k, s in score_dict.items():
+        res.append({"name": players[k].name, "id": k, "score": s})
+    return encoder.encode(res)
 
 
 # Mark player as inactive, removes thread from player_threads dict
