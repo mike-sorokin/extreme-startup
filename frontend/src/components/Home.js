@@ -4,7 +4,9 @@ import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
 import Modal from 'react-bootstrap/Modal';
+import Table from 'react-bootstrap/Table'
 import Container from 'react-bootstrap/Container';
+import Form from 'react-bootstrap/Form'
 import Row from 'react-bootstrap/Row';
 import AddPlayer from './AddPlayer';
 import CreateGame from './CreateGame';
