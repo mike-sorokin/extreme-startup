@@ -130,7 +130,7 @@ def test_players_post_creates_a_new_player(extras, cli):
 
     response = cli.post(
         f"/api/{gid}/players",
-        json={"name": "John_Doe", "api": "abc.com"}
+        data={"name": "John_Doe", "api": "abc.com"}
     )
     rd = response_as_dict_if_sucecssful(response)
     assert is_valid_player_json(rd)
