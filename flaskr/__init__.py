@@ -2,17 +2,12 @@ from crypt import methods
 from uuid import uuid4
 from flask import Flask, render_template, request, redirect, make_response, url_for, send_from_directory
 from flaskr.player import Player
-from flaskr.event import Event
 from flaskr.game import Game
 from flaskr.scoreboard import Scoreboard
 from flaskr.quiz_master import QuizMaster
 from flaskr.json_encoder import JSONEncoder
 from flaskr.questions import *
-from flaskr.question_factory import QuestionFactory
-import os
 import threading
-import requests
-import time
 
 # todo remove later
 import pprint
@@ -39,6 +34,8 @@ encoder = JSONEncoder()
 # PRODUCTION CONSTANT(S)
 QUESTION_TIMEOUT = 10
 QUESTION_DELAY = 5
+DELETE_SUCCESSFUL = ("Successfully deleted", 204)
+NOT_ACCEPTABLE = ("Requested resource not found", 406)
 
 
 # This is a catch-all function that will redirect anything not caught by the other rules
@@ -61,9 +58,10 @@ def kill_all_players():
     return ""
 
 
+# Game Management
 @app.route("/api", methods=["GET", "POST", "DELETE"])
 def api_index():
-    if request.method == "GET":
+    if request.method == "GET":  # fetch all games
         return encoder.encode(games)
     elif request.method == "POST":  # create new game -- initially no players
         new_game = Game()
@@ -75,13 +73,14 @@ def api_index():
         remove_players(*[p for g in games.values() for p in g.players])
         # garbage collect each game's question_factory
         games.clear()
-        return ("", 204)
+        return DELETE_SUCCESSFUL
 
 
+# Managing a specific game
 @app.route("/api/<game_id>", methods=["GET", "PUT", "DELETE"])
 def game(game_id):
     if game_id not in games:
-        return ("NOT FOUND", 404)
+        return NOT_ACCEPTABLE
 
     if request.method == "GET":  # fetch game with <game_id>
         return encoder.encode(games[game_id])
@@ -96,21 +95,25 @@ def game(game_id):
         return {"deleted": game_id}
 
 
+# Managing all players
 @app.route("/api/<game_id>/players", methods=["GET", "POST", "DELETE"])
 def all_players(game_id):
-    if request.method == "GET":
-        if game_id not in games:
-            return ("", 404)
+    if game_id not in games:
+        return NOT_ACCEPTABLE
+
+    if request.method == "GET":  # fetch game players
         players_ids = games[game_id].players
         players_dict = {id: players[id] for id in players_ids}
         r = make_response(encoder.encode({"players": players_dict}))
         r.mimetype = "application/json"
         return r
 
-    elif request.method == "POST":
-        player = Player(game_id, request.form["name"], api=request.form["api"])
+    elif request.method == "POST":  # create a new player -- initialise thread
+        # player = Player(game_id, request.form["name"], api=request.form["api"])
+        print(request.is_json, request.json, request.get_json())
+        player = Player(game_id, request.get_json()["name"], api=request.get_json()["api"])
+        games[game_id].new_player(player.uuid)
         scoreboards[game_id].new_player(player)
-        games[game_id].players.append(player.uuid)
         players[player.uuid] = player
         quiz_master = QuizMaster(
             player, games[game_id].question_factory, scoreboards[game_id]
@@ -125,13 +128,14 @@ def all_players(game_id):
     elif request.method == "DELETE":  # deletes all players in <game_id> game instance
         remove_players(*games[game_id].players)
         games[game_id].players.clear()
-        return ("", 204)
+        return DELETE_SUCCESSFUL
 
 
+# Managing <player_id> player
 @app.route("/api/<game_id>/players/<player_id>", methods=["GET", "PUT", "DELETE"])
 def player(game_id, player_id):
     if game_id not in games or player_id not in players:
-        return ("NOT FOUND", 404)
+        return NOT_ACCEPTABLE
 
     if request.method == "GET":  # fetch player with <player_id>
         return encoder.encode(players[player_id])
@@ -149,18 +153,20 @@ def player(game_id, player_id):
         return {"deleted": player_id}
 
 
+# Managing events for <player_id>
 @app.route("/api/<game_id>/players/<player_id>/events", methods=["GET", "DELETE"])
 def player_events(game_id, player_id):
     if game_id not in games or player_id not in players:
-        return ("NOT FOUND", 404)
+        return NOT_ACCEPTABLE
 
     if request.method == "GET":  # fetch all events for <game_id> player <player_id>
         return encoder.encode({"events": players[player_id].events})
     elif request.method == "DELETE":  # delets all events for <player_id>
         players[player_id].events.clear()
-        return ("", 204)
+        return DELETE_SUCCESSFUL
 
 
+# Managing one event
 @app.route(
     "/api/<game_id>/players/<player_id>/events/<event_id>", methods=["GET", "DELETE"]
 )
@@ -170,7 +176,7 @@ def player_event(game_id, player_id, event_id):
         or player_id not in players
         or event_id not in map(lambda e: e.event_id, players[player_id].events)
     ):
-        return ("NOT FOUND", 404)
+        return NOT_ACCEPTABLE
 
     event = filter(lambda e: e.id == event_id, players[player_id].events)[0]
 
@@ -178,7 +184,8 @@ def player_event(game_id, player_id, event_id):
         return encoder.encode(event)
     elif request.method == "DELETE":  # delete event with <event_id>
         players[player_id].events.remove(event)
-        return ("", 204)
+        return DELETE_SUCCESSFUL
+
 
 
 # Mark player as inactive, removes thread from player_threads dict
@@ -187,38 +194,7 @@ def remove_players(*player_id):
         assert pid in player_threads
         players[pid].active = False
         del player_threads[pid]
-
-        lock.acquire()
         del players[pid]
-        lock.release()
-
-
-def sendQuestion(player):
-    while player.active:
-        r = None
-        try:
-            r = requests.get(
-                player.api, params={"q": "What is your name?"}, timeout=QUESTION_TIMEOUT
-            ).text
-        except Exception:
-            pass
-        lock.acquire()
-        if player in scoreboards:
-            if r == None:
-                points_gained = -50
-                response_type = "NO_RESPONSE"
-            elif r == player.name:
-                points_gained = +50
-                response_type = "CORRECT"
-            else:
-                points_gained = -50
-                response_type = "WRONG"
-            event = Event(
-                player.uuid, "What is your name?", 0, points_gained, response_type
-            )
-            player.log_event(event)
-        lock.release()
-        time.sleep(QUESTION_DELAY)
 
 
 # FORGIVE ME
