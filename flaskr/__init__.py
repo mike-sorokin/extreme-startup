@@ -142,10 +142,10 @@ def player(game_id, player_id):
     elif (
         request.method == "PUT"
     ):  # update player (change name/api, NOT event management)
-        if "name" in request.form:
-            players[player_id].name = request.form["name"]
-        if "api" in request.form:
-            players[player_id].api = request.form["api"]
+        if "name" in request.get_json():
+            players[player_id].name = request.get_json()["name"]
+        if "api" in request.get_json():
+            players[player_id].api = request.get_json()["api"]
         return encoder.encode(players[player_id])
     elif request.method == "DELETE":  # delete player with id
         games[game_id].players.remove(player_id)
