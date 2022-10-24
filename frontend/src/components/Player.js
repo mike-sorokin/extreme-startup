@@ -1,10 +1,11 @@
 import { React, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { Button, Card } from "@mantine/core";
-import { Container, Table } from "@mantine/core";
+import { Button, Card, Container, Table } from "@mantine/core";
 import PlayerEventCard from "./PlayerEventCard";
 import { playerPageUrl } from "../utils/urls";
+
+// TODO: fix playerDetail
 
 function Player() {
   const params = useParams();

@@ -27,26 +27,6 @@ function Leaderboard() {
       });
   }
 
-  const rows = (
-    <>
-      <tr>
-        <td>aaosnaosinfaosifasoif</td>
-        <td>John</td>
-        <td>500</td>
-      </tr>
-      <tr>
-        <td>aaosnaosinfaosifasoif</td>
-        <td>John</td>
-        <td>500</td>
-      </tr>
-      <tr>
-        <td>aaosnaosinfaosifasoif</td>
-        <td>John</td>
-        <td>500</td>
-      </tr>
-    </>
-  )
-
   return (
     <Container size="xl" px="sm">
       <h2>Leaderboard</h2>
@@ -61,16 +41,15 @@ function Leaderboard() {
                 </tr>
             </thead>
             <tbody>
-              {rows}
-              {/* { 
-                    leaderboard.map(({id, name, score}) => (
-                        <tr key={id}>
-                        <td>{id}</td>
-                        <td>{name}</td>
-                        <td>{score}</td>
-                        </tr>
-                    ))
-                } */}
+              { 
+                leaderboard.map(({id, name, score}) => (
+                    <tr key={id}>
+                    <td>{id}</td>
+                    <td>{name}</td>
+                    <td>{score}</td>
+                    </tr>
+                ))
+              }
             </tbody>   
           </Table>
       }
