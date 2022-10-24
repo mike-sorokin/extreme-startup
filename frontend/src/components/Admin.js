@@ -1,8 +1,7 @@
 import Container from 'react-bootstrap/Container'
 import React, { useEffect, useState } from 'react'
 import { useParams } from "react-router-dom"
-import Button from 'react-bootstrap/Button'
-import Stack from 'react-bootstrap/Stack'
+import { Button, Stack } from "@mantine/core";
 import axios from 'axios'
 import { requestGameCreation } from '../utils/requests'
 import { gameUrl } from '../utils/urls'
@@ -49,13 +48,11 @@ function Admin() {
         <h3>Number of Players</h3>
         <h4 style={{ color: 'grey' }}>{playerNo}</h4>
         <br />
-        <Stack direction="horizontal" gap={2}>
-          <Stack>
-            <h3>Rounds</h3>
+        <Stack justify="flex-start">
+            <h3>Rounds<Button variant="outline-secondary" onClick={() => advanceRound()}>Advance Round</Button></h3>
             <h4 style={{ color: 'grey' }}>{round}</h4>
-          </Stack>
-          <Button variant="outline-secondary" onClick={() => advanceRound()}>Advance Round</Button>
         </Stack>
+        {/* <Button variant="outline-secondary" onClick={() => advanceRound()}>Advance Round</Button> */}
 
       </Container>
     </Container>

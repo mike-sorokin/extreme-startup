@@ -67,3 +67,18 @@ export function requestPlayerCreation(gameId, playerData) {
     })
     .catch(alertError)
 }
+
+
+// const fetchEvents = async () => {
+//   try {
+//     const response = await axios.get("/api" + playerPageUrl(params.gameid, params.id));
+//     return response;
+//   } catch (error) {
+//     // console.error(error);
+//   }
+// }
+
+
+// const deletePlayer = (id) => {
+//   console.log("deleted player", id);
+// };
