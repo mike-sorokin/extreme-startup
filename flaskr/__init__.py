@@ -1,6 +1,14 @@
 from crypt import methods
 from uuid import uuid4
-from flask import Flask, render_template, request, redirect, make_response, url_for, send_from_directory
+from flask import (
+    Flask,
+    render_template,
+    request,
+    redirect,
+    make_response,
+    url_for,
+    send_from_directory,
+)
 from flaskr.player import Player
 from flaskr.game import Game
 from flaskr.scoreboard import Scoreboard
@@ -46,9 +54,11 @@ def serve_frontend(path):
     print("path is", path)
     return make_response(render_template("index.html", path=path))
 
+
 @app.route("/favicon.ico")
 def favicon():
     return send_from_directory(app.root_path, "favicon.ico")
+
 
 # Game Management
 @app.route("/api", methods=["GET", "POST", "DELETE"])
@@ -84,26 +94,26 @@ def game(game_id):
     elif request.method == "PUT":  # update game settings
         r = request.get_json()
 
-        if "round" in r: # increment <game_id>'s round by 1 
+        if "round" in r:  # increment <game_id>'s round by 1
             games[game_id].question_factory.advance_round()
             games[game_id].round += 1
             return ("ROUND_INCREMENTED", 200)
 
         elif "pause" in r:
-            if r["pause"]: # pause <game_id> 
-                pause_successful = games[game_id].pause_wlock.acquire(timeout=5)
+            if r["pause"]:  # pause <game_id>
+                pause_successful = games[game_id].pause_wlock.acquire(timeout=15)
                 if not pause_successful:
-                    return ("Race condition with lock", 429)  
-                games[game_id].paused = True                  
+                    return ("Race condition with lock", 429)
+                games[game_id].paused = True
                 return ("GAME_PAUSED", 200)
 
             else:
                 try:
                     games[game_id].pause_wlock.release()
                     games[game_id].paused = False
-                except RuntimeException:
+                except RuntimeError:
                     return ("Race condition wtih lock", 429)
-                return ("GAME_UNPAUSED", 200) 
+                return ("GAME_UNPAUSED", 200)
 
         return NOT_ACCEPTABLE
 
@@ -129,14 +139,19 @@ def all_players(game_id):
         return r
 
     elif request.method == "POST":  # create a new player -- initialise thread
-        player = Player(game_id, request.get_json()["name"], api=request.get_json()["api"])
+        player = Player(
+            game_id, request.get_json()["name"], api=request.get_json()["api"]
+        )
 
         games[game_id].new_player(player.uuid)
         scoreboards[game_id].new_player(player)
         players[player.uuid] = player
 
         quiz_master = QuizMaster(
-            player, games[game_id].question_factory, scoreboards[game_id], games[game_id].pause_rlock
+            player,
+            games[game_id].question_factory,
+            scoreboards[game_id],
+            games[game_id].pause_rlock,
         )
 
         player_thread = threading.Thread(target=quiz_master.start)
