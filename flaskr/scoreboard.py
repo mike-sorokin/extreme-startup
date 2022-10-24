@@ -17,13 +17,20 @@ class Scoreboard:
     def increment_score_for(self, player, question):
         increment = self.score(question, self.leaderboard_position(player))
         self.scores[player.uuid] += increment
+
         if increment > 0:
             self.correct_tally[player.uuid] += 1
+            player.streak = "1" + player.streak
+
         elif increment < 0:
             self.incorrect_tally[player.uuid] += 1
+            player.streak = "0" + player.streak
+        
         player.score = self.scores[player.uuid]
         event = Event(player.uuid, player.game_id, question.as_text(), 0, increment, question.result if question.problem == "" else question.problem)
+
         player.log_event(event)
+        player.streak = player.streak[:6]
 
     def record_request_for(self, player):
         self.request_counts[player.uuid] += 1
@@ -67,14 +74,17 @@ class Scoreboard:
         res, problem = question.result, question.problem
         if res == "CORRECT":
             return question.points
+
         elif res == "WRONG":
             return (
                 self.allow_passes(question, leaderboard_position)
                 if self.lenient
                 else self.penalty(question, leaderboard_position)
             )
+
         elif problem == "ERROR_RESPONSE" or problem == "NO_SERVER_RESPONSE":
             return -1 * PROBLEM_DECREMENT
+
         else:
             print(
                 f"!!!!! unrecognized result '#{question.result}' from #{repr(question)} in Scoreboard#score"

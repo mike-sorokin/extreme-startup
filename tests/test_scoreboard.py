@@ -1,22 +1,22 @@
 from flaskr.scoreboard import Scoreboard 
-from unittest.mock import Mock
+from unittest.mock import Mock, MagicMock
 import pytest
 
 PROBLEM_DECREMENT = 50 
 
 @pytest.fixture()
 def game_setup(): # (scoreboard, player, question)
-    return (Scoreboard(), Mock())
+    return (Scoreboard(), MagicMock())
 
 @pytest.fixture()
 def game_with_player_setup():
-    sb, player = Scoreboard(), Mock()
+    sb, player = Scoreboard(), MagicMock()
     sb.new_player(player)
     return (sb, player)
 
 @pytest.fixture()
 def full_game_setup():
-    sb, player, question= Scoreboard(), Mock(), Mock()
+    sb, player, question= Scoreboard(), MagicMock(), Mock()
     sb.new_player(player)
     yield (sb, player, question)
     del sb
@@ -97,7 +97,7 @@ def test_decrements_score_for_question_with_error_response(full_game_setup):
 
 def test_leaderboard_orders_players_by_decreasing_socre(full_game_setup):
     scoreboard, player1, question = full_game_setup
-    player2 = Mock()
+    player2 = MagicMock()
     scoreboard.new_player(player2)
     question.result, question.points = "CORRECT", 10 
 
@@ -116,7 +116,7 @@ def test_leaderboard_orders_players_by_decreasing_socre(full_game_setup):
 
 def test_scoreboard_penalises_higher_ranking_players_more(full_game_setup):
     scoreboard, better_player, question = full_game_setup
-    worse_player, points = Mock(), 10
+    worse_player, points = MagicMock(), 10
     num_players = 2
     scoreboard.new_player(worse_player)
     question.result, question.points = "CORRECT", points

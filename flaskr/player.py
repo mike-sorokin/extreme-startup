@@ -11,6 +11,7 @@ class Player:
         self.api = api
         self.events = []
         self.active = True
+        self.streak = ""
 
     def log_event(self, event):
         self.events.append(event)
