@@ -11,7 +11,7 @@ const instance = axios.create({
 
 /**
  * Fetches all games
- * @returns {{gameId: game_json, ...}} Object containing all game json objects
+ * @returns {{gameId: game_json, ...}} Object containing all game objects
  */
 export async function fetchAllGames() {
   try {
@@ -24,7 +24,7 @@ export async function fetchAllGames() {
 
 /**
  * Creates a new game and returns its game json object
- * @returns {game_json} 
+ * @returns {game_json} Game object of newly created game
  */
 export async function createNewGame() {
   try {
