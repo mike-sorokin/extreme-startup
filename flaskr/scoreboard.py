@@ -1,6 +1,8 @@
-from flaskr.event import Event 
+from flaskr.event import Event
+
 
 PROBLEM_DECREMENT = 50
+
 
 class Scoreboard:
     def __init__(self, lenient=True):
@@ -30,7 +32,7 @@ class Scoreboard:
     def new_player(self, player):
         self.request_counts[player.uuid] = 0
         self.correct_tally[player.uuid] = 0
-        self.incorrect_tally[player.uuid] = 0 
+        self.incorrect_tally[player.uuid] = 0
         self.scores[player.uuid] = 0
 
     def delete_player(self, player):
@@ -52,7 +54,12 @@ class Scoreboard:
         return self.request_counts[player.uuid]
 
     def leaderboard(self):
-        return {k: v for k, v in sorted(self.scores.items(), key=lambda item: item[1], reverse=True)}
+        return {
+            k: v
+            for k, v in sorted(
+                self.scores.items(), key=lambda item: item[1], reverse=True
+            )
+        }
 
     def leaderboard_position(self, player):
         return list(self.leaderboard().keys()).index(player.uuid) + 1
@@ -62,11 +69,17 @@ class Scoreboard:
         if res == "CORRECT":
             return question.points
         elif res == "WRONG":
-            return self.allow_passes(question, leaderboard_position) if self.lenient else self.penalty(question, leaderboard_position)
+            return (
+                self.allow_passes(question, leaderboard_position)
+                if self.lenient
+                else self.penalty(question, leaderboard_position)
+            )
         elif problem == "ERROR_RESPONSE" or problem == "NO_SERVER_RESPONSE":
             return -1 * PROBLEM_DECREMENT
-        else: 
-            print(f"!!!!! unrecognized result '#{question.result}' from #{repr(question)} in Scoreboard#score")
+        else:
+            print(
+                f"!!!!! unrecognized result '#{question.result}' from #{repr(question)} in Scoreboard#score"
+            )
 
     def allow_passes(self, question, leaderboard_position):
         return (

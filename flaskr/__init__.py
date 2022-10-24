@@ -1,6 +1,6 @@
 from crypt import methods
 from uuid import uuid4
-from flask import Flask, render_template, request, redirect, make_response
+from flask import Flask, render_template, request, redirect, make_response, url_for, send_from_directory
 from flaskr.player import Player
 from flaskr.game import Game
 from flaskr.scoreboard import Scoreboard
@@ -19,6 +19,9 @@ games = {}
 
 # players: player_id -> Player
 players = {}
+
+# Scoreboard lock
+lock = threading.Lock()
 
 # scoreboards: game_id -> Scoreboard
 scoreboards = {}
@@ -43,6 +46,9 @@ def serve_frontend(path):
     print("path is", path)
     return make_response(render_template("index.html", path=path))
 
+@app.route("/favicon.ico")
+def favicon():
+    return send_from_directory(app.root_path, "favicon.ico")
 
 # Game Management
 @app.route("/api", methods=["GET", "POST", "DELETE"])
@@ -126,10 +132,10 @@ def player(game_id, player_id):
     elif (
         request.method == "PUT"
     ):  # update player (change name/api, NOT event management)
-        if "name" in request.json:
-            players[player_id].name = request.json["name"]
-        if "api" in request.json:
-            players[player_id].api = request.json["api"]
+        if "name" in request.get_json():
+            players[player_id].name = request.get_json()["name"]
+        if "api" in request.get_json():
+            players[player_id].api = request.get_json()["api"]
         return encoder.encode(players[player_id])
     elif request.method == "DELETE":  # delete player with id
         games[game_id].players.remove(player_id)
@@ -171,6 +177,18 @@ def player_event(game_id, player_id, event_id):
         return DELETE_SUCCESSFUL
 
 
+@app.get("/api/<game_id>/leaderboard")
+def leaderboard(game_id):
+    if game_id not in scoreboards:
+        return NOT_ACCEPTABLE
+
+    score_dict = scoreboards[game_id].leaderboard()
+    res = []
+    for k, s in score_dict.items():
+        res.append({"name": players[k].name, "id": k, "score": s})
+    return encoder.encode(res)
+
+
 # Mark player as inactive, removes thread from player_threads dict
 def remove_players(*player_id):
     for pid in player_id:
@@ -181,22 +199,20 @@ def remove_players(*player_id):
 
 
 # FORGIVE ME
-pp = pprint.PrettyPrinter(indent=4)
-bot_responses = {1: "Hello world!"}
+bot_responses = {n: (f"Bot{n}", 0) for n in range(100)}
 
 # /2/hi  style links, these update the response
 @app.route("/api/bot/<int:bot_id>/<string:resp>", methods=["GET"])
 def _update_response(bot_id, resp):
-    print(f"Updated {bot_id} to {resp}")
-    bot_responses[bot_id] = resp
+    bot_responses[bot_id][0] = resp
+    bot_responses[bot_id][1] += 1
     return redirect(url_for("api_response", bot_id=bot_id))
 
 
 # Get a response
 @app.route("/api/bot/<int:bot_id>", methods=["GET"])
 def _api_response(bot_id):
-    print(f"Received GET for {bot_id}\nResponding with {bot_responses[bot_id]}\n\n")
-    return bot_responses[bot_id]
+    return bot_responses[bot_id][0]
 
 
 @app.route("/api/bot/cleanup", methods=["GET"])
@@ -207,4 +223,4 @@ def _cleanup():
 
 @app.route("/api/bot/", methods=["GET"])
 def _main_view():
-    return pp.pformat(bot_responses)
+    return "<br>".join(list(str(x) for x in bot_responses.values()))

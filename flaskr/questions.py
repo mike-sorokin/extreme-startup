@@ -1,5 +1,6 @@
 import numbers
 from uuid import uuid4
+import requests
 import random
 import yaml
 import os
@@ -14,6 +15,9 @@ class Question:
         self.problem = ""
 
     def ask(self, player):
+        if isinstance(self, WarmupQuestion): 
+            self.player_name = player.name.strip().lower()
+
         try:
             response = requests.get(player.api, params={"q": self.as_text()})
 
@@ -64,7 +68,7 @@ class WarmupQuestion(Question):
         super().__init__()
 
     def correct_answer(self):
-        return self.player_name
+        return self.player_name 
 
     def as_text(self):
         return "What is your name?"
