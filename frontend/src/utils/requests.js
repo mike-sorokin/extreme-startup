@@ -7,11 +7,43 @@ const instance = axios.create({
   headers: { 'Content-Type': 'application/json', }
 })
 
-// Main page requests ("/api")
+/**
+ * Object representing a Player
+ * @typedef {Object} Player
+ * @property {String} id
+ * @property {String} game_id
+ * @property {String} name
+ * @property {Number} score
+ * @property {String} api
+ * @property {Event[]} events - List of all event IDs
+ */
+
+/**
+ * Object representing an Event
+ * @typedef {Object} Event
+ * @property {String} id
+ * @property {String} player_id
+ * @property {String} query
+ * @property {Number} difficulty - "0" for warmup, 1 for round 1, etc.
+ * @property {Number} points_gained - +ve / -ve point difference
+ * @property {NO_RESPONSE/WRONG/CORRECT} response_type 
+ * @property {RFC3339} timestamp
+ */
+
+/**
+ * Object representing a Game
+ * @typedef {Object} Game
+ * @property {String} id
+ * @property {Number} round
+ * @property {player_id[]} players - List of player IDs
+ * @property {Boolean} paused
+ */
+
+// Main page requests - ("/api")
 
 /**
  * Fetches all games
- * @returns {{gameId: game_json, ...}} Object containing all game objects
+ * @return {{gameId: Game, ...}} Object containing all game objects
  */
 export async function fetchAllGames() {
   try {
@@ -24,7 +56,7 @@ export async function fetchAllGames() {
 
 /**
  * Creates a new game and returns its game json object
- * @returns {game_json} Game object of newly created game
+ * @return {Game} Game object of newly created game
  */
 export async function createNewGame() {
   try {
@@ -37,7 +69,7 @@ export async function createNewGame() {
 
 /**
  * Drops all games, ids, events
- * @returns TODO
+ * @return TODO
  */
 export async function deleteEverything() {
   try {
@@ -48,12 +80,12 @@ export async function deleteEverything() {
   }
 }
 
-// Game Page requests ("/api/(gameId)")
+// Requests to ("/api/(gameId)")
 
 /**
  * Fetches game json object for a given game ID
- * @param   {String} gameId
- * @returns {game_json}
+ * @param  {String} gameId
+ * @return {Game} Game json object
  */
 export async function fetchGame(gameId) {
   try {
@@ -69,9 +101,9 @@ export async function fetchGame(gameId) {
  * 
  * Sending an object containing {"round": roundNumber} will advance the game to roundNumber
  * Sending an object containing {"pause": true/false} will pause the game if true and unpause if false
- * @param   {String} gameId 
- * @param   {{"round": Number, "pause": Boolean}} data Object containing either the round to advance to or whether to pause/unpause the game
- * @returns {String} 
+ * @param  {String} gameId 
+ * @param  {{"round": Number, "pause": Boolean}} data Object containing either the round to advance to or whether to pause/unpause the game
+ * @return {String} 
  */
 export async function updateGame(gameId, data) {
   try {
@@ -84,8 +116,8 @@ export async function updateGame(gameId, data) {
 
 /**
  * Drops a given game
- * @param   {String} gameId 
- * @returns TODO
+ * @param  {String} gameId 
+ * @return {{"deleted": gameId}} ID of deleted game
  */
 export async function deleteGame(gameId) {
   try {
@@ -96,12 +128,12 @@ export async function deleteGame(gameId) {
   }
 }
 
-// ("/api/(game_id)/players")
+// Requests to ("/api/(game_id)/players")
 
 /**
- * 
- * @param   {String} gameId 
- * @returns {{"players": !Array<player_json>}
+ * Fetches all players in a given game
+ * @param  {String} gameId 
+ * @return {{"players": Player[]}} Object containing list of all players
  */
 export async function fetchPlayers(gameId) {
   try {
@@ -114,10 +146,10 @@ export async function fetchPlayers(gameId) {
 
 /**
  * Validates user submission and creates new player if valid (returns false if invalid)
- * @param   {String} gameId 
- * @param   {String} name   Name submitted by user
- * @param   {String} api    URL submitted by user
- * @returns {player_json}   player json object for newly created player
+ * @param  {String} gameId 
+ * @param  {String} name   Name submitted by user
+ * @param  {String} api    URL submitted by user
+ * @return {Player}   player json object for newly created player
  */
 export async function createPlayer(gameId, name, api) {
 
@@ -191,8 +223,8 @@ async function validateData(gameId, data) {
 
 /**
  * Deletes all players in a game
- * @param   {String} gameId 
- * @returns TODO
+ * @param  {String} gameId 
+ * @return TODO
  */
 export async function deleteAllPlayers(gameId) {
   try {
@@ -207,9 +239,9 @@ export async function deleteAllPlayers(gameId) {
 
 /**
  * Returns player json object for a given player in a given game
- * @param   {String} gameId 
- * @param   {String} playerId 
- * @returns {{player_json}}
+ * @param  {String} gameId 
+ * @param  {String} playerId 
+ * @return {Player} Player json object
  */
 export async function fetchPlayer(gameId, playerId) {
   try {
@@ -222,10 +254,10 @@ export async function fetchPlayer(gameId, playerId) {
 
 /**
  * Updates a player's name and/or api url
- * @param   {String} gameId 
- * @param   {String} playerId 
- * @param   {{name: String, api: String}} data Object containing new name and/or new api
- * @returns {{player_json}} Updated player json object
+ * @param  {String} gameId 
+ * @param  {String} playerId 
+ * @param  {{name: String, api: String}} data Object containing new name and/or new api
+ * @return {Player} Updated player json object
  */
 export async function updatePlayer(gameId, playerId, data) {
 
@@ -246,9 +278,9 @@ export async function updatePlayer(gameId, playerId, data) {
 
 /**
  * Drops a player
- * @param   {String} gameId 
- * @param   {String} playerId 
- * @returns {{"deleted": playerId}} playerId is the ID of the deleted player
+ * @param  {String} gameId 
+ * @param  {String} playerId 
+ * @return {{"deleted": playerId}} ID of the deleted player
  */
 export async function deletePlayer(gameId, playerId) {
   try {
@@ -263,9 +295,9 @@ export async function deletePlayer(gameId, playerId) {
 
 /**
  * Returns a list of all event json objects for a given player
- * @param {String} gameId 
- * @param {String} playerId 
- * @returns {{"events": !Array<event_json>}} List of all event json objects
+ * @param  {String} gameId 
+ * @param  {String} playerId 
+ * @return {{"events": Event[]}} List of all event json objects
  */
 export async function fetchAllEvents(gameId, playerId) {
   try {
@@ -280,7 +312,7 @@ export async function fetchAllEvents(gameId, playerId) {
  * Deletes all events for a given player
  * @param {String} gameId 
  * @param {String} playerId 
- * @returns TODO
+ * @return TODO
  */
 export async function deleteAllEvents(gameId, playerId) {
   try {
@@ -295,10 +327,10 @@ export async function deleteAllEvents(gameId, playerId) {
 
 /**
  * Returns the event json object for a given eventId
- * @param {String} gameId 
- * @param {String} playerId 
- * @param {String} eventId 
- * @returns {{event_json}}
+ * @param  {String} gameId 
+ * @param  {String} playerId 
+ * @param  {String} eventId 
+ * @return {Event} Event json object
  */
 export async function fetchEvent(gameId, playerId, eventId) {
   try {
@@ -311,10 +343,10 @@ export async function fetchEvent(gameId, playerId, eventId) {
 
 /**
  * Drops a given event
- * @param {String} gameId 
- * @param {String} playerId 
- * @param {String} eventId 
- * @returns {"deleted": eventId}
+ * @param  {String} gameId 
+ * @param  {String} playerId 
+ * @param  {String} eventId 
+ * @return {"deleted": eventId} ID of deleted event
  */
 export async function deleteEvent(gameId, playerId, eventId) {
   try {
