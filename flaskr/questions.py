@@ -4,7 +4,7 @@ import requests
 import random
 import yaml
 import os
-
+import requests
 
 class Question:
     def __init__(self, points=10):
