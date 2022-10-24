@@ -12,6 +12,18 @@ export function game(gameId) {
   return `/${gameId}`
 }
 
+export function players(gameId) {
+  return `/${gameId}/players`
+}
+
+export function player(gameId, playerId) {
+  return `/${gameId}/players/${playerId}`
+}
+
+export function admin(gameId) {
+  return `/${gameId}/admin`
+}
+
 /**
  * URLs for requests
  */
