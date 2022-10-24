@@ -30,6 +30,10 @@ class Scoreboard:
         event = Event(player.uuid, player.game_id, question.as_text(), 0, increment, question.result if question.problem == "" else question.problem)
 
         player.log_event(event)
+
+        if question.problem != "":
+            player.streak = "X" + player.streak[1:]
+            
         player.streak = player.streak[:6]
 
     def record_request_for(self, player):
