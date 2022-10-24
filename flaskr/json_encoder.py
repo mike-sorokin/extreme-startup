@@ -3,7 +3,7 @@ from flaskr.player import Player
 from flaskr.event import Event
 from flaskr.game import Game
 
-
+# Encode application objects to JSON format to support REST api 
 class JSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, Player):
@@ -26,5 +26,6 @@ class JSONEncoder(json.JSONEncoder):
                 timestamp=obj.timestamp,
             )
         elif isinstance(obj, Game):
-            return dict(id=obj.id, round=obj.round, players=obj.players)
+            return dict(id=obj.id, round=obj.round, players=obj.players, paused=obj.paused)
+            
         return super().default(obj)

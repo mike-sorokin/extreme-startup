@@ -1,16 +1,20 @@
 import time
 from flaskr.rate_controller import RateController
 
+# Unique to each player. Responsible for sending questions to user api endpoint at frequency determined by rate_controller
+# and incrementing player score in scoreboard
 class QuizMaster:
-    def __init__(self, player, question_factory, scoreboard, rate_controller = RateController()):
+    def __init__(self, player, question_factory, scoreboard, rlock, rate_controller = RateController()):
         self.player = player
         self.rate_controller = rate_controller
         self.question_factory = question_factory
         self.scoreboard = scoreboard 
+        self.rlock = rlock
     
     def start(self):
         while self.player.active:
-            self.administer_question()
+            with self.rlock:
+                self.administer_question()
     
     def administer_question(self):
         question = self.question_factory.next_question()

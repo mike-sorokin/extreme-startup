@@ -6,9 +6,10 @@ import yaml
 import os
 import requests
 
+# Basic question object. Questions asked to players are instances of subclasses. Should be treated as abstract class
 class Question:
     def __init__(self, points=10):
-        self.uuid = str(uuid4())
+        self.uuid = uuid4().hex[:8]
         self.points = points
         self.answer = None
         self.result = ""
@@ -28,21 +29,26 @@ class Question:
 
         except Exception:
             self.problem = "NO_SERVER_RESPONSE"
+
         self.get_result()
 
     def get_result(self):
         if self.answer is None:
             self.result = self.problem
+
         elif self.answered_correctly():
             self.result = "CORRECT"
+
         else:
             self.result = "WRONG"
 
     def delay_before_next(self):
         if self.result == "CORRECT":
             return 5
+
         elif self.result == "WRONG":
             return 10
+
         else:
             return 20
 
@@ -79,6 +85,7 @@ class UnaryyMathsQuestion(Question):
         super().__init__()
         if valid_num_arguments(1, number):
             self.number = number[0]
+
         else:
             self.number = random.randrange(1, 100)
 
@@ -89,6 +96,7 @@ class BinaryMathsQuestion(Question):
         if valid_num_arguments(2, numbers):
             self.n1 = numbers[0]
             self.n2 = numbers[1]
+
         else:
             self.n1 = random.randrange(1, 100)
             self.n2 = random.randrange(1, 100)
@@ -99,6 +107,7 @@ class TernaryMathsQuestion(Question):
         super().__init__()
         if valid_num_arguments(3, numbers):
             self.n1, self.n2, self.n3 = numbers
+
         else:
             self.n1, self.n2, self.n3 = random.sample(range(1, 100), 3)
 
@@ -108,6 +117,7 @@ class SelectFromListOfNumbersQuestion(Question):
         super().__init__()
         if len(numbers) != 0 and valid_num_arguments(len(numbers), numbers):
             self.numbers = list(numbers)
+
         else:
             size = random.randrange(1, 10)
             self.numbers = random.sample(range(1, 100), size)
@@ -239,12 +249,16 @@ class FibonacciQuestion(UnaryyMathsQuestion):
         last_digit = number % 10
         if number in [11, 12, 13]:
             return "th"
+
         if last_digit == 1:
             return "st"
+
         elif last_digit == 2:
             return "nd"
+
         elif last_digit == 3:
             return "rd"
+
         else:
             return "th"
 
@@ -255,6 +269,7 @@ class FibonacciQuestion(UnaryyMathsQuestion):
         a, b = 0, 1
         for i in range(n):
             a, b = b, a + b
+
         return a
 
     def correct_answer(self):
@@ -265,11 +280,12 @@ class GeneralKnowledgeQuestion(Question):
     def __init__(self, question="", answer=""):
         super().__init__
         if question == "" or answer == "":
-            with open("flaskr/general_knowledge.yaml", "r") as infile:
+            with open("flaskr/yaml/general_knowledge.yaml", "r") as infile:
                 quiz_cards = yaml.safe_load(infile)
             card = random.choice(quiz_cards)
             self.question = card["question"]
             self.answer = card["answer"]
+
         else:
             self.question = question
             self.answer = answer
@@ -285,10 +301,12 @@ class AnagramQuestion(Question):
     def __init__(self, anagram="", correct="", incorrect=[]):
         super().__init__
         if anagram == "" or correct == "" or len(incorrect) == 0:
-            with open("flaskr/anagrams.yaml", "r") as infile:
+            with open("flaskr/yaml/anagrams.yaml", "r") as infile:
                 anagrams = yaml.safe_load(infile)
+
             anagram = random.choice(anagrams)
             self.anagram, self.correct, self.incorrect = anagram.values()
+
         else:
             self.anagram, self.correct, self.incorrect = anagram, correct, incorrect
 
@@ -301,12 +319,19 @@ class AnagramQuestion(Question):
 
 
 class ScrabbleQuestion(Question):
+    SCRABBLE_SCORES = {"a": 1, "c": 3, "b": 3, "e": 1, "d": 2, "g": 2, 
+          "f": 4, "i": 1, "h": 4, "k": 5, "j": 8, "m": 3, 
+          "l": 1, "o": 1, "n": 1, "q": 10, "p": 3, "s": 1, 
+          "r": 1, "u": 1, "t": 1, "w": 4, "v": 4, "y": 4, 
+          "x": 8, "z": 10}
+
     def __init__(self, word=""):
         super().__init__()
         if word == "":
             self.word = random.choice(
                 ["banana", "september", "cloud", "zoo", "ruby", "buzzword"]
             )
+
         else:
             self.word = word.lower()
 
@@ -316,20 +341,8 @@ class ScrabbleQuestion(Question):
     def score(word):
         score = 0
         for c in word:
-            if c in "eaionrtlsu":
-                score += 1
-            elif c in "dg":
-                score += 2
-            elif c in "bcmp":
-                score += 3
-            elif c in "fhvw":
-                score += 4
-            elif c in "k":
-                score += 5
-            elif c in "jx":
-                score += 8
-            elif c in "qz":
-                score += 0
+            score += ScrabbleQuestion.SCRABBLE_SCORES[c]
+
         return score
 
     def correct_answer(self):

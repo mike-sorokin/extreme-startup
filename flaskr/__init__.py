@@ -55,12 +55,16 @@ def favicon():
 def api_index():
     if request.method == "GET":  # fetch all games
         return encoder.encode(games)
+
     elif request.method == "POST":  # create new game -- initially no players
         new_game = Game()
+
         gid = new_game.id
         scoreboards[gid] = Scoreboard()
         games[gid] = new_game
+
         return encoder.encode(new_game)
+
     elif request.method == "DELETE":  # delete all games
         remove_players(*[p for g in games.values() for p in g.players])
         # garbage collect each game's question_factory
@@ -76,12 +80,36 @@ def game(game_id):
 
     if request.method == "GET":  # fetch game with <game_id>
         return encoder.encode(games[game_id])
-    elif request.method == "PUT":  # update game (advance round)
-        games[game_id].question_factory.advance_round()
-        games[game_id].round += 1
-        return ("ROUND_INCREMENTED", 200)
+
+    elif request.method == "PUT":  # update game settings
+        r = request.get_json()
+
+        if "round" in r: # increment <game_id>'s round by 1 
+            games[game_id].question_factory.advance_round()
+            games[game_id].round += 1
+            return ("ROUND_INCREMENTED", 200)
+
+        elif "pause" in r:
+            if r["pause"]: # pause <game_id> 
+                pause_successful = games[game_id].pause_wlock.acquire(timeout=5)
+                if not pause_successful:
+                    return ("Race condition with lock", 429)  
+                games[game_id].paused = True                  
+                return ("GAME_PAUSED", 200)
+
+            else:
+                try:
+                    games[game_id].pause_wlock.release()
+                    games[game_id].paused = False
+                except RuntimeException:
+                    return ("Race condition wtih lock", 429)
+                return ("GAME_UNPAUSED", 200) 
+
+        return NOT_ACCEPTABLE
+
     elif request.method == "DELETE":  # delete game with <game_id>
         remove_players(*games[game_id].players)
+
         # garbage collect the question_factory
         del games[game_id]
         return {"deleted": game_id}
@@ -102,19 +130,24 @@ def all_players(game_id):
 
     elif request.method == "POST":  # create a new player -- initialise thread
         player = Player(game_id, request.get_json()["name"], api=request.get_json()["api"])
+
         games[game_id].new_player(player.uuid)
         scoreboards[game_id].new_player(player)
         players[player.uuid] = player
+
         quiz_master = QuizMaster(
-            player, games[game_id].question_factory, scoreboards[game_id]
+            player, games[game_id].question_factory, scoreboards[game_id], games[game_id].pause_rlock
         )
+
         player_thread = threading.Thread(target=quiz_master.start)
         player_threads[player.uuid] = player_thread
         player_thread.daemon = True
         player_thread.start()
+
         r = make_response(encoder.encode(player))
         r.mimetype = "application/json"
         return r
+
     elif request.method == "DELETE":  # deletes all players in <game_id> game instance
         remove_players(*games[game_id].players)
         games[game_id].players.clear()
@@ -134,8 +167,10 @@ def player(game_id, player_id):
     ):  # update player (change name/api, NOT event management)
         if "name" in request.get_json():
             players[player_id].name = request.get_json()["name"]
+
         if "api" in request.get_json():
             players[player_id].api = request.get_json()["api"]
+
         return encoder.encode(players[player_id])
     elif request.method == "DELETE":  # delete player with id
         games[game_id].players.remove(player_id)
@@ -151,6 +186,7 @@ def player_events(game_id, player_id):
 
     if request.method == "GET":  # fetch all events for <game_id> player <player_id>
         return encoder.encode({"events": players[player_id].events})
+
     elif request.method == "DELETE":  # delets all events for <player_id>
         players[player_id].events.clear()
         return DELETE_SUCCESSFUL
@@ -172,6 +208,7 @@ def player_event(game_id, player_id, event_id):
 
     if request.method == "GET":  # fetch event with <event_id>
         return encoder.encode(event)
+
     elif request.method == "DELETE":  # delete event with <event_id>
         players[player_id].events.remove(event)
         return DELETE_SUCCESSFUL
@@ -184,8 +221,10 @@ def leaderboard(game_id):
 
     score_dict = scoreboards[game_id].leaderboard()
     res = []
+
     for k, s in score_dict.items():
         res.append({"name": players[k].name, "id": k, "score": s})
+
     return encoder.encode(res)
 
 
@@ -194,6 +233,7 @@ def remove_players(*player_id):
     for pid in player_id:
         assert pid in player_threads
         players[pid].active = False
+
         del player_threads[pid]
         del players[pid]
 

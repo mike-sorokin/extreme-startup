@@ -1,9 +1,8 @@
 from flaskr.event import Event
 
-
 PROBLEM_DECREMENT = 50
 
-
+# Track player's score in a particular game. Scores players based on question type, positioning on scoreboard, and leniency mode.  
 class Scoreboard:
     def __init__(self, lenient=True):
         self.lenient = lenient

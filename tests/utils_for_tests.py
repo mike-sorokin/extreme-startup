@@ -30,7 +30,7 @@ def keyset_of(response):
 
 def is_valid_game_json(response):
     return keyset_of(response).only_contains_the_following_keys(
-        "id", "round", "players"
+        "id", "round", "players", "paused"
     )
 
 

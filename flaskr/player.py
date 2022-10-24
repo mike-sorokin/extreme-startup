@@ -1,9 +1,10 @@
 from curses import noecho
-import uuid
+from uuid import uuid4
 
+# Player object -- NOTE: all player objects are associated with a game_id
 class Player:
     def __init__(self, game_id, name, api):
-        self.uuid = str(uuid.uuid4())
+        self.uuid = uuid4().hex[:8]
         self.game_id = game_id
         self.name = name
         self.score = 0
