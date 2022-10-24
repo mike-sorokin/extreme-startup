@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from "react-router-dom"
-import { Button, Stack, Container } from "@mantine/core";
+import { Button, Container } from "@mantine/core";
 import axios from 'axios'
-import { requestGameCreation } from '../utils/requests'
 import { gameUrl } from '../utils/urls'
 
 
@@ -68,11 +67,7 @@ function Admin() {
           Advance Round
         </Button>
       </div>
-      <Stack justify="flex-start">
-          <h4 style={{ color: 'grey' }}>{round}</h4>
-      </Stack>
-      {/* <Button variant="outline-secondary" onClick={() => advanceRound()}>Advance Round</Button> */}
-
+      <h4 style={{ color: 'grey' }}>{round}</h4>
     </Container>
   )
 }
