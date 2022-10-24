@@ -1,11 +1,9 @@
 import React, {useEffect, useState} from 'react'
 import { useParams } from "react-router-dom"
-import Container from "react-bootstrap/Container"
-import Table from "react-bootstrap/Table"
+import { Container, Table } from "@mantine/core"
 import axios from 'axios'
 import { gameUrl } from '../utils/urls'
-
-
+import Chart from "./Chart"
 
 function Leaderboard() {
   const params = useParams()
@@ -30,8 +28,9 @@ function Leaderboard() {
   }
 
   return (
-    <Container className="p-5">
+    <Container size="xl" px="sm">
       <h2>Leaderboard</h2>
+      <Chart gameid={params.gameid} />
       {
           <Table>
             <thead>
@@ -42,16 +41,16 @@ function Leaderboard() {
                 </tr>
             </thead>
             <tbody>
-                {
-                    leaderboard.map(({id, name, score}) => (
-                        <tr>
-                        <td>{id}</td>
-                        <td>{name}</td>
-                        <td>{score}</td>
-                        </tr>
-                    ))
-                }
-            </tbody>
+              { 
+                leaderboard.map(({id, name, score}) => (
+                    <tr key={id}>
+                    <td>{id}</td>
+                    <td>{name}</td>
+                    <td>{score}</td>
+                    </tr>
+                ))
+              }
+            </tbody>   
           </Table>
       }
     </Container>

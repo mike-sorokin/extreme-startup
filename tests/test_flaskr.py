@@ -82,7 +82,7 @@ def test_game_id_put_advances_round(extras, cli):
     ADVANCED_ROUND_NO = 1
     game_id = extras["game"]["id"]
 
-    update_game_resp = cli.put(f"/api/{game_id}", data={"round": ADVANCED_ROUND_NO})
+    update_game_resp = cli.put(f"/api/{game_id}", json={"round": ADVANCED_ROUND_NO})
     assert update_game_resp.status_code == ALL_GOOD
 
     get_game_resp = cli.get(f"/api/{game_id}")

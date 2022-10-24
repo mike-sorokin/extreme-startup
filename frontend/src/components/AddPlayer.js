@@ -1,72 +1,54 @@
-import axios from 'axios';
+import { requestPlayerCreation, playerCreationData, validPlayerData } from '../utils/requests'
+import { showSuccessfulNotification, showFailureNotification } from '../utils/utils'
+import { playerPageUrl } from '../utils/urls'
 import React from 'react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom'
 import { TextInput, Button } from '@mantine/core';
-import { showNotification } from '@mantine/notifications';
-import { IconCheck, IconX } from '@tabler/icons';
 
 function AddPlayer(setOpened) {
-  const [id, setId] = useState("");
+  const [gameId, setGameId] = useState("");
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
 
-  const addPlayer = (e) => {
-    e.preventDefault();
+  const navigate = useNavigate();
 
-    let gameId = id.trim()
-    let playerName = name.trim()
-    let playerUrl = url.trim()
+  const submission = event => {
+    event.preventDefault()
 
-    if (gameId === "") {
-      showNotification({
-        title: "Error creating player",
-        message: "You forgot to enter a game id!",
-        icon: <IconX size={18} />,
-        color: "red"
-      });
+    let validStatus = validPlayerData(gameId, name, url)
 
-      return
+    if (validStatus === 0) {
+      const playerData = playerCreationData(name, url)
+      return requestPlayerCreation(gameId, playerData)
+        .then(player => {
+          showSuccessfulNotification("Successfully Created Player!")
+          console.log("player")
+          console.log(player)
+          navigate(playerPageUrl(player.game_id, player.id))
+        })
     }
 
-    if (playerName === "") {
-      showNotification({
-        title: "Error creating player",
-        message: "You forgot to enter a name!",
-        icon: <IconX size={18} />,
-        color: "red"
-      });
-
-      return
+    if (validStatus === 1) {
+      showFailureNotification("Error creating player", "Game id does not exist!")
+    }
+    else if (validStatus === 2) {
+      showFailureNotification("Error creating player", "Your name cannot be empty!")
+    }
+    else if (validStatus === 3) {
+      showFailureNotification("Error creating player", "Your name already exists in the game!")
+    }
+    else {
+      showFailureNotification("Error creating player", "You entered an invalid URL!")
     }
 
-    const playerObject = {
-      name: playerName,
-      url: playerUrl,
-    };
-
-    const json = "/api/" + gameId + "/players";
-
-    axios
-      .post(json, playerObject)
-      .then(() => {
-        showNotification({
-          title: "Success",
-          message: "Player successfully created!",
-          icon: <IconCheck size={18} />,
-          color: "teal"
-        });
-      })
-      .catch((err) => alert(err.response.data));
-
-    setOpened(false)
-
-    // TODO: Get player id from backend and redirect to player page
-  };
+    return
+  }
 
   return (
     <div>
-      <form onSubmit={addPlayer}>
-        <TextInput value={id} onChange={(e) => setId(e.target.value)} placeholder="Game id (e.g. abc123)" label="Enter game id:" required />
+      <form onSubmit={submission}>
+        <TextInput value={gameId} onChange={(e) => setGameId(e.target.value)} placeholder="Game id (e.g. abc123)" label="Enter game id:" required />
         <TextInput value={name} onChange={(e) => setName(e.target.value)} placeholder="Your player name" label="Enter player name:" required />
         <TextInput value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Your URL (http://...)" label="Enter URL:" required />
         <Button type="submit">Submit</Button>

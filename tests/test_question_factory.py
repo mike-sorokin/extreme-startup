@@ -1,4 +1,7 @@
-from flaskr.question_factory import *
+import sys
+sys.path.append(".")
+
+from flaskr.question_factory import QuestionFactory
 from flaskr.questions import WarmupQuestion, Question
 import pytest
 import random
