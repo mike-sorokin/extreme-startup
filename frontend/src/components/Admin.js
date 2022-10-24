@@ -1,7 +1,6 @@
-import Container from 'react-bootstrap/Container'
 import React, { useEffect, useState } from 'react'
 import { useParams } from "react-router-dom"
-import { Button, Stack } from "@mantine/core";
+import { Button, Stack, Container } from "@mantine/core";
 import axios from 'axios'
 import { requestGameCreation } from '../utils/requests'
 import { gameUrl } from '../utils/urls'
@@ -38,23 +37,42 @@ function Admin() {
       });
   }
 
+  const roundsBarStyle = {
+    width: "100%",
+    display: "inline-flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
+  }
 
   return (
-    <Container>
-      <Container className='p-5'>
-        <h3>Game ID</h3>
-        <h4 style={{ color: 'grey' }}>{params.gameid}</h4>
-        <br />
-        <h3>Number of Players</h3>
-        <h4 style={{ color: 'grey' }}>{playerNo}</h4>
-        <br />
-        <Stack justify="flex-start">
-            <h3>Rounds<Button variant="outline-secondary" onClick={() => advanceRound()}>Advance Round</Button></h3>
-            <h4 style={{ color: 'grey' }}>{round}</h4>
-        </Stack>
-        {/* <Button variant="outline-secondary" onClick={() => advanceRound()}>Advance Round</Button> */}
+    <Container size="xl" px="xs">
+      <h3>Game ID</h3>
+      <h4 style={{ color: 'grey' }}>{params.gameid}</h4>
+      <br />
+      <h3>Number of Players</h3>
+      <h4 style={{ color: 'grey' }}>{playerNo}</h4>
+      <br />
+      <div style={roundsBarStyle}>
+        <div>
+          <h3>Rounds</h3>
+        </div>
+        <Button variant="outline"
+                color="dark"
+                radius="md"
+                size="md"
+                style={{
+                  marginLeft:"20px"
+                }}
+                onClick={() => advanceRound()}>
+          Advance Round
+        </Button>
+      </div>
+      <Stack justify="flex-start">
+          <h4 style={{ color: 'grey' }}>{round}</h4>
+      </Stack>
+      {/* <Button variant="outline-secondary" onClick={() => advanceRound()}>Advance Round</Button> */}
 
-      </Container>
     </Container>
   )
 }

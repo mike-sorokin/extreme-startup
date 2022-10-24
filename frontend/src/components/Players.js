@@ -1,6 +1,9 @@
+// TODO: BROKEN :)
+
 import Container from 'react-bootstrap/Container'
 import React, {useEffect, useState} from 'react'
 import { useParams } from "react-router-dom"
+// import { Stack, Table, Modal, Button } from '@mantine/core'
 import Button from 'react-bootstrap/Button'
 import Stack from 'react-bootstrap/Stack'
 import Table from 'react-bootstrap/Table'
@@ -81,7 +84,7 @@ function Players() {
           event.preventDefault();
           event.stopPropagation();
         }
-    
+
         setValidated(true);
 
         addPlayer();
@@ -90,7 +93,7 @@ function Players() {
         setModalAPI('')
         setValidated(false)
       };
-  
+
     return (
       <Container className="p-5">
 
