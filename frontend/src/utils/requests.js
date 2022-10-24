@@ -326,12 +326,6 @@ export async function deleteEvent(gameId, playerId, eventId) {
 }
 
 
-
-
-
-
-
-
 // import { gameCreationUrl, gameUrl, playerCreationUrl } from '../utils/urls';
 // import { alertError } from '../utils/utils'
 // import axios from 'axios';
@@ -406,3 +400,17 @@ export async function deleteEvent(gameId, playerId, eventId) {
 //     .catch(err => alertError("Error fetching players from game id: " + err.response.data))
 //   return []
 // }
+
+// const fetchEvents = async () => {
+//   try {
+//     const response = await axios.get("/api" + playerPageUrl(params.gameid, params.id));
+//     return response;
+//   } catch (error) {
+//     // console.error(error);
+//   }
+// }
+
+
+// const deletePlayer = (id) => {
+//   console.log("deleted player", id);
+// };
