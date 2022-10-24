@@ -1,32 +1,34 @@
-import React from 'react'
-import { Outlet, useParams } from "react-router-dom"
-import Navbar from 'react-bootstrap/Navbar'
-import Nav from 'react-bootstrap/Nav'
-import Container from 'react-bootstrap/Container'
+import React from 'react';
+import { Outlet, useParams } from "react-router-dom";
+import { Menu, Button, Burger } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 
 function Game() {
 
   const params = useParams()
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+
+  const navButton = (suffix, text) => {
+    let url = '/' + params.gameid + suffix
+    return (
+      <Button variant="outline" color="dark" radius="md" size="md" onClick={() => navigate(url)}>{text}</Button>
+    )
+  }
 
   return (
     <>
-    <Navbar collapseOnSelect bg="light" expand="lg" variant="light" activeKey="/leaderboard">
-        <Container>
-          <Navbar.Brand href="#home">Extreme Startup</Navbar.Brand>
-          <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-          <Navbar.Collapse id="responsive-navbar-nav">
-          <Nav className="me-auto">
-            <Nav.Link onClick={() => navigate('/' + params.gameid + '/admin')}>Game</Nav.Link>
-          </Nav>
-          <Nav>
-            <Nav.Link onClick={() => navigate('/' + params.gameid)}>Leaderboard</Nav.Link>
-            <Nav.Link onClick={() => navigate('/' + params.gameid + '/players')}>Players</Nav.Link>
-          </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
+    <Menu shadow="md" width={200}>
+      <Menu.Target>
+        <Burger size="lg" /> 
+      </Menu.Target>
+
+      <Menu.Dropdown>
+        <Menu.Label>Menu</Menu.Label>
+        <Menu.Item>{navButton('/admin', "Host Page")}</Menu.Item>
+        <Menu.Item>{navButton('', "Leaderboard")}</Menu.Item>
+        <Menu.Item>{navButton('/players', "Players")}</Menu.Item>
+      </Menu.Dropdown>
+    </Menu>
     <Outlet />
     </>
   )
