@@ -142,12 +142,12 @@ export async function deleteGame(gameId) {
  * Fetches all players in a given game
  * @async
  * @param  {string} gameId
- * @return {Promise<{"players": Player[]}>} Object containing list of all player JSON objects
+ * @return {Promise<Player[]>} List of all player JSON objects
  */
 export async function fetchAllPlayers(gameId) {
   try {
     const response = await instance.get(playersAPI(gameId));
-    return response.data;
+    return response.data.players;
   } catch (error) {
     alertError(error);
   }
@@ -322,12 +322,12 @@ export async function deletePlayer(gameId, playerId) {
  * @async
  * @param  {string} gameId
  * @param  {string} playerId
- * @return {Promise<{"events": Event[]}>} List of all event JSON objects
+ * @return {Promise<Event[]>} List of all event JSON objects
  */
 export async function fetchAllEvents(gameId, playerId) {
   try {
     const response = await instance.get(playerEventsAPI(gameId, playerId));
-    return response.data;
+    return response.data.events;
   } catch (error) {
     alertError(error);
   }
