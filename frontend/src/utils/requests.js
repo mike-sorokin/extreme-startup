@@ -7,6 +7,8 @@ const instance = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+// Need to test returning response.json() vs response.data
+
 /**
  * Object representing a Player
  * @typedef {Object} Player
@@ -74,7 +76,7 @@ export async function createNewGame() {
  * @async
  * @return unsure
  */
-export async function deleteEverything() {
+export async function deleteAllGames() {
   try {
     const response = await instance.delete(homeAPI());
     return response.data;
@@ -108,7 +110,7 @@ export async function fetchGame(gameId) {
  * @async
  * @param  {string} gameId
  * @param  {{"round": number, "pause": boolean}} data Object containing either the round or whether to pause/unpause
- * @return {Promise<string>}
+ * @return {Promise<string>} unsure
  */
 export async function updateGame(gameId, data) {
   try {
@@ -142,7 +144,7 @@ export async function deleteGame(gameId) {
  * @param  {string} gameId
  * @return {Promise<{"players": Player[]}>} Object containing list of all player JSON objects
  */
-export async function fetchPlayers(gameId) {
+export async function fetchAllPlayers(gameId) {
   try {
     const response = await instance.get(playersAPI(gameId));
     return response.data;
@@ -197,7 +199,7 @@ async function validateData(gameId, data) {
     return false;
   }
 
-  const players = await fetchPlayers(gameId);
+  const players = await fetchAllPlayers(gameId);
 
   if (data.name) {
     const name = data.name.trim();
