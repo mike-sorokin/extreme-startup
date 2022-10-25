@@ -18,11 +18,12 @@ function AddPlayer(setOpened) {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const response = await createPlayer(gameId, name, url);
-
-    if (response) {
+    try {
+      const response = await createPlayer(gameId, name, url);
       showSuccessNotification("Successfully Created Player!");
       navigate(player(response.game_id, response.id));
+    } catch (error) {
+      // TODO
     }
 
     // let validStatus = validPlayerData(gameId, name, url);
