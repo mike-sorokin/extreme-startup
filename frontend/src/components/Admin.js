@@ -6,6 +6,8 @@ import axios from "axios";
 import { fetchGame, updateGame } from "../utils/requests";
 import { gameUrl } from "../utils/urls";
 
+import "../styles/Admin.css";
+
 function Admin() {
   const [playerNo, setPlayerNo] = useState(0);
   // Removing round 0 = "Warmup" and just keeping it to 0
@@ -67,23 +69,23 @@ function Admin() {
   //     });
   // }
 
-  const roundsBarStyle = {
-    width: "100%",
-    display: "inline-flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  };
+  // const roundsBarStyle = {
+  //   width: "100%",
+  //   display: "inline-flex",
+  //   flexDirection: "row",
+  //   justifyContent: "space-between",
+  //   alignItems: "center",
+  // };
 
   return (
     <Container size="xl" px="xs">
       <h3>Game ID</h3>
-      <h4 style={{ color: "grey" }}>{params.gameid}</h4>
+      <h4 className="bar">{params.gameid}</h4>
       <br />
       <h3>Number of Players</h3>
-      <h4 style={{ color: "grey" }}>{playerNo}</h4>
+      <h4 className="bar">{playerNo}</h4>
       <br />
-      <div style={roundsBarStyle}>
+      <div className="roundsBar">
         <div>
           <h3>Rounds</h3>
         </div>
@@ -100,7 +102,7 @@ function Admin() {
           Advance Round
         </Button>
       </div>
-      <h4 style={{ color: "grey" }}>{round}</h4>
+      <h4 className="bar">{round}</h4>
     </Container>
   );
 }
