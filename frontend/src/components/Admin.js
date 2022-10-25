@@ -1,37 +1,36 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Button, Container } from "@mantine/core";
+import React, { useEffect, useState } from "react"
+import { useParams } from "react-router-dom"
+import { Button, Container } from "@mantine/core"
 
-import { fetchGame, updateGame } from "../utils/requests";
+import { fetchGame, updateGame } from "../utils/requests"
 
-import "../styles/Admin.css";
+import "../styles/Admin.css"
 
 function Admin() {
-  const [playerNo, setPlayerNo] = useState(0);
+  const [playerNo, setPlayerNo] = useState(0)
   // Removing round 0 = "Warmup" and just keeping it to 0
   // It is implied that round 0 is the warmup round
   // Change it manually in frontend if you need to display warmup
-  const [round, setRound] = useState(0);
-  const [refreshTimer, setRefreshTimer] = useState(0);
+  const [round, setRound] = useState(0)
+  const [refreshTimer, setRefreshTimer] = useState(0)
 
-  const params = useParams();
+  const params = useParams()
 
   useEffect(() => {
-    const fetchData = async () => {
+    const getGameData = async () => {
       try {
-        const response = await fetchGame(params.gameId);
-        setRound(response.round);
-        setPlayerNo(response.players.length);
+        const response = await fetchGame(params.gameId)
+        setRound(response.round)
+        setPlayerNo(response.players.length)
       } catch (error) {
         // TODO
       }
     };
 
-    fetchData();
+    getGameData();
 
-    // What is this for?
-    setTimeout(() => setRefreshTimer((prevState) => prevState + 1), 1000);
-  }, []);
+    setTimeout(() => setRefreshTimer((prevState) => prevState + 1), 1000)
+  }, [refreshTimer]);
 
   // useEffect(() => {
   //   axios
@@ -50,7 +49,7 @@ function Admin() {
 
   const advanceRound = async () => {
     try {
-      const response = await updateGame(params.gameid, { round: round + 1 });
+      const response = await updateGame(params.gameid, { round: round + 1 })
       setRound(round + 1);
     } catch (error) {
       // TODO
