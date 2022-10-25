@@ -1,15 +1,16 @@
 import React from 'react';
-import { Outlet, useParams } from "react-router-dom";
+import { Outlet, useParams, useNavigate } from "react-router-dom";
 import { Menu, Button, Burger } from "@mantine/core";
-import { useNavigate } from "react-router-dom";
+
+import { players, admin } from "../utils/urls"
 
 function Game() {
 
   const params = useParams()
   const navigate = useNavigate()
 
-  const navButton = (suffix, text) => {
-    let url = '/' + params.gameid + suffix
+  // Separate file for navButton?
+  const navButton = (url, text) => {
     return (
       <Button variant="outline" color="dark" radius="md" size="md" onClick={() => navigate(url)}>{text}</Button>
     )
@@ -17,19 +18,19 @@ function Game() {
 
   return (
     <>
-    <Menu shadow="md" width={200}>
-      <Menu.Target>
-        <Burger size="lg" /> 
-      </Menu.Target>
+      <Menu shadow="md" width={200}>
+        <Menu.Target>
+          <Burger size="lg" />
+        </Menu.Target>
 
-      <Menu.Dropdown>
-        <Menu.Label>Menu</Menu.Label>
-        <Menu.Item>{navButton('/admin', "Host Page")}</Menu.Item>
-        <Menu.Item>{navButton('', "Leaderboard")}</Menu.Item>
-        <Menu.Item>{navButton('/players', "Players")}</Menu.Item>
-      </Menu.Dropdown>
-    </Menu>
-    <Outlet />
+        <Menu.Dropdown>
+          <Menu.Label>Menu</Menu.Label>
+          <Menu.Item>{navButton(admin(params.gameid), "Host Page")}</Menu.Item>
+          <Menu.Item>{navButton('', "Leaderboard")}</Menu.Item>
+          <Menu.Item>{navButton(players(params.gameid), "Players")}</Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
+      <Outlet />
     </>
   )
 }
