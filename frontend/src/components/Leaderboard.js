@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams } from "react-router-dom"
 import { Container, Table } from "@mantine/core"
 import axios from 'axios'
@@ -16,7 +16,7 @@ function Leaderboard() {
   }, [refreshTimer]);
 
   function getLeaderboard() {
-      axios.get(gameUrl(params.gameid) + '/leaderboard')
+    axios.get(gameUrl(params.gameid) + '/leaderboard')
       .then(function (response) {
         console.log(response);
         setLeaderboard(response.data)
@@ -30,28 +30,28 @@ function Leaderboard() {
   return (
     <Container size="xl" px="sm">
       <h2>Leaderboard</h2>
-      <Chart gameid={params.gameid} />
+      <Chart gameId={params.gameid} />
       {
-          <Table>
-            <thead>
-                <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Score</th>
+        <Table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              leaderboard.map(({ id, name, score }) => (
+                <tr key={id}>
+                  <td>{id}</td>
+                  <td>{name}</td>
+                  <td>{score}</td>
                 </tr>
-            </thead>
-            <tbody>
-              { 
-                leaderboard.map(({id, name, score}) => (
-                    <tr key={id}>
-                    <td>{id}</td>
-                    <td>{name}</td>
-                    <td>{score}</td>
-                    </tr>
-                ))
-              }
-            </tbody>   
-          </Table>
+              ))
+            }
+          </tbody>
+        </Table>
       }
     </Container>
   )
