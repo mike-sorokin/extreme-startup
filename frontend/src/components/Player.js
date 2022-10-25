@@ -1,33 +1,40 @@
 import { React, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
-import { Button, Card, Container, Table } from "@mantine/core";
+import { Container, Table } from "@mantine/core";
+
+import { fetchPlayer } from "../utils/requests";
+
 import PlayerEventCard from "./PlayerEventCard";
-import { playerPageUrl } from "../utils/urls";
 
 // TODO: fix playerDetail
-
 function Player() {
-  const params = useParams();
   const [playerDetail, setPlayerDetail] = useState({})
 
+  const params = useParams();
 
-  // Gets list of events from api (need to implement this with sockets)
   useEffect(() => {
-    getPlayer()
+    const getPlayerData = async () => {
+      try {
+        const response = await fetchPlayer(params.gameid, params.id)
+        setPlayerDetail(response)
+      } catch (error) {
+        // TODO
+      }
+    }
+
+    getPlayerData()
   }, []);
 
-  function getPlayer() {
-    axios.get("/api" + playerPageUrl(params.gameid, params.id))
-      .then(function (response) {
-        console.log(response);
-        setPlayerDetail(response.data)
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }
-
+  // function getPlayer() {
+  //   axios.get("/api" + playerPageUrl(params.gameid, params.id))
+  //     .then(function (response) {
+  //       console.log(response);
+  //       setPlayerDetail(response.data)
+  //     })
+  //     .catch(function (error) {
+  //       console.log(error);
+  //     });
+  // }
 
   const sampleGameId = "asdaskmasom"
   const samplePlayerDetail = {
