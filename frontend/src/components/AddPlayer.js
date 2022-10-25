@@ -1,11 +1,13 @@
-import { requestPlayerCreation, playerCreationData, validPlayerData } from '../utils/requests'
-import { showSuccessfulNotification, showFailureNotification } from '../utils/utils'
-import { playerPageUrl } from '../utils/urls'
-import React from 'react';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom'
-import { TextInput, Button } from '@mantine/core';
+import React from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { TextInput, Button } from "@mantine/core";
 
+import { createPlayer } from "../utils/requests";
+import { player } from "../utils/urls";
+import { showSuccessNotification } from "../utils/utils";
+
+// Do we need this setOpened prop?
 function AddPlayer(setOpened) {
   const [gameId, setGameId] = useState("");
   const [name, setName] = useState("");
@@ -13,48 +15,49 @@ function AddPlayer(setOpened) {
 
   const navigate = useNavigate();
 
-  const submission = event => {
-    event.preventDefault()
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-    let validStatus = validPlayerData(gameId, name, url)
+    const response = await createPlayer(gameId, name, url);
 
-    if (validStatus === 0) {
-      const playerData = playerCreationData(name, url)
-      return requestPlayerCreation(gameId, playerData)
-        .then(player => {
-          showSuccessfulNotification("Successfully Created Player!")
-          console.log("player")
-          console.log(player)
-          navigate(playerPageUrl(player.game_id, player.id))
-        })
+    if (response) {
+      showSuccessNotification("Successfully Created Player!");
+      navigate(player(response.game_id, response.id));
     }
 
-    if (validStatus === 1) {
-      showFailureNotification("Error creating player", "Game id does not exist!")
-    }
-    else if (validStatus === 2) {
-      showFailureNotification("Error creating player", "Your name cannot be empty!")
-    }
-    else if (validStatus === 3) {
-      showFailureNotification("Error creating player", "Your name already exists in the game!")
-    }
-    else {
-      showFailureNotification("Error creating player", "You entered an invalid URL!")
-    }
+    // let validStatus = validPlayerData(gameId, name, url);
 
-    return
-  }
+    // if (validStatus === 0) {
+    //   const playerData = playerCreationData(name, url);
+    //   return requestPlayerCreation(gameId, playerData).then((player) => {
+    //     showSuccessfulNotification("Successfully Created Player!");
+    //     console.log("player");
+    //     console.log(player);
+    //     navigate(playerPageUrl(player.game_id, player.id));
+    //   });
+    // }
+
+    // if (validStatus === 1) {
+    //   showFailureNotification("Error creating player", "Game id does not exist!");
+    // } else if (validStatus === 2) {
+    //   showFailureNotification("Error creating player", "Your name cannot be empty!");
+    // } else if (validStatus === 3) {
+    //   showFailureNotification("Error creating player", "Your name already exists in the game!");
+    // } else {
+    //   showFailureNotification("Error creating player", "You entered an invalid URL!");
+    // }
+  };
 
   return (
     <div>
-      <form onSubmit={submission}>
+      <form onSubmit={handleSubmit}>
         <TextInput value={gameId} onChange={(e) => setGameId(e.target.value)} placeholder="Game id (e.g. abc123)" label="Enter game id:" required />
         <TextInput value={name} onChange={(e) => setName(e.target.value)} placeholder="Your player name" label="Enter player name:" required />
         <TextInput value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Your URL (http://...)" label="Enter URL:" required />
         <Button type="submit">Submit</Button>
       </form>
     </div>
-  )
+  );
 }
 
-export default AddPlayer
+export default AddPlayer;

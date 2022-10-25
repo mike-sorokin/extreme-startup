@@ -1,20 +1,20 @@
-import { showNotification } from '@mantine/notifications';
-import { IconCheck, IconX } from '@tabler/icons';
+import { showNotification } from "@mantine/notifications";
+import { IconCheck, IconX } from "@tabler/icons";
 
 export function str(obj) {
   return JSON.stringify(obj);
 }
 
 export function alertError(error) {
-  console.log(error.toJSON())
+  console.log(error.toJSON());
 }
 
-export function showSuccessfulNotification(msg) {
+export function showSuccessNotification(msg) {
   showNotification({
     title: "Success",
     message: msg,
     icon: <IconCheck size={18} />,
-    color: "teal"
+    color: "teal",
   });
 }
 
@@ -23,6 +23,6 @@ export function showFailureNotification(header, msg) {
     title: header,
     message: msg,
     icon: <IconX size={18} />,
-    color: "red"
+    color: "red",
   });
 }
