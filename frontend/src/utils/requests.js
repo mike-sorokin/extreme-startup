@@ -10,22 +10,22 @@ const instance = axios.create({
 /**
  * Object representing a Player
  * @typedef {Object} Player
- * @property {String} id
- * @property {String} game_id
- * @property {String} name
- * @property {Number} score
- * @property {String} api
+ * @property {string} id
+ * @property {string} game_id
+ * @property {string} name
+ * @property {number} score
+ * @property {string} api
  * @property {Event[]} events - List of all event IDs
  */
 
 /**
  * Object representing an Event
  * @typedef {Object} Event
- * @property {String} id
- * @property {String} player_id
- * @property {String} query
- * @property {Number} difficulty - "0" for warmup, 1 for round 1, etc.
- * @property {Number} points_gained - +ve / -ve point difference
+ * @property {string} id
+ * @property {string} player_id
+ * @property {string} query
+ * @property {number} difficulty - "0" for warmup, 1 for round 1, etc.
+ * @property {number} points_gained - +ve / -ve point difference
  * @property {NO_RESPONSE/WRONG/CORRECT} response_type
  * @property {RFC3339} timestamp
  */
@@ -33,17 +33,18 @@ const instance = axios.create({
 /**
  * Object representing a Game
  * @typedef {Object} Game
- * @property {String} id
- * @property {Number} round
+ * @property {string} id
+ * @property {number} round
  * @property {playerId[]} players - List of player IDs
- * @property {Boolean} paused
+ * @property {boolean} paused
  */
 
 // Main page requests - ("/api")
 
 /**
  * Fetches all games
- * @return {{gameId: Game, ...}} Object containing all Game objects
+ * @async
+ * @return {Promise<{gameId: Game, ...}>} Object containing all Game objects
  */
 export async function fetchAllGames() {
   try {
@@ -56,7 +57,8 @@ export async function fetchAllGames() {
 
 /**
  * Creates a new game and returns its game JSON object
- * @return {Game} Game object of newly created game
+ * @async
+ * @return {Promise<Game>} Game object of newly created game
  */
 export async function createNewGame() {
   try {
@@ -69,6 +71,7 @@ export async function createNewGame() {
 
 /**
  * Drops all games, ids, events
+ * @async
  * @return unsure
  */
 export async function deleteEverything() {
@@ -84,8 +87,9 @@ export async function deleteEverything() {
 
 /**
  * Fetches game JSON object for a given game ID
- * @param  {String} gameId
- * @return {Game} Game JSON object
+ * @async
+ * @param  {string} gameId
+ * @return {Promise<Game>} Game JSON object
  */
 export async function fetchGame(gameId) {
   try {
@@ -101,9 +105,10 @@ export async function fetchGame(gameId) {
  *
  * Sending an object containing {"round": roundNum} will advance the game to roundNum
  * Sending an object containing {"pause": (true|false)} will pause the game if true and unpause if false
- * @param  {String} gameId
- * @param  {{"round": Number, "pause": Boolean}} data Object containing either the round or whether to pause/unpause
- * @return {String}
+ * @async
+ * @param  {string} gameId
+ * @param  {{"round": number, "pause": boolean}} data Object containing either the round or whether to pause/unpause
+ * @return {Promise<string>}
  */
 export async function updateGame(gameId, data) {
   try {
@@ -116,8 +121,9 @@ export async function updateGame(gameId, data) {
 
 /**
  * Drops a given game
- * @param  {String} gameId
- * @return {{"deleted": gameId}} Id of deleted game
+ * @async
+ * @param  {string} gameId
+ * @return {Promise<{"deleted": gameId}>} Id of deleted game
  */
 export async function deleteGame(gameId) {
   try {
@@ -132,8 +138,9 @@ export async function deleteGame(gameId) {
 
 /**
  * Fetches all players in a given game
- * @param  {String} gameId
- * @return {{"players": Player[]}} Object containing list of all player JSON objects
+ * @async
+ * @param  {string} gameId
+ * @return {Promise<{"players": Player[]}>} Object containing list of all player JSON objects
  */
 export async function fetchPlayers(gameId) {
   try {
@@ -146,10 +153,11 @@ export async function fetchPlayers(gameId) {
 
 /**
  * Validates user submission and creates new player if valid
- * @param  {String} gameId
- * @param  {String} name   Name submitted by user
- * @param  {String} api    URL submitted by user
- * @return {Player}        Player JSON object for newly created player (returns false if invalid)
+ * @async
+ * @param  {string} gameId
+ * @param  {string} name   Name submitted by user
+ * @param  {string} api    URL submitted by user
+ * @return {Promise<Player>}        Player JSON object for newly created player (returns false if invalid)
  */
 export async function createPlayer(gameId, name, api) {
   const valid = await validateData(gameId, { name: name, api: api });
@@ -174,9 +182,10 @@ export async function createPlayer(gameId, name, api) {
 
 /**
  * Validates a given name and api url
- * @param {String} gameId
- * @param {{"name": String, "api": String}} data Object containing name and/or api
- * @returns {Boolean} Returns true if valid and false if invalid
+ * @async
+ * @param {string} gameId
+ * @param {{"name": string, "api": string}} data Object containing name and/or api
+ * @returns {Promise<boolean>} Returns true if valid and false if invalid
  */
 async function validateData(gameId, data) {
   // Check gameId exists
@@ -234,7 +243,7 @@ async function validateData(gameId, data) {
 
 /**
  * Deletes all players in a game
- * @param  {String} gameId
+ * @param  {string} gameId
  * @return unsure
  */
 export async function deleteAllPlayers(gameId) {
@@ -250,9 +259,10 @@ export async function deleteAllPlayers(gameId) {
 
 /**
  * Returns player JSON object for a given player in a given game
- * @param  {String} gameId
- * @param  {String} playerId
- * @return {Player} Player JSON object
+ * @async
+ * @param  {string} gameId
+ * @param  {string} playerId
+ * @return {Promise<Player>} Player JSON object
  */
 export async function fetchPlayer(gameId, playerId) {
   try {
@@ -265,10 +275,11 @@ export async function fetchPlayer(gameId, playerId) {
 
 /**
  * Updates a player's name and/or api url
- * @param  {String} gameId
- * @param  {String} playerId
- * @param  {{name: String, api: String}} data Object containing new name and/or new api
- * @return {Player} Updated player JSON object (returns false if data is invalid)
+ * @async
+ * @param  {string} gameId
+ * @param  {string} playerId
+ * @param  {{name: string, api: string}} data Object containing new name and/or new api
+ * @return {Promise<Player>} Updated player JSON object (returns false if data is invalid)
  */
 export async function updatePlayer(gameId, playerId, data) {
   const valid = await validateData(gameId, data);
@@ -288,9 +299,10 @@ export async function updatePlayer(gameId, playerId, data) {
 
 /**
  * Drops a player
- * @param  {String} gameId
- * @param  {String} playerId
- * @return {{"deleted": playerId}} ID of the deleted player
+ * @async
+ * @param  {string} gameId
+ * @param  {string} playerId
+ * @return {Promise<{"deleted": playerId}>} ID of the deleted player
  */
 export async function deletePlayer(gameId, playerId) {
   try {
@@ -305,9 +317,10 @@ export async function deletePlayer(gameId, playerId) {
 
 /**
  * Returns a list of all event JSON objects for a given player
- * @param  {String} gameId
- * @param  {String} playerId
- * @return {{"events": Event[]}} List of all event JSON objects
+ * @async
+ * @param  {string} gameId
+ * @param  {string} playerId
+ * @return {Promise<{"events": Event[]}>} List of all event JSON objects
  */
 export async function fetchAllEvents(gameId, playerId) {
   try {
@@ -320,8 +333,9 @@ export async function fetchAllEvents(gameId, playerId) {
 
 /**
  * Deletes all events for a given player
- * @param  {String} gameId
- * @param  {String} playerId
+ * @async
+ * @param  {string} gameId
+ * @param  {string} playerId
  * @return unsure
  */
 export async function deleteAllEvents(gameId, playerId) {
@@ -337,10 +351,11 @@ export async function deleteAllEvents(gameId, playerId) {
 
 /**
  * Returns the event JSON object for a given eventId
- * @param  {String} gameId
- * @param  {String} playerId
- * @param  {String} eventId
- * @return {Event} Event JSON object
+ * @async
+ * @param  {string} gameId
+ * @param  {string} playerId
+ * @param  {string} eventId
+ * @return {Promise<Event>} Event JSON object
  */
 export async function fetchEvent(gameId, playerId, eventId) {
   try {
@@ -353,10 +368,11 @@ export async function fetchEvent(gameId, playerId, eventId) {
 
 /**
  * Drops a given event
- * @param  {String} gameId
- * @param  {String} playerId
- * @param  {String} eventId
- * @return {{"deleted": eventId}} ID of deleted event
+ * @async
+ * @param  {string} gameId
+ * @param  {string} playerId
+ * @param  {string} eventId
+ * @return {Promise<{"deleted": eventId}>} ID of deleted event
  */
 export async function deleteEvent(gameId, playerId, eventId) {
   try {
