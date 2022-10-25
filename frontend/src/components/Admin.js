@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Button, Container } from "@mantine/core";
-import axios from "axios";
 
 import { fetchGame, updateGame } from "../utils/requests";
-import { gameUrl } from "../utils/urls";
 
 import "../styles/Admin.css";
 
@@ -51,12 +49,14 @@ function Admin() {
   // }, [refreshTimer]);
 
   const advanceRound = async () => {
-    const response = await updateGame(params.gameid, { round: round + 1 });
-
-    if (response) {
+    try {
+      const response = await updateGame(params.gameid, { round: round + 1 });
       setRound(round + 1);
+    } catch (error) {
+      // TODO
     }
   };
+
   // function advanceRound() {
   //   axios
   //     .put(gameUrl(params.gameid))
