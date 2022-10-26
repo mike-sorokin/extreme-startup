@@ -185,6 +185,7 @@ export async function createPlayer(gameId, name, api) {
 
 /**
  * Validates a given name and api url
+ * Currently broken because players is actually an object not a list like its supposed to be
  * @async
  * @param {string} gameId
  * @param {{"name": string, "api": string}} data Object containing name and/or api

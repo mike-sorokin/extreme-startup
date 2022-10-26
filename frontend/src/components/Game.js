@@ -25,9 +25,9 @@ function Game() {
 
         <Menu.Dropdown>
           <Menu.Label>Menu</Menu.Label>
-          <Menu.Item>{navButton(adminUrl(params.gameid), "Host Page")}</Menu.Item>
+          <Menu.Item>{navButton(adminUrl(params.gameId), "Host Page")}</Menu.Item>
           <Menu.Item>{navButton('', "Leaderboard")}</Menu.Item>
-          <Menu.Item>{navButton(playersUrl(params.gameid), "Players")}</Menu.Item>
+          <Menu.Item>{navButton(playersUrl(params.gameId), "Players")}</Menu.Item>
         </Menu.Dropdown>
       </Menu>
       <Outlet />

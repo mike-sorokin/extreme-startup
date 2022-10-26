@@ -13,7 +13,7 @@ function Players() {
   // Fetches list of all players
   const getPlayers = useCallback(async () => {
     try {
-      const response = await fetchAllPlayers(params.gameid)
+      const response = await fetchAllPlayers(params.gameId)
       setPlayers(response)
     } catch (error) {
       // TODO
@@ -31,7 +31,7 @@ function Players() {
 
   const withdrawPlayer = async (playerId) => {
     try {
-      const response = await deletePlayer(params.gameid, playerId)
+      const response = await deletePlayer(params.gameId, playerId)
       console.log(response)
     } catch (error) {
       // TODO
@@ -40,7 +40,7 @@ function Players() {
 
   const withdrawAllPlayers = async () => {
     try {
-      const response = await deleteAllPlayers(params.gameid)
+      const response = await deleteAllPlayers(params.gameId)
       console.log(response)
     } catch (error) {
       // TODO

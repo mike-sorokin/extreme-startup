@@ -19,7 +19,7 @@ function App() {
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/:gameid" element={<Game />} >
+            <Route path="/:gameId" element={<Game />} >
               <Route path="players" element={<Players />} />
               <Route path="players/:id" element={<Player />} />
               <Route path="admin" element={<Admin />} />
@@ -29,7 +29,7 @@ function App() {
         </Router>
       </NotificationsProvider>
     </MantineProvider>
-    
+
   );
 }
 

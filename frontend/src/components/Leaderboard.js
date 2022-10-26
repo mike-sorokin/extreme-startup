@@ -14,7 +14,7 @@ function Leaderboard() {
   // Fetches the list of all players and sorts in descending order based on score
   const getLeaderboard = async () => {
     try {
-      const response = await fetchAllPlayers(params.gameid)
+      const response = await fetchAllPlayers(params.gameId)
       const sortedResponse = response.sort((a, b) => { return b.score - a.score })
       setLeaderboard(sortedResponse)
     } catch (error) {
@@ -34,7 +34,7 @@ function Leaderboard() {
   return (
     <Container size="xl" px="sm">
       <h2>Leaderboard</h2>
-      <Chart gameId={params.gameid} />
+      <Chart gameId={params.gameId} />
       {
         <Table>
           <thead>

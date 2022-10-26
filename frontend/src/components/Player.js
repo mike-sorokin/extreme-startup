@@ -16,7 +16,7 @@ function Player() {
   useEffect(() => {
     const getPlayerData = async () => {
       try {
-        const response = await fetchPlayer(params.gameid, params.id)
+        const response = await fetchPlayer(params.gameId, params.id)
         setPlayerDetail(response)
       } catch (error) {
         // TODO
