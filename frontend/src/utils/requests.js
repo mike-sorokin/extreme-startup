@@ -167,7 +167,7 @@ export async function createPlayer(gameId, name, api) {
 
   if (!valid) {
     console.error("Invalid data submitted");
-    throw "Invalid data submitted"
+    throw new Error("Invalid data submitted")
   }
 
   const playerData = {
@@ -212,9 +212,7 @@ async function validateData(gameId, data) {
     }
 
     // Check player name is unique in a game
-    const names = players.map((player) => {
-      player.name;
-    });
+    const names = players.map(player => player.name);
 
     if (name in names) {
       showFailureNotification("Error creating player", "Your name already exists in the game!");
@@ -230,9 +228,7 @@ async function validateData(gameId, data) {
     }
 
     // Check api url is unique in a game
-    const apis = players.map((player) => {
-      player.api;
-    });
+    const apis = players.map(player => player.api);
 
     if (data.api in apis) {
       showFailureNotification("Error creating player", "Your url already exists in the game!");

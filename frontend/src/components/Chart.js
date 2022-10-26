@@ -52,7 +52,7 @@ function Chart({ gameId }) {
         <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
 
         {players.map((player) => {
-          <Line type="monotone" dataKey={player} stroke="#8884d8" />
+          return <Line type="monotone" dataKey={player} stroke="#8884d8" />
         })}
         <Tooltip />
       </LineChart>

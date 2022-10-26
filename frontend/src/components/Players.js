@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from "react-router-dom"
 import { Button, Container, Table } from '@mantine/core'
 
@@ -11,14 +11,14 @@ function Players() {
   const navigate = useNavigate();
 
   // Fetches list of all players
-  const getPlayers = async () => {
+  const getPlayers = useCallback(async () => {
     try {
       const response = await fetchAllPlayers(params.gameid)
       setPlayers(response)
     } catch (error) {
       // TODO
     }
-  }
+  }, [])
 
   // Fetches player data every 2 seconds
   useEffect(() => {
@@ -27,7 +27,7 @@ function Players() {
     return () => {
       clearInterval(timer)
     }
-  }, [])
+  }, [getPlayers])
 
   const withdrawPlayer = async (playerId) => {
     try {
