@@ -16,6 +16,7 @@ const instance = axios.create({
  * @property {string} game_id
  * @property {string} name
  * @property {number} score
+ * @property {number} streak
  * @property {string} api
  * @property {Event[]} events - List of all event IDs
  */
