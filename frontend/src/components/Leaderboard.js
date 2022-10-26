@@ -8,25 +8,36 @@ import Chart from "./Chart"
 
 function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState([])
-  const [refreshTimer, setRefreshTimer] = useState(0)
+  // const [refreshTimer, setRefreshTimer] = useState(0)
 
   const params = useParams()
 
   // Fetches the list of all players and sorts in descending order based on score
-  useEffect(() => {
-    const getLeaderboard = async () => {
-      try {
-        const response = await fetchAllPlayers(params.gameid)
-        const sortedResponse = response.sort((a, b) => { return b.score - a.score })
-        setLeaderboard(sortedResponse)
-      } catch (error) {
-        // TODO
-      }
+  const getLeaderboard = async () => {
+    try {
+      const response = await fetchAllPlayers(params.gameid)
+      const sortedResponse = response.sort((a, b) => { return b.score - a.score })
+      setLeaderboard(sortedResponse)
+    } catch (error) {
+      // TODO
     }
+  }
 
-    getLeaderboard()
-    setTimeout(() => setRefreshTimer(prevState => prevState + 1), 3000)
-  }, [refreshTimer]);
+  // Fetches leaderboard data every 2 seconds
+  useEffect(() => {
+    const timer = setInterval(getLeaderboard, 2000)
+
+    return () => {
+      clearInterval(timer)
+    }
+  }, [])
+
+  // useEffect(() => {
+
+
+  //   getLeaderboard()
+  //   setTimeout(() => setRefreshTimer(prevState => prevState + 1), 3000)
+  // }, [refreshTimer]);
 
   // function getLeaderboard() {
   //   axios.get(gameUrl(params.gameid) + '/leaderboard')

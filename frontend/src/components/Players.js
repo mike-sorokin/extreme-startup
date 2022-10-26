@@ -11,22 +11,32 @@ function Players() {
   const params = useParams();
   const navigate = useNavigate();
 
-  // Fethces list of all players
-  useEffect(() => {
-    const getPlayers = async () => {
-      try {
-        const response = await fetchAllPlayers(params.gameid)
-        setPlayers(response)
-      } catch (error) {
-        // TODO
-      }
+  // Fetches list of all players
+  const getPlayers = async () => {
+    try {
+      const response = await fetchAllPlayers(params.gameid)
+      setPlayers(response)
+    } catch (error) {
+      // TODO
     }
+  }
 
-    getPlayers()
+  // Fetches player data every 2 seconds
+  useEffect(() => {
+    const timer = setInterval(getPlayers, 2000)
 
-    setTimeout(() => setRefreshTimer(prevState => prevState + 1), 1000)
-  }, [refreshTimer])
+    return () => {
+      clearInterval(timer)
+    }
+  }, [])
 
+  // useEffect(() => {
+
+
+  //   getPlayers()
+
+  //   setTimeout(() => setRefreshTimer(prevState => prevState + 1), 1000)
+  // }, [refreshTimer])
 
   // useEffect(() => {
   //   getPlayers()

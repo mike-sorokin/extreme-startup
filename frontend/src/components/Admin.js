@@ -12,27 +12,45 @@ function Admin() {
   // It is implied that round 0 is the warmup round
   // Change it manually in frontend if you need to display warmup
   const [round, setRound] = useState(0)
-  const [refreshTimer, setRefreshTimer] = useState(0)
+  // const [refreshTimer, setRefreshTimer] = useState(0)
 
   const params = useParams()
 
   // Fetches game data (current round and number of players)
-  // Currently reruns every second (need to change)
+  const getGameData = async () => {
+    try {
+      const response = await fetchGame(params.gameId)
+      setRound(response.round)
+      setPlayerNo(response.players.length)
+    } catch (error) {
+      // TODO
+    }
+  };
+
+  // Fetches game data every 2 seconds
   useEffect(() => {
-    const getGameData = async () => {
-      try {
-        const response = await fetchGame(params.gameId)
-        setRound(response.round)
-        setPlayerNo(response.players.length)
-      } catch (error) {
-        // TODO
-      }
-    };
+    const timer = setInterval(getGameData, 2000)
 
-    getGameData();
+    return () => {
+      clearInterval(timer)
+    }
+  }, [])
 
-    setTimeout(() => setRefreshTimer((prevState) => prevState + 1), 1000)
-  }, [refreshTimer]);
+  // useEffect(() => {
+  //   const getGameData = async () => {
+  //     try {
+  //       const response = await fetchGame(params.gameId)
+  //       setRound(response.round)
+  //       setPlayerNo(response.players.length)
+  //     } catch (error) {
+  //       // TODO
+  //     }
+  //   };
+
+  //   getGameData();
+
+  //   setTimeout(() => setRefreshTimer((prevState) => prevState + 1), 1000)
+  // }, [refreshTimer]);
 
   // useEffect(() => {
   //   axios
