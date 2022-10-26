@@ -14,7 +14,7 @@ function GoToGame(gameIdGetter) {
   return (
     <div>
       <p>Your game id is: {gameIdGetter.getGameId()}</p>
-      <Button type="button" onClick={goToGamePage}>To Game Page</Button>
+      <Button color="violet" radius="md" size="md" onClick={goToGamePage}>To Game Page</Button>
     </div>
   )
 }

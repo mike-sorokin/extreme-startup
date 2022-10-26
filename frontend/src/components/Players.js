@@ -56,8 +56,8 @@ function Players() {
     return (
       <Container size="xl" px="sm">
         <h3>Players</h3>
-        <Button variant="outline" color="red" radius="md" size="md" 
-                onClick={() => withdrawPlayers()}>Withdraw All</Button>
+        <Button variant="gradient" gradient={{ from: 'orange', to: 'red' }} 
+                radius="md" size="lg" onClick={() => withdrawPlayers()}>Withdraw All</Button>
         <hr/>
 
         <Table hover>

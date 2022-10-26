@@ -14,7 +14,7 @@ function App() {
 
   return (
 
-    <MantineProvider withGlobalStyles withNormalizeCSS>
+    <MantineProvider theme={{ colorScheme: 'dark' }} withGlobalStyles withNormalizeCSS>
       <NotificationsProvider position='top-right'>
         <Router>
           <Routes>

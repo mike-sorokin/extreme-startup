@@ -8,10 +8,10 @@ function Game() {
   const params = useParams()
   const navigate = useNavigate()
 
-  const navButton = (suffix, text) => {
+  const navButton = (suffix, text, color) => {
     let url = '/' + params.gameid + suffix
     return (
-      <Button variant="outline" color="dark" radius="md" size="md" onClick={() => navigate(url)}>{text}</Button>
+      <Button variant="light" color={color} radius="md" size="md" onClick={() => navigate(url)}>{text}</Button>
     )
   }
 
@@ -23,10 +23,10 @@ function Game() {
       </Menu.Target>
 
       <Menu.Dropdown>
-        <Menu.Label>Menu</Menu.Label>
-        <Menu.Item>{navButton('/admin', "Host Page")}</Menu.Item>
-        <Menu.Item>{navButton('', "Leaderboard")}</Menu.Item>
-        <Menu.Item>{navButton('/players', "Players")}</Menu.Item>
+        <Menu.Label>Game Menu</Menu.Label>
+        <Menu.Item>{navButton('/admin', "Host Page", "grape")}</Menu.Item>
+        <Menu.Item>{navButton('', "Leaderboard", "indigo")}</Menu.Item>
+        <Menu.Item>{navButton('/players', "Players", "teal")}</Menu.Item>
       </Menu.Dropdown>
     </Menu>
     <Outlet />

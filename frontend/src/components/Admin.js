@@ -56,10 +56,10 @@ function Admin() {
         <div>
           <h3>Rounds</h3>
         </div>
-        <Button variant="outline"
-                color="dark"
-                radius="md"
-                size="md"
+        <Button variant="outline" 
+                color="yellow" 
+                radius="md" 
+                size="lg"
                 style={{
                   marginLeft:"20px"
                 }}
