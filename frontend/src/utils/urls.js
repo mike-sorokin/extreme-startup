@@ -1,26 +1,23 @@
-import { alertError } from "./utils"
-import axios from 'axios';
-
 /**
  * URLs for navigation (not prepended with "/api")
  */
-export function home() {
+export function homeUrl() {
   return "/"
 }
 
-export function game(gameId) {
+export function gameUrl(gameId) {
   return `/${gameId}`
 }
 
-export function players(gameId) {
+export function playersUrl(gameId) {
   return `/${gameId}/players`
 }
 
-export function player(gameId, playerId) {
+export function playerUrl(gameId, playerId) {
   return `/${gameId}/players/${playerId}`
 }
 
-export function admin(gameId) {
+export function adminUrl(gameId) {
   return `/${gameId}/admin`
 }
 

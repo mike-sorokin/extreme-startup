@@ -2,7 +2,7 @@ import React from 'react';
 import { Outlet, useParams, useNavigate } from "react-router-dom";
 import { Menu, Button, Burger } from "@mantine/core";
 
-import { players, admin } from "../utils/urls"
+import { playersUrl, adminUrl } from "../utils/urls"
 
 function Game() {
 
@@ -25,9 +25,9 @@ function Game() {
 
         <Menu.Dropdown>
           <Menu.Label>Menu</Menu.Label>
-          <Menu.Item>{navButton(admin(params.gameid), "Host Page")}</Menu.Item>
+          <Menu.Item>{navButton(adminUrl(params.gameid), "Host Page")}</Menu.Item>
           <Menu.Item>{navButton('', "Leaderboard")}</Menu.Item>
-          <Menu.Item>{navButton(players(params.gameid), "Players")}</Menu.Item>
+          <Menu.Item>{navButton(playersUrl(params.gameid), "Players")}</Menu.Item>
         </Menu.Dropdown>
       </Menu>
       <Outlet />

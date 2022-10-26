@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { homeAPI, gameAPI, playersAPI, playerAPI, playerEventsAPI, eventAPI, home } from "./urls";
+import { homeAPI, gameAPI, playersAPI, playerAPI, playerEventsAPI, eventAPI } from "./urls";
 import { alertError, showFailureNotification } from "./utils";
 
 const instance = axios.create({

@@ -1,10 +1,9 @@
-import React from "react"
-import { useState } from "react"
+import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { TextInput, Button } from "@mantine/core"
 
 import { createPlayer } from "../utils/requests"
-import { player } from "../utils/urls"
+import { playerUrl } from "../utils/urls"
 import { showSuccessNotification } from "../utils/utils"
 
 // What is this setOpened prop used for?
@@ -15,13 +14,14 @@ function AddPlayer(setOpened) {
 
   const navigate = useNavigate()
 
+  // Adds a new player to the game
   const handleSubmit = async (event) => {
     event.preventDefault()
 
     try {
       const response = await createPlayer(gameId, name, url)
       showSuccessNotification("Successfully Created Player!")
-      navigate(player(response.game_id, response.id))
+      navigate(playerUrl(response.game_id, response.id))
     } catch (error) {
       // TODO
     }

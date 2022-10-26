@@ -12,6 +12,7 @@ function Player() {
 
   const params = useParams();
 
+  // Fetches player json object from backend
   useEffect(() => {
     const getPlayerData = async () => {
       try {

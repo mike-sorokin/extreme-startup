@@ -16,6 +16,8 @@ function Admin() {
 
   const params = useParams()
 
+  // Fetches game data (current round and number of players)
+  // Currently reruns every second (need to change)
   useEffect(() => {
     const getGameData = async () => {
       try {
@@ -47,6 +49,7 @@ function Admin() {
   //   setTimeout(() => setRefreshTimer((prevState) => prevState + 1), 1000);
   // }, [refreshTimer]);
 
+  // Increments round
   const advanceRound = async () => {
     try {
       const response = await updateGame(params.gameid, { round: round + 1 })

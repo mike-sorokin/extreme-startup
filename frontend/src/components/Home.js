@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, Modal } from '@mantine/core';
 
 import { createNewGame } from '../utils/requests'
-import { showSuccessfulNotification } from '../utils/utils'
+import { showSuccessNotification } from '../utils/utils'
 
 import AddPlayer from './AddPlayer';
 import GoToGame from './GoToGame';
@@ -12,12 +12,13 @@ function Home() {
   const [openedAddPlayer, setOpenedAddPlayer] = useState(false);
   const [newGameId, setNewGameId] = useState("")
 
+  // Creates a new game
   const handleCreateGame = async () => {
     setOpenedCreateGame(true)
 
     try {
       const response = await createNewGame();
-      showSuccessfulNotification("Successfully Created Game!")
+      showSuccessNotification("Successfully Created Game!")
       setNewGameId(response.id)
     } catch (error) {
       // TODO

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from "react-router-dom"
 import { Button, Container, Table } from '@mantine/core'
-import axios from 'axios'
 
 import { deleteAllPlayers, deletePlayer, fetchAllPlayers } from '../utils/requests'
 
@@ -12,6 +11,7 @@ function Players() {
   const params = useParams();
   const navigate = useNavigate();
 
+  // Fethces list of all players
   useEffect(() => {
     const getPlayers = async () => {
       try {
