@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react"
+import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { Button, Container } from "@mantine/core"
 
@@ -12,26 +12,24 @@ function Admin() {
 
   const params = useParams()
 
-  // Fetches game data (current round and number of players)
-  const getGameData = useCallback(async () => {
-    try {
-      console.log(params.gameId)
-      const response = await fetchGame(params.gameId)
-      setRound(response.round)
-      setPlayerNo(response.players.length)
-    } catch (error) {
-      // TODO
-    }
-  }, [params.gameId])
-
-  // Fetches game data every 2 seconds
+  // Fetches game data every 2 seconds (current round and number of players)
   useEffect(() => {
+    const getGameData = async () => {
+      try {
+        const response = await fetchGame(params.gameId)
+        setRound(response.round)
+        setPlayerNo(response.players.length)
+      } catch (error) {
+        // TODO
+      }
+    }
+
     const timer = setInterval(getGameData, 2000)
 
     return () => {
       clearInterval(timer)
     }
-  }, [getGameData])
+  }, [params.gameId])
 
   // Increments round
   const advanceRound = async () => {

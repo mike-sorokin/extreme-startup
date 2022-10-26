@@ -11,25 +11,24 @@ function Leaderboard() {
 
   const params = useParams()
 
-  // Fetches the list of all players and sorts in descending order based on score
-  const getLeaderboard = async () => {
-    try {
-      const response = await fetchAllPlayers(params.gameId)
-      const sortedResponse = response.sort((a, b) => { return b.score - a.score })
-      setLeaderboard(sortedResponse)
-    } catch (error) {
-      // TODO
-    }
-  }
-
-  // Fetches leaderboard data every 2 seconds
+  // Fetches list of all players every 2 seconds and sorts in descending order based on score
   useEffect(() => {
+    const getLeaderboard = async () => {
+      try {
+        const response = await fetchAllPlayers(params.gameId)
+        const sortedResponse = response.sort((a, b) => { return b.score - a.score })
+        setLeaderboard(sortedResponse)
+      } catch (error) {
+        // TODO
+      }
+    }
+
     const timer = setInterval(getLeaderboard, 2000)
 
     return () => {
       clearInterval(timer)
     }
-  }, [])
+  }, [params.gameId])
 
   return (
     <Container size="xl" px="sm">

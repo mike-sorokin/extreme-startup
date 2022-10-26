@@ -24,7 +24,7 @@ function Player() {
     }
 
     getPlayerData()
-  }, []);
+  }, [params.gameId, params.id]);
 
   const sampleGameId = "asdaskmasom"
   const samplePlayerDetail = {

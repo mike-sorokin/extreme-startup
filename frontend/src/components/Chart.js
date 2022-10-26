@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import io from "socket.io-client"
 import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts"
 
@@ -9,26 +9,10 @@ function Chart({ gameId }) {
   const [players, setPlayers] = useState([])
   const [scores, setScores] = useState([])
 
-  const getScores = async () => {
-    const [playerData, scoreData] = await fetchScores()
-    setScores([...scores, scoreData])
-    setPlayers(playerData)
-  }
-
-  // TODO use sockets instead?
-  useEffect(() => {
-    const timer = setInterval(getScores, 2000)
-
-    return () => {
-      clearInterval(timer)
-    }
-  }, [])
-
   // Gets list of players objects and returns list of players
   // and an object with key-value pairs, where the keys are all the player id's
   // and the values are the player's scores 
-  const fetchScores = async () => {
-
+  const fetchScores = useCallback(async () => {
     try {
       const response = await fetchAllPlayers(gameId)
       let scoreData = {}
@@ -42,7 +26,22 @@ function Chart({ gameId }) {
     } catch (err) {
       // TODO
     }
-  }
+  }, [gameId])
+
+  // TODO use sockets instead?
+  useEffect(() => {
+    const getScores = async () => {
+      const [playerData, scoreData] = await fetchScores()
+      setScores(s => [...s, scoreData])
+      setPlayers(playerData)
+    }
+
+    const timer = setInterval(getScores, 2000)
+
+    return () => {
+      clearInterval(timer)
+    }
+  }, [fetchScores])
 
   return (
     <div>
