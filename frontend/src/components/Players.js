@@ -6,7 +6,6 @@ import { deleteAllPlayers, deletePlayer, fetchAllPlayers } from '../utils/reques
 
 function Players() {
   const [players, setPlayers] = useState([])
-  const [refreshTimer, setRefreshTimer] = useState(0)
 
   const params = useParams();
   const navigate = useNavigate();
@@ -30,36 +29,6 @@ function Players() {
     }
   }, [])
 
-  // useEffect(() => {
-
-
-  //   getPlayers()
-
-  //   setTimeout(() => setRefreshTimer(prevState => prevState + 1), 1000)
-  // }, [refreshTimer])
-
-  // useEffect(() => {
-  //   getPlayers()
-  //   setTimeout(() => setRefreshTimer(prevState => prevState + 1), 1000)
-  // }, [refreshTimer]);
-
-  // function getPlayers() {
-  //   axios.get(playerCreationUrl(params.gameid))
-  //     .then(function (response) {
-  //       console.log(response);
-  //       const temp = []
-  //       for (let [id, player] of Object.entries(response.data.players)) {
-  //         temp.push({ 'id': id, 'name': player.name, 'api': player.api })
-  //       }
-  //       console.log(temp)
-  //       setPlayers(temp)
-  //       console.log(players)
-  //     })
-  //     .catch(function (error) {
-  //       console.log(error);
-  //     });
-  // }
-
   const withdrawPlayer = async (playerId) => {
     try {
       const response = await deletePlayer(params.gameid, playerId)
@@ -69,16 +38,6 @@ function Players() {
     }
   }
 
-  // function withdrawPlayer(playerid) {
-  //   axios.delete("/api" + playerPageUrl(params.gameid, playerid))
-  //     .then(function (response) {
-  //       console.log(response);
-  //     })
-  //     .catch(function (error) {
-  //       console.log(error);
-  //     });
-  // }
-
   const withdrawAllPlayers = async () => {
     try {
       const response = await deleteAllPlayers(params.gameid)
@@ -87,16 +46,6 @@ function Players() {
       // TODO
     }
   }
-
-  // function withdrawPlayers() {
-  //   axios.delete(playerCreationUrl(params.gameid))
-  //     .then(function (response) {
-  //       console.log(response);
-  //     })
-  //     .catch(function (error) {
-  //       console.log(error);
-  //     });
-  // }
 
   return (
     <Container size="xl" px="sm">

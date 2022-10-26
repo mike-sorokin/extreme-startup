@@ -25,28 +25,6 @@ function AddPlayer(setOpened) {
     } catch (error) {
       // TODO
     }
-
-    // let validStatus = validPlayerData(gameId, name, url)
-
-    // if (validStatus === 0) {
-    //   const playerData = playerCreationData(name, url)
-    //   return requestPlayerCreation(gameId, playerData).then((player) => {
-    //     showSuccessfulNotification("Successfully Created Player!")
-    //     console.log("player")
-    //     console.log(player)
-    //     navigate(playerPageUrl(player.game_id, player.id))
-    //   });
-    // }
-
-    // if (validStatus === 1) {
-    //   showFailureNotification("Error creating player", "Game id does not exist!")
-    // } else if (validStatus === 2) {
-    //   showFailureNotification("Error creating player", "Your name cannot be empty!")
-    // } else if (validStatus === 3) {
-    //   showFailureNotification("Error creating player", "Your name already exists in the game!")
-    // } else {
-    //   showFailureNotification("Error creating player", "You entered an invalid URL!")
-    // }
   };
 
   return (

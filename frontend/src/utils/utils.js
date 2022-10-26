@@ -7,6 +7,7 @@ export function str(obj) {
 
 export function alertError(error) {
   console.log(error.toJSON());
+  throw error
 }
 
 export function showSuccessNotification(msg) {

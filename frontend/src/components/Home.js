@@ -25,15 +25,6 @@ function Home() {
     }
   }
 
-  // const handleCreateGame = () => {
-  //   return requestGameCreation()
-  //     .then(game => {
-  //       showSuccessfulNotification("Successfully Created Game!")
-  //       setNewGameId(game.id)
-  //       setOpenedCreateGame(true)
-  //     })
-  // }
-
   return (
     <div className="Home">
       <h1>🔥 Extreme Startup 🔥</h1>

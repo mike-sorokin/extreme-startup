@@ -167,7 +167,7 @@ export async function createPlayer(gameId, name, api) {
 
   if (!valid) {
     console.error("Invalid data submitted");
-    return false;
+    throw "Invalid data submitted"
   }
 
   const playerData = {
@@ -212,8 +212,7 @@ async function validateData(gameId, data) {
     }
 
     // Check player name is unique in a game
-    // TODO: why is this a list inside an object - why not just return a list?
-    const names = players.players.map((player) => {
+    const names = players.map((player) => {
       player.name;
     });
 
@@ -231,7 +230,7 @@ async function validateData(gameId, data) {
     }
 
     // Check api url is unique in a game
-    const apis = players.players.map((player) => {
+    const apis = players.map((player) => {
       player.api;
     });
 
@@ -385,91 +384,3 @@ export async function deleteEvent(gameId, playerId, eventId) {
     alertError(error);
   }
 }
-
-// import { gameCreationUrl, gameUrl, playerCreationUrl } from '../utils/urls';
-// import { alertError } from '../utils/utils'
-// import axios from 'axios';
-//
-// export function justJsonHeaders() {
-//   return {
-//     headers: {
-//       'Content-Type': 'application/json',
-//     }
-//   }
-// }
-
-// export function requestGameCreation() {
-//   return axios
-//     .post(gameCreationUrl(), {}, justJsonHeaders())
-//     .then(request => {
-//       console.log(request)
-//       return {
-//         id: request.data.id
-//       }
-//     })
-//     .catch(alertError)
-// }
-
-// export function validPlayerData(gameId, name, url) {
-//   let player = name.trim()
-
-//   if (player === "")
-//     return 2
-
-//   try {
-//     const response = axios.get(gameUrl(gameId))
-//     console.log(response)
-//   }
-//   catch (err) {
-//     alertError(err)
-//     return 1
-//   }
-
-//   let players = getPlayersFromGameId(gameId)
-
-//   if (player in players)
-//     return 3
-
-//   if (url.substring(0, 7) === "http://" || url.substring(0, 8) === "https://")
-//     return 0
-
-//   return 4
-// }
-
-// export function playerCreationData(name, api) {
-//   return {
-//     name: name.trim(),
-//     api: api
-//   }
-// }
-
-// export function requestPlayerCreation(gameId, playerData) {
-//   return axios
-//     .post(playerCreationUrl(gameId), playerData, justJsonHeaders())
-//     .then(request => {
-//       console.log(request)
-//       return request.data
-//     })
-//     .catch(alertError)
-// }
-
-// export function getPlayersFromGameId(gameId) {
-//   let url = playerCreationUrl(gameId)
-//   axios.get(url)
-//     .then(data => { return data.players })
-//     .catch(err => alertError("Error fetching players from game id: " + err.response.data))
-//   return []
-// }
-
-// const fetchEvents = async () => {
-//   try {
-//     const response = await axios.get("/api" + playerPageUrl(params.gameid, params.id));
-//     return response;
-//   } catch (error) {
-//     // console.error(error);
-//   }
-// }
-
-// const deletePlayer = (id) => {
-//   console.log("deleted player", id);
-// };

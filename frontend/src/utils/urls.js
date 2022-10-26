@@ -56,25 +56,3 @@ export function eventAPI(gameId, playerId, eventId) {
   return `${API_PREFIX}/${gameId}/players/${playerId}/events/${eventId}`
 }
 
-
-// const API_PREFIX = "/api"
-// const rootUrl = () => API_PREFIX
-// export function gameCreationUrl() {
-//   return API_PREFIX
-// }
-
-// export function gameUrl(gameId) {
-//   return `${rootUrl()}/${gameId}`
-// }
-
-// export function playerCreationUrl(gameId) {
-//   return `${gameUrl(gameId)}/players`
-// }
-
-// export function gamePageUrl(gameId) {
-//   return `/${gameId}`
-// }
-
-// export function playerPageUrl(gameId, playerId) {
-//   return `${gamePageUrl(gameId)}/players/${playerId}`
-// }

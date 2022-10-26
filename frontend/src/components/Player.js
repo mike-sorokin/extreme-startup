@@ -26,17 +26,6 @@ function Player() {
     getPlayerData()
   }, []);
 
-  // function getPlayer() {
-  //   axios.get("/api" + playerPageUrl(params.gameid, params.id))
-  //     .then(function (response) {
-  //       console.log(response);
-  //       setPlayerDetail(response.data)
-  //     })
-  //     .catch(function (error) {
-  //       console.log(error);
-  //     });
-  // }
-
   const sampleGameId = "asdaskmasom"
   const samplePlayerDetail = {
     id: "asonfaosmfi",

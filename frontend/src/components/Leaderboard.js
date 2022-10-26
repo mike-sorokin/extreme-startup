@@ -8,7 +8,6 @@ import Chart from "./Chart"
 
 function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState([])
-  // const [refreshTimer, setRefreshTimer] = useState(0)
 
   const params = useParams()
 
@@ -31,25 +30,6 @@ function Leaderboard() {
       clearInterval(timer)
     }
   }, [])
-
-  // useEffect(() => {
-
-
-  //   getLeaderboard()
-  //   setTimeout(() => setRefreshTimer(prevState => prevState + 1), 3000)
-  // }, [refreshTimer]);
-
-  // function getLeaderboard() {
-  //   axios.get(gameUrl(params.gameid) + '/leaderboard')
-  //     .then(function (response) {
-  //       console.log(response);
-  //       setLeaderboard(response.data)
-
-  //     })
-  //     .catch(function (error) {
-  //       console.log(error);
-  //     });
-  // }
 
   return (
     <Container size="xl" px="sm">
