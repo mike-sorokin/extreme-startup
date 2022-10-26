@@ -1,31 +1,44 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from "react-router-dom"
 import { Container, Table } from "@mantine/core"
-import axios from 'axios'
-import { gameUrl } from '../utils/urls'
+
+import { fetchAllPlayers } from '../utils/requests'
+
 import Chart from "./Chart"
 
 function Leaderboard() {
-  const params = useParams()
-  const [refreshTimer, setRefreshTimer] = useState(0)
   const [leaderboard, setLeaderboard] = useState([])
+  const [refreshTimer, setRefreshTimer] = useState(0)
 
+  const params = useParams()
+
+  // Fetches the list of all players and sorts in descending order based on score
   useEffect(() => {
+    const getLeaderboard = async () => {
+      try {
+        const response = await fetchAllPlayers(params.gameid)
+        const sortedResponse = response.sort((a, b) => { return b.score - a.score })
+        setLeaderboard(sortedResponse)
+      } catch (error) {
+        // TODO
+      }
+    }
+
     getLeaderboard()
-    setTimeout(() => setRefreshTimer(prevState => prevState + 1), 1000)
+    setTimeout(() => setRefreshTimer(prevState => prevState + 1), 3000)
   }, [refreshTimer]);
 
-  function getLeaderboard() {
-    axios.get(gameUrl(params.gameid) + '/leaderboard')
-      .then(function (response) {
-        console.log(response);
-        setLeaderboard(response.data)
+  // function getLeaderboard() {
+  //   axios.get(gameUrl(params.gameid) + '/leaderboard')
+  //     .then(function (response) {
+  //       console.log(response);
+  //       setLeaderboard(response.data)
 
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }
+  //     })
+  //     .catch(function (error) {
+  //       console.log(error);
+  //     });
+  // }
 
   return (
     <Container size="xl" px="sm">
@@ -42,11 +55,11 @@ function Leaderboard() {
           </thead>
           <tbody>
             {
-              leaderboard.map(({ id, name, score }) => (
-                <tr key={id}>
-                  <td>{id}</td>
-                  <td>{name}</td>
-                  <td>{score}</td>
+              leaderboard.map((player) => (
+                <tr key={player.id}>
+                  <td>{player.id}</td>
+                  <td>{player.name}</td>
+                  <td>{player.score}</td>
                 </tr>
               ))
             }
