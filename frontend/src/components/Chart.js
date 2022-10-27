@@ -46,9 +46,10 @@ function Chart ({ gameId }) {
       <LineChart width={750} height={450} data={scores}>
         {/* <XAxis dataKey="name" /> */}
         <YAxis />
-        <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
+        <CartesianGrid stroke="#111" strokeDasharray="5 5" />
 
-        {players.forEach((player) => {
+        {players.map((player) => {
+          // eslint-disable-next-line react/jsx-key
           return <Line type="monotone" dataKey={player} stroke="#8884d8" />
         })}
         <Tooltip />
