@@ -8,6 +8,7 @@ import PlayerTable from './PlayerTable'
 
 function Player () {
   const [playerData, setPlayerData] = useState({})
+  const [events, setEvents] = useState([])
 
   const params = useParams()
 
@@ -16,14 +17,19 @@ function Player () {
     const getPlayerData = async () => {
       try {
         const response = await fetchPlayer(params.gameId, params.id)
-        console.log('response', response)
         setPlayerData(response)
+        setEvents(response.events.reverse())
       } catch (error) {
         // TODO
       }
     }
 
     getPlayerData()
+    const timer = setInterval(getPlayerData, 2000)
+
+    return () => {
+      clearInterval(timer)
+    }
   }, [params.gameId, params.id])
 
   return (
@@ -45,7 +51,7 @@ function Player () {
       <h4 style={{ color: 'grey' }}>{playerData.score}</h4>
       <br />
       <h3>Events</h3>
-      <PlayerTable events={playerData.events} />
+      <PlayerTable events={events} />
     </Container>
   )
 }
