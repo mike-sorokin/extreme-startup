@@ -1,47 +1,46 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from "react-router-dom"
-import { Button, Container } from "@mantine/core";
+import { useParams } from 'react-router-dom'
+import { Button, Container } from '@mantine/core'
 import axios from 'axios'
 import { gameUrl } from '../utils/urls'
 
-
-function Admin() {
-  const params = useParams();
-  const [playerNo, setPlayerNo] = useState(0);
+function Admin () {
+  const params = useParams()
+  const [playerNo, setPlayerNo] = useState(0)
   const [round, setRound] = useState('Warmup')
   const [refreshTimer, setRefreshTimer] = useState(0)
 
   useEffect(() => {
     axios.get(gameUrl(params.gameid))
       .then(function (response) {
-        console.log(response);
+        console.log(response)
         setRound(response.data.round === 0 ? 'Warmup' : response.data.round)
         setPlayerNo(response.data.players.length)
       })
       .catch(function (error) {
-        console.log(error);
-      });
+        console.log(error)
+      })
 
     setTimeout(() => setRefreshTimer(prevState => prevState + 1), 1000)
-  }, [refreshTimer]);
+  }, [refreshTimer])
 
-  function advanceRound() {
+  function advanceRound () {
     axios.put(gameUrl(params.gameid))
       .then(function (response) {
-        console.log(response);
+        console.log(response)
         setRound(round === 'Warmup' ? 1 : (round + 1))
       })
       .catch(function (error) {
-        console.log(error);
-      });
+        console.log(error)
+      })
   }
 
   const roundsBarStyle = {
-    width: "100%",
-    display: "inline-flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center"
+    width: '100%',
+    display: 'inline-flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   }
 
   return (
@@ -61,7 +60,7 @@ function Admin() {
           radius="md"
           size="md"
           style={{
-            marginLeft: "20px"
+            marginLeft: '20px'
           }}
           onClick={() => advanceRound()}>
           Advance Round
