@@ -26,8 +26,8 @@ def setup_server_with(client, server_setup):
     for (method, url, data, query_str) in server_setup:
         get_response_by_request_method = {
             GET: lambda: client.get(url, query_string=query_str),
-            POST: lambda: client.post(url, data=data, query_string=query_str),
-            PUT: lambda: client.put(url, data=data, query_string=query_str),
+            POST: lambda: client.post(url, json=data, query_string=query_str),
+            PUT: lambda: client.put(url, json=data, query_string=query_str),
             DELETE: lambda: client.delete(url, query_string=query_str),
         }
         rd = response_as_dict(get_response_by_request_method[method]())
@@ -65,7 +65,7 @@ def with_setup(server_setup=None, **callable_setup_kwargs):
     return inner
 
 
-create_a_couple_of_games = ((POST, "/api", None, None), (POST, "/api", None, None))
+create_a_couple_of_games = ((POST, "/api", {"password": "dummy_password"}, None),) * 2
 
 
 def create_a_game_with_players(cli, num_players=2):

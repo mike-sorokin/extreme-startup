@@ -8,6 +8,7 @@ from flask import (
     make_response,
     url_for,
     send_from_directory,
+    session
 )
 from flaskr.player import Player
 from flaskr.game import Game
@@ -21,6 +22,7 @@ import threading
 import pprint
 
 app = Flask(__name__)
+app.secret_key = b'_5#2L"F4Q8Z\n\xec]/'
 
 # games: game_id -> game object
 games = {}
@@ -35,7 +37,7 @@ lock = threading.Lock()
 scoreboards = {}
 
 # player_threads: player_id -> player_thread
-player_threads = {}
+player_threads = {} 
 
 encoder = JSONEncoder()
 
@@ -66,21 +68,38 @@ def api_index():
     if request.method == "GET":  # fetch all games
         return encoder.encode(games)
 
-    elif request.method == "POST":  # create new game -- initially no players
-        new_game = Game()
+    elif request.method == "POST":  # create new game -- initially no players -- passkey for administrators 
+        password = request.get_json()["password"]
+        new_game = Game(password)
 
         gid = new_game.id
         scoreboards[gid] = Scoreboard()
         games[gid] = new_game
-
+        add_session_admin(gid, session) 
         return encoder.encode(new_game)
 
-    elif request.method == "DELETE":  # delete all games
+    elif request.method == "DELETE":  # delete all games 
+        for gid in session['admin']:
+            if not is_admin(gid, session):
+                return NOT_ACCEPTABLE
+
         remove_players(*[p for g in games.values() for p in g.players])
         # garbage collect each game's question_factory
         games.clear()
         return DELETE_SUCCESSFUL
 
+@app.route("/api/<game_id>/auth", methods=["POST"])
+def admin_authentication(game_id): # check if passkey valid for <game_id> and authenticate user with session if yes
+    if game_id not in games:
+        return NOT_ACCEPTABLE
+
+    password = request.get_json()["password"]
+    if password == games[game_id].admin_password:
+        add_session_admin(game_id, session)
+        return {"valid": True}
+
+    return {"valid": False}
+    
 
 # Managing a specific game
 @app.route("/api/<game_id>", methods=["GET", "PUT", "DELETE"])
@@ -92,6 +111,9 @@ def game(game_id):
         return encoder.encode(games[game_id])
 
     elif request.method == "PUT":  # update game settings
+        if not is_admin(game_id, session):
+            return NOT_ACCEPTABLE
+
         r = request.get_json()
 
         if "round" in r:  # increment <game_id>'s round by 1
@@ -118,6 +140,9 @@ def game(game_id):
         return NOT_ACCEPTABLE
 
     elif request.method == "DELETE":  # delete game with <game_id>
+        if not is_admin(game_id, session):
+            return NOT_ACCEPTABLE
+
         remove_players(*games[game_id].players)
 
         # garbage collect the question_factory
@@ -164,6 +189,9 @@ def all_players(game_id):
         return r
 
     elif request.method == "DELETE":  # deletes all players in <game_id> game instance
+        if not is_admin(game_id, session):
+            return NOT_ACCEPTABLE
+
         remove_players(*games[game_id].players)
         games[game_id].players.clear()
         return DELETE_SUCCESSFUL
@@ -187,7 +215,10 @@ def player(game_id, player_id):
             players[player_id].api = request.get_json()["api"]
 
         return encoder.encode(players[player_id])
+
     elif request.method == "DELETE":  # delete player with id
+        if not is_admin(game_id, session):
+            return NOT_ACCEPTABLE
         games[game_id].players.remove(player_id)
         remove_players(player_id)
         return {"deleted": player_id}
@@ -203,6 +234,9 @@ def player_events(game_id, player_id):
         return encoder.encode({"events": players[player_id].events})
 
     elif request.method == "DELETE":  # delets all events for <player_id>
+        if not is_admin(game_id, session):
+            return NOT_ACCEPTABLE
+
         players[player_id].events.clear()
         return DELETE_SUCCESSFUL
 
@@ -225,6 +259,8 @@ def player_event(game_id, player_id, event_id):
         return encoder.encode(event)
 
     elif request.method == "DELETE":  # delete event with <event_id>
+        if not is_admin(game_id, session):
+            return NOT_ACCEPTABLE
         players[player_id].events.remove(event)
         return DELETE_SUCCESSFUL
 
@@ -252,6 +288,14 @@ def remove_players(*player_id):
         del player_threads[pid]
         del players[pid]
 
+def add_session_admin(game_id, session):
+    if 'admin' in session:
+        session['admin'].append(game_id)
+    else:
+        session['admin'] = [game_id]
+
+def is_admin(game_id, session):
+    return 'admin' in session and game_id in session['admin']
 
 # FORGIVE ME
 bot_responses = {n: (f"Bot{n}", 0) for n in range(100)}

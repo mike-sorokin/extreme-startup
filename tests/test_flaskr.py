@@ -21,6 +21,7 @@ def test_index_post_blank_game_is_initialized_empty_warmup(_, cli):
 @with_setup(create_a_couple_of_games)
 def test_index_can_get(extras, cli):
     resp = cli.get("/api")
+
     assert resp.status_code == ALL_GOOD
 
     # Expected ids
