@@ -1,11 +1,10 @@
-import React from 'react';
-import { Outlet, useParams, useNavigate } from "react-router-dom";
-import { Menu, Button, Burger } from "@mantine/core";
+import React from 'react'
+import { Outlet, useParams, useNavigate } from 'react-router-dom'
+import { Menu, Button, Burger } from '@mantine/core'
 
-import { playersUrl, adminUrl } from "../utils/urls"
+import { playersUrl, adminUrl } from '../utils/urls'
 
-function Game() {
-
+function Game () {
   const params = useParams()
   const navigate = useNavigate()
 
@@ -25,9 +24,9 @@ function Game() {
 
         <Menu.Dropdown>
           <Menu.Label>Menu</Menu.Label>
-          <Menu.Item>{navButton(adminUrl(params.gameId), "Host Page")}</Menu.Item>
-          <Menu.Item>{navButton('', "Leaderboard")}</Menu.Item>
-          <Menu.Item>{navButton(playersUrl(params.gameId), "Players")}</Menu.Item>
+          <Menu.Item>{navButton(adminUrl(params.gameId), 'Host Page')}</Menu.Item>
+          <Menu.Item>{navButton('', 'Leaderboard')}</Menu.Item>
+          <Menu.Item>{navButton(playersUrl(params.gameId), 'Players')}</Menu.Item>
         </Menu.Dropdown>
       </Menu>
       <Outlet />

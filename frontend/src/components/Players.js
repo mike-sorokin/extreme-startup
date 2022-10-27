@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate } from 'react-router-dom'
 import { Button, Container, Table } from '@mantine/core'
 
 import { deleteAllPlayers, deletePlayer, fetchAllPlayers } from '../utils/requests'
 
-function Players() {
+function Players () {
   const [players, setPlayers] = useState([])
 
-  const params = useParams();
-  const navigate = useNavigate();
+  const params = useParams()
+  const navigate = useNavigate()
 
   // Fetches player data every 2 seconds
   useEffect(() => {

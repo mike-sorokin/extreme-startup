@@ -1,24 +1,24 @@
-import React, { useState } from 'react';
-import { Button, Modal } from '@mantine/core';
+import React, { useState } from 'react'
+import { Button, Modal } from '@mantine/core'
 
 import { createNewGame } from '../utils/requests'
 import { showSuccessNotification } from '../utils/utils'
 
-import AddPlayer from './AddPlayer';
-import GoToGame from './GoToGame';
+import AddPlayer from './AddPlayer'
+import GoToGame from './GoToGame'
 
-function Home() {
-  const [openedCreateGame, setOpenedCreateGame] = useState(false);
-  const [openedAddPlayer, setOpenedAddPlayer] = useState(false);
-  const [newGameId, setNewGameId] = useState("")
+function Home () {
+  const [openedCreateGame, setOpenedCreateGame] = useState(false)
+  const [openedAddPlayer, setOpenedAddPlayer] = useState(false)
+  const [newGameId, setNewGameId] = useState('')
 
   // Creates a new game
   const handleCreateGame = async () => {
     setOpenedCreateGame(true)
 
     try {
-      const response = await createNewGame();
-      showSuccessNotification("Successfully Created Game!")
+      const response = await createNewGame()
+      showSuccessNotification('Successfully Created Game!')
       setNewGameId(response.id)
     } catch (error) {
       // TODO

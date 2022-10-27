@@ -1,17 +1,17 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { MantineProvider } from '@mantine/core';
-import { NotificationsProvider } from '@mantine/notifications';
-import Home from "./components/Home"
-import Game from "./components/Game"
-import Player from "./components/Player"
-import Players from "./components/Players"
-import Admin from "./components/Admin"
-import Leaderboard from "./components/Leaderboard"
+import { MantineProvider } from '@mantine/core'
+import { NotificationsProvider } from '@mantine/notifications'
+import { React } from 'react'
+import Home from './components/Home'
+import Game from './components/Game'
+import Player from './components/Player'
+import Players from './components/Players'
+import Admin from './components/Admin'
+import Leaderboard from './components/Leaderboard'
 
-import './App.css';
+import './App.css'
 
-function App() {
-
+function App () {
   return (
 
     <MantineProvider withGlobalStyles withNormalizeCSS>
@@ -30,7 +30,7 @@ function App() {
       </NotificationsProvider>
     </MantineProvider>
 
-  );
+  )
 }
 
-export default App;
+export default App

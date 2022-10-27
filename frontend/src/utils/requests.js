@@ -1,12 +1,11 @@
-import axios from "axios";
+import axios from 'axios'
 
-import { homeAPI, gameAPI, playersAPI, playerAPI, playerEventsAPI, eventAPI } from "./urls";
-import { alertError, showFailureNotification, playersAsArray } from "./utils";
-
+import { homeAPI, gameAPI, playersAPI, playerAPI, playerEventsAPI, eventAPI } from './urls'
+import { alertError, showFailureNotification, playersAsArray } from './utils'
 
 const instance = axios.create({
-  headers: { "Content-Type": "application/json" },
-});
+  headers: { 'Content-Type': 'application/json' }
+})
 
 // Need to test returning response.json() vs response.data
 
@@ -50,12 +49,12 @@ const instance = axios.create({
  * @async
  * @return {Promise<{gameId: Game, ...}>} Object containing all Game objects
  */
-export async function fetchAllGames() {
+export async function fetchAllGames () {
   try {
-    const response = await instance.get(homeAPI());
-    return response.data;
+    const response = await instance.get(homeAPI())
+    return response.data
   } catch (error) {
-    alertError(error);
+    alertError(error)
   }
 }
 
@@ -64,12 +63,12 @@ export async function fetchAllGames() {
  * @async
  * @return {Promise<Game>} Game object of newly created game
  */
-export async function createNewGame() {
+export async function createNewGame () {
   try {
-    const response = await instance.post(homeAPI());
-    return response.data;
+    const response = await instance.post(homeAPI())
+    return response.data
   } catch (error) {
-    alertError(error);
+    alertError(error)
   }
 }
 
@@ -78,12 +77,12 @@ export async function createNewGame() {
  * @async
  * @return unsure
  */
-export async function deleteAllGames() {
+export async function deleteAllGames () {
   try {
-    const response = await instance.delete(homeAPI());
-    return response.data;
+    const response = await instance.delete(homeAPI())
+    return response.data
   } catch (error) {
-    alertError(error);
+    alertError(error)
   }
 }
 
@@ -95,12 +94,12 @@ export async function deleteAllGames() {
  * @param  {string} gameId
  * @return {Promise<Game>} Game JSON object
  */
-export async function fetchGame(gameId) {
+export async function fetchGame (gameId) {
   try {
-    const response = await instance.get(gameAPI(gameId));
-    return response.data;
+    const response = await instance.get(gameAPI(gameId))
+    return response.data
   } catch (error) {
-    alertError(error);
+    alertError(error)
   }
 }
 
@@ -114,12 +113,12 @@ export async function fetchGame(gameId) {
  * @param  {{"round": number, "pause": boolean}} data Object containing either the round or whether to pause/unpause
  * @return {Promise<string>} unsure
  */
-export async function updateGame(gameId, data) {
+export async function updateGame (gameId, data) {
   try {
-    const response = await instance.put(gameAPI(gameId, data));
-    return response.data;
+    const response = await instance.put(gameAPI(gameId, data))
+    return response.data
   } catch (error) {
-    alertError(error);
+    alertError(error)
   }
 }
 
@@ -129,12 +128,12 @@ export async function updateGame(gameId, data) {
  * @param  {string} gameId
  * @return {Promise<{"deleted": gameId}>} Id of deleted game
  */
-export async function deleteGame(gameId) {
+export async function deleteGame (gameId) {
   try {
-    const response = await instance.delete(gameAPI(gameId));
-    return response.data;
+    const response = await instance.delete(gameAPI(gameId))
+    return response.data
   } catch (error) {
-    alertError(error);
+    alertError(error)
   }
 }
 
@@ -146,12 +145,12 @@ export async function deleteGame(gameId) {
  * @param  {string} gameId
  * @return {Promise<Player[]>} List of all player JSON objects
  */
-export async function fetchAllPlayers(gameId) {
+export async function fetchAllPlayers (gameId) {
   try {
-    const response = await instance.get(playersAPI(gameId));
-    return playersAsArray(response.data.players);
+    const response = await instance.get(playersAPI(gameId))
+    return playersAsArray(response.data.players)
   } catch (error) {
-    alertError(error);
+    alertError(error)
   }
 }
 
@@ -163,24 +162,24 @@ export async function fetchAllPlayers(gameId) {
  * @param  {string} api    URL submitted by user
  * @return {Promise<Player>}        Player JSON object for newly created player (returns false if invalid)
  */
-export async function createPlayer(gameId, name, api) {
-  const valid = await validateData(gameId, { name: name, api: api });
+export async function createPlayer (gameId, name, api) {
+  const valid = await validateData(gameId, { name, api })
 
   if (!valid) {
-    console.error("Invalid data submitted");
-    throw new Error("Invalid data submitted")
+    console.error('Invalid data submitted')
+    throw new Error('Invalid data submitted')
   }
 
   const playerData = {
     name: name.trim(),
-    api: api,
-  };
+    api
+  }
 
   try {
-    const response = await instance.post(playersAPI(gameId), playerData);
-    return response.data;
+    const response = await instance.post(playersAPI(gameId), playerData)
+    return response.data
   } catch (error) {
-    alertError(error);
+    alertError(error)
   }
 }
 
@@ -191,53 +190,53 @@ export async function createPlayer(gameId, name, api) {
  * @param {{"name": string, "api": string}} data Object containing name and/or api
  * @returns {Promise<boolean>} Returns true if valid and false if invalid
  */
-async function validateData(gameId, data) {
+async function validateData (gameId, data) {
   // Check gameId exists
   try {
-    const response = await fetchGame(gameId);
-    // console.log(response);
+    const response = await fetchGame(gameId)
+    console.log(response)
   } catch (error) {
-    showFailureNotification("Error creating player", "Game id does not exist!");
-    return false;
+    showFailureNotification('Error creating player', 'Game id does not exist!')
+    return false
   }
 
-  const players = await fetchAllPlayers(gameId);
+  const players = await fetchAllPlayers(gameId)
 
   if (data.name) {
-    const name = data.name.trim();
+    const name = data.name.trim()
 
     // Check player name is not empty
-    if (name === "") {
-      showFailureNotification("Error creating player", "Your name cannot be empty!");
-      return false;
+    if (name === '') {
+      showFailureNotification('Error creating player', 'Your name cannot be empty!')
+      return false
     }
 
     // Check player name is unique in a game
-    const names = players.map(player => player.name);
+    const names = players.map(player => player.name)
 
     if (name in names) {
-      showFailureNotification("Error creating player", "Your name already exists in the game!");
-      return false;
+      showFailureNotification('Error creating player', 'Your name already exists in the game!')
+      return false
     }
   }
 
   if (data.api) {
     // Check valid URL
-    if (data.api.substring(0, 7) !== "http://" && data.api.substring(0, 8) !== "https://") {
-      showFailureNotification("Error creating player", "You entered an invalid URL!");
-      return false;
+    if (data.api.substring(0, 7) !== 'http://' && data.api.substring(0, 8) !== 'https://') {
+      showFailureNotification('Error creating player', 'You entered an invalid URL!')
+      return false
     }
 
     // Check api url is unique in a game
-    const apis = players.map(player => player.api);
+    const apis = players.map(player => player.api)
 
     if (data.api in apis) {
-      showFailureNotification("Error creating player", "Your url already exists in the game!");
-      return false;
+      showFailureNotification('Error creating player', 'Your url already exists in the game!')
+      return false
     }
   }
 
-  return true;
+  return true
 }
 
 /**
@@ -245,12 +244,12 @@ async function validateData(gameId, data) {
  * @param  {string} gameId
  * @return unsure
  */
-export async function deleteAllPlayers(gameId) {
+export async function deleteAllPlayers (gameId) {
   try {
-    const response = await instance.delete(playersAPI(gameId));
-    return response.data;
+    const response = await instance.delete(playersAPI(gameId))
+    return response.data
   } catch (error) {
-    alertError(error);
+    alertError(error)
   }
 }
 
@@ -263,12 +262,12 @@ export async function deleteAllPlayers(gameId) {
  * @param  {string} playerId
  * @return {Promise<Player>} Player JSON object
  */
-export async function fetchPlayer(gameId, playerId) {
+export async function fetchPlayer (gameId, playerId) {
   try {
-    const response = await instance.get(playerAPI(gameId, playerId));
-    return response.data;
+    const response = await instance.get(playerAPI(gameId, playerId))
+    return response.data
   } catch (error) {
-    alertError(error);
+    alertError(error)
   }
 }
 
@@ -280,19 +279,19 @@ export async function fetchPlayer(gameId, playerId) {
  * @param  {{name: string, api: string}} data Object containing new name and/or new api
  * @return {Promise<Player>} Updated player JSON object (returns false if data is invalid)
  */
-export async function updatePlayer(gameId, playerId, data) {
-  const valid = await validateData(gameId, data);
+export async function updatePlayer (gameId, playerId, data) {
+  const valid = await validateData(gameId, data)
 
   if (!valid) {
-    console.error("Invalid data submitted");
-    return false;
+    console.error('Invalid data submitted')
+    return false
   }
 
   try {
-    const response = await instance.put(playerAPI(gameId, playerId), data);
-    return response.data;
+    const response = await instance.put(playerAPI(gameId, playerId), data)
+    return response.data
   } catch (error) {
-    alertError(error);
+    alertError(error)
   }
 }
 
@@ -303,12 +302,12 @@ export async function updatePlayer(gameId, playerId, data) {
  * @param  {string} playerId
  * @return {Promise<{"deleted": playerId}>} ID of the deleted player
  */
-export async function deletePlayer(gameId, playerId) {
+export async function deletePlayer (gameId, playerId) {
   try {
-    const response = await instance.delete(playerAPI(gameId, playerId));
-    return response.data;
+    const response = await instance.delete(playerAPI(gameId, playerId))
+    return response.data
   } catch (error) {
-    alertError(error);
+    alertError(error)
   }
 }
 
@@ -321,12 +320,12 @@ export async function deletePlayer(gameId, playerId) {
  * @param  {string} playerId
  * @return {Promise<Event[]>} List of all event JSON objects
  */
-export async function fetchAllEvents(gameId, playerId) {
+export async function fetchAllEvents (gameId, playerId) {
   try {
-    const response = await instance.get(playerEventsAPI(gameId, playerId));
-    return response.data.events;
+    const response = await instance.get(playerEventsAPI(gameId, playerId))
+    return response.data.events
   } catch (error) {
-    alertError(error);
+    alertError(error)
   }
 }
 
@@ -337,12 +336,12 @@ export async function fetchAllEvents(gameId, playerId) {
  * @param  {string} playerId
  * @return unsure
  */
-export async function deleteAllEvents(gameId, playerId) {
+export async function deleteAllEvents (gameId, playerId) {
   try {
-    const response = await instance.delete(playerEventsAPI(gameId, playerId));
-    return response.data;
+    const response = await instance.delete(playerEventsAPI(gameId, playerId))
+    return response.data
   } catch (error) {
-    alertError(error);
+    alertError(error)
   }
 }
 
@@ -356,12 +355,12 @@ export async function deleteAllEvents(gameId, playerId) {
  * @param  {string} eventId
  * @return {Promise<Event>} Event JSON object
  */
-export async function fetchEvent(gameId, playerId, eventId) {
+export async function fetchEvent (gameId, playerId, eventId) {
   try {
-    const response = await instance.get(eventAPI(gameId, playerId, eventId));
-    return response.data;
+    const response = await instance.get(eventAPI(gameId, playerId, eventId))
+    return response.data
   } catch (error) {
-    alertError(error);
+    alertError(error)
   }
 }
 
@@ -373,11 +372,11 @@ export async function fetchEvent(gameId, playerId, eventId) {
  * @param  {string} eventId
  * @return {Promise<{"deleted": eventId}>} ID of deleted event
  */
-export async function deleteEvent(gameId, playerId, eventId) {
+export async function deleteEvent (gameId, playerId, eventId) {
   try {
-    const response = await instance.delete(eventAPI(gameId, playerId, eventId));
-    return response.data;
+    const response = await instance.delete(eventAPI(gameId, playerId, eventId))
+    return response.data
   } catch (error) {
-    alertError(error);
+    alertError(error)
   }
 }

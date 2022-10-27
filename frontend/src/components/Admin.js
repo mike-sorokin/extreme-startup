@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
-import { Button, Container } from "@mantine/core"
+import React, { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { Button, Container } from '@mantine/core'
 
-import { fetchGame, updateGame } from "../utils/requests"
+import { fetchGame, updateGame } from '../utils/requests'
 
-import "../styles/Admin.css"
+import '../styles/Admin.css'
 
-function Admin() {
+function Admin () {
   const [playerNo, setPlayerNo] = useState(0)
   const [round, setRound] = useState(0)
 
@@ -35,11 +35,11 @@ function Admin() {
   const advanceRound = async () => {
     try {
       await updateGame(params.gameId, { round: round + 1 })
-      setRound(round + 1);
+      setRound(round + 1)
     } catch (error) {
       // TODO
     }
-  };
+  }
 
   return (
     <Container size="xl" px="xs">
@@ -59,16 +59,16 @@ function Admin() {
           radius="md"
           size="md"
           style={{
-            marginLeft: "20px",
+            marginLeft: '20px'
           }}
           onClick={() => advanceRound()}
         >
           Advance Round
         </Button>
       </div>
-      <h4 className="grey-text">{round === 0 ? "Warmup" : round}</h4>
+      <h4 className="grey-text">{round === 0 ? 'Warmup' : round}</h4>
     </Container>
-  );
+  )
 }
 
-export default Admin;
+export default Admin

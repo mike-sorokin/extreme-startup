@@ -1,16 +1,16 @@
-import React, { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { TextInput, Button } from "@mantine/core"
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { TextInput, Button } from '@mantine/core'
 
-import { createPlayer } from "../utils/requests"
-import { playerUrl } from "../utils/urls"
-import { showSuccessNotification } from "../utils/utils"
+import { createPlayer } from '../utils/requests'
+import { playerUrl } from '../utils/urls'
+import { showSuccessNotification } from '../utils/utils'
 
 // What is this setOpened prop used for?
-function AddPlayer(setOpened) {
-  const [gameId, setGameId] = useState("")
-  const [name, setName] = useState("")
-  const [url, setUrl] = useState("")
+function AddPlayer (setOpened) {
+  const [gameId, setGameId] = useState('')
+  const [name, setName] = useState('')
+  const [url, setUrl] = useState('')
 
   const navigate = useNavigate()
 
@@ -21,12 +21,12 @@ function AddPlayer(setOpened) {
     try {
       const response = await createPlayer(gameId, name, url)
       console.log(response)
-      showSuccessNotification("Successfully Created Player!")
+      showSuccessNotification('Successfully Created Player!')
       navigate(playerUrl(response.game_id, response.id))
     } catch (error) {
       // TODO
     }
-  };
+  }
 
   return (
     <div>
@@ -37,7 +37,7 @@ function AddPlayer(setOpened) {
         <Button type="submit">Submit</Button>
       </form>
     </div>
-  );
+  )
 }
 
-export default AddPlayer;
+export default AddPlayer

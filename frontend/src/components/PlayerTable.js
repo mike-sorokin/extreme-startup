@@ -1,7 +1,7 @@
 import React from 'react'
-import { Table, Badge } from "@mantine/core"
+import { Table, Badge } from '@mantine/core'
 
-function PlayerTable({ events }) {
+function PlayerTable ({ events }) {
   return (
     <Table>
       <thead>
@@ -24,13 +24,13 @@ function PlayerTable({ events }) {
               <td>{event.points_gained}</td>
               <td>{event.timestamp}</td>
               <td>
-                {event.response_type === "NO_RESPONSE" && (
+                {event.response_type === 'NO_RESPONSE' && (
                   <Badge color="red"> NO RESPONSE </Badge>
                 )}
-                {event.response_type === "WRONG" && (
+                {event.response_type === 'WRONG' && (
                   <Badge color="orange"> INCORRECT </Badge>
                 )}
-                {event.response_type === "CORRECT" && (
+                {event.response_type === 'CORRECT' && (
                   <Badge color="green"> CORRECT </Badge>
                 )}
               </td>

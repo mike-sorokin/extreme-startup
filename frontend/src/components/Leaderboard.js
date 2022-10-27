@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from "react-router-dom"
-import { Container, Table } from "@mantine/core"
+import { useParams } from 'react-router-dom'
+import { Container, Table } from '@mantine/core'
 
 import { fetchAllPlayers } from '../utils/requests'
 
-import Chart from "./Chart"
+import Chart from './Chart'
 
-function Leaderboard() {
+function Leaderboard () {
   const [leaderboard, setLeaderboard] = useState([])
 
   const params = useParams()

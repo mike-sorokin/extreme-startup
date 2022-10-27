@@ -1,22 +1,22 @@
-import { React, useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { Container, Table, Badge } from "@mantine/core";
+import { React, useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
+import { Container } from '@mantine/core'
 
-import { fetchPlayer } from "../utils/requests";
+import { fetchPlayer } from '../utils/requests'
 
-import PlayerTable from "./PlayerTable";
+import PlayerTable from './PlayerTable'
 
-function Player() {
+function Player () {
   const [playerData, setPlayerData] = useState({})
 
-  const params = useParams();
+  const params = useParams()
 
   // Fetches player json object from backend
   useEffect(() => {
     const getPlayerData = async () => {
       try {
         const response = await fetchPlayer(params.gameId, params.id)
-        console.log("response", response)
+        console.log('response', response)
         setPlayerData(response)
       } catch (error) {
         // TODO
@@ -24,7 +24,7 @@ function Player() {
     }
 
     getPlayerData()
-  }, [params.gameId, params.id]);
+  }, [params.gameId, params.id])
 
   return (
     <Container size="xl" px="xs">
@@ -47,7 +47,7 @@ function Player() {
       <h3>Events</h3>
       <PlayerTable events={playerData.events} />
     </Container>
-  );
+  )
 }
 
-export default Player;
+export default Player

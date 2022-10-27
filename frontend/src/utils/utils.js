@@ -1,34 +1,35 @@
-import { showNotification } from "@mantine/notifications";
-import { IconCheck, IconX } from "@tabler/icons";
+import { showNotification } from '@mantine/notifications'
+import { IconCheck, IconX } from '@tabler/icons'
+import { React } from 'react'
 
-export function str(obj) {
-  return JSON.stringify(obj);
+export function str (obj) {
+  return JSON.stringify(obj)
 }
 
-export function alertError(error) {
-  console.log(error.toJSON());
+export function alertError (error) {
+  console.log(error.toJSON())
   throw error
 }
 
-export function showSuccessNotification(msg) {
+export function showSuccessNotification (msg) {
   showNotification({
-    title: "Success",
+    title: 'Success',
     message: msg,
     icon: <IconCheck size={18} />,
-    color: "teal",
-  });
+    color: 'teal'
+  })
 }
 
-export function showFailureNotification(header, msg) {
+export function showFailureNotification (header, msg) {
   showNotification({
     title: header,
     message: msg,
     icon: <IconX size={18} />,
-    color: "red",
-  });
+    color: 'red'
+  })
 }
 
-export function playersAsArray(playersDict) {
+export function playersAsArray (playersDict) {
   const arr = []
   for (const playerId in playersDict) {
     arr.push(playersDict[playerId])

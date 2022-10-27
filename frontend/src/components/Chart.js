@@ -1,24 +1,22 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import io from "socket.io-client"
-import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts"
+import { Line, LineChart, CartesianGrid, YAxis, Tooltip } from 'recharts'
 
-import { fetchAllPlayers } from "../utils/requests"
+import { fetchAllPlayers } from '../utils/requests'
 
-function Chart({ gameId }) {
-
+function Chart ({ gameId }) {
   const [players, setPlayers] = useState([])
   const [scores, setScores] = useState([])
 
   // Gets list of players objects and returns list of players
   // and an object with key-value pairs, where the keys are all the player id's
-  // and the values are the player's scores 
+  // and the values are the player's scores
   const fetchScores = useCallback(async () => {
     try {
       const response = await fetchAllPlayers(gameId)
-      let scoreData = {}
-      let playerData = []
+      const scoreData = {}
+      const playerData = []
       response.forEach(player => {
-        scoreData[player.id] = player.score;
+        scoreData[player.id] = player.score
         playerData.push(player.id)
       })
 
@@ -50,7 +48,7 @@ function Chart({ gameId }) {
         <YAxis />
         <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
 
-        {players.map((player) => {
+        {players.forEach((player) => {
           return <Line type="monotone" dataKey={player} stroke="#8884d8" />
         })}
         <Tooltip />
