@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from "react-router-dom"
-import { Button, Container } from "@mantine/core";
+import { Button, Card, Container, Title, Space } from "@mantine/core";
 import axios from 'axios'
 import { gameUrl } from '../utils/urls'
 
@@ -46,28 +46,33 @@ function Admin() {
 
   return (
     <Container size="xl" px="xs">
-      <h3>Game ID</h3>
-      <h4 style={{ color: 'grey' }}>{params.gameid}</h4>
-      <br />
-      <h3>Number of Players</h3>
-      <h4 style={{ color: 'grey' }}>{playerNo}</h4>
-      <br />
-      <div style={roundsBarStyle}>
-        <div>
-          <h3>Rounds</h3>
+      <Title order={1} color="white" weight={1000}>Host Page</Title>
+      <Space h="md" />
+      <Card shadow="sm" p="lg" radius="md" withBorder 
+            style={{backgroundColor: "#2C2E33"}}>
+        <h3>Game ID</h3>
+        <h4 style={{ color: 'grey' }}>{params.gameid}</h4>
+        <br />
+        <h3>Number of Players</h3>
+        <h4 style={{ color: 'grey' }}>{playerNo}</h4>
+        <br />
+        <div style={roundsBarStyle}>
+          <div>
+            <h3>Rounds</h3>
+          </div>
+          <Button variant="outline" 
+                  color="yellow" 
+                  radius="md" 
+                  size="lg"
+                  style={{
+                    marginLeft:"20px"
+                  }}
+                  onClick={() => advanceRound()}>
+            Advance Round
+          </Button>
         </div>
-        <Button variant="outline" 
-                color="yellow" 
-                radius="md" 
-                size="lg"
-                style={{
-                  marginLeft:"20px"
-                }}
-                onClick={() => advanceRound()}>
-          Advance Round
-        </Button>
-      </div>
-      <h4 style={{ color: 'grey' }}>{round}</h4>
+        <h4 style={{ color: 'grey' }}>{round}</h4>
+      </Card>
     </Container>
   )
 }

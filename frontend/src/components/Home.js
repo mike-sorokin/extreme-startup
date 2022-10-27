@@ -39,18 +39,16 @@ function Home() {
       </Modal>
 
       
-        <Card shadow="sm" p="lg" radius="md" withBorder 
-              style={{backgroundColor: "#2C2E33", width: "fit-content", 
-              position: 'absolute', left: '50%', top: '50%',
-              transform: 'translate(-50%, -50%)'}}>
-          <Stack align="center" spacing="xl">
-            <Title order={1} color="red">🔥 Extreme Startup 🔥</Title>
-            <Button variant="outline" color="green" radius="md" size="lg" onClick={createGameButtonAction}>Create a Game!</Button>
-            <Button variant="outline" color="orange" radius="md" size="lg" onClick={() => { setOpenedAddPlayer(true) }}>Join a Game!</Button>
-          </Stack>
-        </Card>
-      
-      
+      <Card shadow="sm" p="lg" radius="md" withBorder 
+            style={{backgroundColor: "#2C2E33", width: "fit-content", 
+            position: 'absolute', left: '50%', top: '50%',
+            transform: 'translate(-50%, -50%)'}}>
+        <Stack align="center" spacing="xl">
+          <Title order={1} color="white" weight={1000}>🔥 Extreme Startup 🔥</Title>
+          <Button variant="outline" color="green" radius="md" size="lg" onClick={createGameButtonAction}>Create a Game!</Button>
+          <Button variant="outline" color="orange" radius="md" size="lg" onClick={() => { setOpenedAddPlayer(true) }}>Join a Game!</Button>
+        </Stack>
+      </Card>
     </div>
   )
 }
