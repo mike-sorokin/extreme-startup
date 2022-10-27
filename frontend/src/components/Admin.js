@@ -44,10 +44,10 @@ function Admin() {
   return (
     <Container size="xl" px="xs">
       <h3>Game ID</h3>
-      <h4 className="bar">{params.gameId}</h4>
+      <h4 className="grey-text">{params.gameId}</h4>
       <br />
       <h3>Number of Players</h3>
-      <h4 className="bar">{playerNo}</h4>
+      <h4 className="grey-text">{playerNo}</h4>
       <br />
       <div className="rounds-bar">
         <div>
@@ -66,7 +66,7 @@ function Admin() {
           Advance Round
         </Button>
       </div>
-      <h4 className="bar">{round === 0 ? "Warmup" : round}</h4>
+      <h4 className="grey-text">{round === 0 ? "Warmup" : round}</h4>
     </Container>
   );
 }
