@@ -69,6 +69,9 @@ def api_index():
         return encoder.encode(games)
 
     elif request.method == "POST":  # create new game -- initially no players -- passkey for administrators 
+        if "password" not in request.get_json():
+            return NOT_ACCEPTABLE
+            
         password = request.get_json()["password"]
         new_game = Game(password)
 
@@ -90,7 +93,7 @@ def api_index():
 
 @app.route("/api/<game_id>/auth", methods=["POST"])
 def admin_authentication(game_id): # check if passkey valid for <game_id> and authenticate user with session if yes
-    if game_id not in games:
+    if game_id not in games or 'password' not in request.get_json():
         return NOT_ACCEPTABLE
 
     password = request.get_json()["password"]
