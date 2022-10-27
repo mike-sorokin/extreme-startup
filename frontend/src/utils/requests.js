@@ -1,7 +1,8 @@
 import axios from "axios";
 
 import { homeAPI, gameAPI, playersAPI, playerAPI, playerEventsAPI, eventAPI } from "./urls";
-import { alertError, showFailureNotification } from "./utils";
+import { alertError, showFailureNotification, playersAsArray } from "./utils";
+
 
 const instance = axios.create({
   headers: { "Content-Type": "application/json" },
@@ -148,7 +149,7 @@ export async function deleteGame(gameId) {
 export async function fetchAllPlayers(gameId) {
   try {
     const response = await instance.get(playersAPI(gameId));
-    return response.data.players;
+    return playersAsArray(response.data.players);
   } catch (error) {
     alertError(error);
   }
@@ -185,7 +186,6 @@ export async function createPlayer(gameId, name, api) {
 
 /**
  * Validates a given name and api url
- * Currently broken because players is actually an object not a list like its supposed to be
  * @async
  * @param {string} gameId
  * @param {{"name": string, "api": string}} data Object containing name and/or api
