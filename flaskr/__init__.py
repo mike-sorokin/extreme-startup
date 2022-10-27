@@ -21,7 +21,7 @@ import secrets
 
 app = Flask(__name__)
 
-app.secret_key = secrets.token_hex()
+app.config["SECRET_KEY"] = secrets.token_hex()
 
 # games: game_id -> game object
 games = {}
@@ -83,7 +83,7 @@ def api_index():
         return encoder.encode(new_game)
 
     elif request.method == "DELETE":  # delete all games - only for admin of all games
-        for gid in session["admin"]:
+        for gid in session['admin']:
             if not is_admin(gid, session):
                 return UNAUTHORIZED
 
@@ -191,7 +191,7 @@ def all_players(game_id):
         player_thread.daemon = True
         player_thread.start()
 
-        session["player"] = player.uuid
+        session['player'] = player.uuid
 
         r = make_response(encoder.encode(player))
         r.mimetype = "application/json"
@@ -304,13 +304,13 @@ def remove_players(*player_id):
 
 
 def add_session_admin(game_id, session):
-    if "admin" in session:
-        session["admin"].append(game_id)
+    if 'admin' in session:
+        session['admin'].append(game_id)
     else:
-        session["admin"] = [game_id]
+        session['admin'] = [game_id]
 
 def is_admin(game_id, session):
-    return ("admin" in session) and (game_id in session["admin"])
+    return ('admin' in session) and (game_id in session['admin'])
 
 def is_player(player_id, session):
-    return ("player" in session) and (player_id in session["player"]) 
+    return ('player' in session) and (player_id in session['player']) 

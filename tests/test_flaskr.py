@@ -2,6 +2,7 @@ import json
 
 from utils_for_tests import *
 from setups_for_tests import *
+from unittest.mock import patch 
 
 @with_setup()
 def test_index_blank_get(_, cli):
@@ -30,7 +31,7 @@ def test_index_can_get(extras, cli):
 
     rd = response_as_dict(resp)
 
-    # assert keyset_of(rd).only_contains_the_following_keys(id_1, id_2)
+    # assert keyset_of(rd)json={"api": new_api}.only_contains_the_following_keys(id_1, id_2)
     assert is_valid_game_json(rd[id_1])
     assert is_valid_game_json(rd[id_2])
 
@@ -127,7 +128,6 @@ def test_players_post_creates_a_new_player(extras, cli):
     gid = extras["game"]["id"]
     players = extras["players"]
     initial_num_players = len(players)
-
     response = cli.post(
         f"/api/{gid}/players",
         json={"name": "John_Doe", "api": "abc.com"}
@@ -239,3 +239,33 @@ def test_event_id_post_throws_an_error(_, cli):
 @with_setup()
 def test_event_id_put_throws_an_error(_, cli):
     assert cli.put("/api/someid/players/someid/events/someid").status_code == ERROR_405
+
+@with_setup()
+def test_game_creation_requires_password(_, cli):
+    empty_request = cli.post(f"/api", json={})
+    assert empty_request.status_code == NOT_ACCEPTED
+
+    with patch("flaskr.session", dict()) as session: 
+        request_with_password = cli.post(f"/api", json={"password": "password"})
+        assert request_with_password.status_code == ALL_GOOD
+
+        r_dict = response_as_dict(request_with_password)
+        assert r_dict["id"] in session.get("admin")
+    
+'''
+@with_setup()
+def test_auth_fail_when_game_id_incorrect():
+    assert False
+
+@with_setup()
+def test_auth_fail_when_password_incorrect():
+    assert False
+
+@with_setup()
+def test_auth_success_when_credential_correct():
+    assert False
+
+@with_setup()
+def test_admin_of_game_can_delete_game():
+    assert False
+'''
