@@ -4,6 +4,14 @@ import { Button, Container, Table } from '@mantine/core'
 
 import { deleteAllPlayers, deletePlayer, fetchAllPlayers } from '../utils/requests'
 
+function playersAsArray(playersDict) {
+  const arr = []
+  for (const playerId in playersDict) {
+    arr.push(playersDict[playerId])
+  }
+  return arr
+}
+
 function Players() {
   const [players, setPlayers] = useState([])
 
@@ -15,7 +23,7 @@ function Players() {
     const getPlayers = async () => {
       try {
         const response = await fetchAllPlayers(params.gameId)
-        setPlayers(response)
+        setPlayers(playersAsArray(response))
       } catch (error) {
         // TODO
       }
@@ -28,7 +36,7 @@ function Players() {
     }
   }, [params.gameId])
 
-  const withdrawPlayer = async (playerId) => {
+  const withdrawPlayer = async playerId => {
     try {
       const response = await deletePlayer(params.gameId, playerId)
       console.log(response)
@@ -63,7 +71,7 @@ function Players() {
           </tr>
         </thead>
         <tbody>
-          {players.map((player) => (
+          {players.map( player => (
             <tr key={player.id} onClick={() => navigate(player.id)}>
               <td>{player.id}</td>
               <td>{player.name}</td>
