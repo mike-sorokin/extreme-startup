@@ -3,7 +3,6 @@ import json
 from utils_for_tests import *
 from setups_for_tests import *
 
-
 @with_setup()
 def test_index_blank_get(_, cli):
     resp = cli.get("/api")

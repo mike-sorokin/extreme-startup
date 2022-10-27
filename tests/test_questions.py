@@ -216,7 +216,7 @@ def test_scrabble_question():
 
 def test_general_knowledge_question_random_initialised():
     general_question = GeneralKnowledgeQuestion()
-    with open("flaskr/general_knowledge.yaml", "r") as infile:
+    with open("flaskr/yaml/general_knowledge.yaml", "r") as infile:
         ques_ans_list = yaml.safe_load(infile)
     assert general_question.question in map(lambda i: i["question"], ques_ans_list)
     assert general_question.answer in map(lambda i: i["answer"], ques_ans_list)
@@ -242,7 +242,7 @@ def test_general_knowledge_question():
 
 def test_anagram_question_random_initialised():
     anagram_question = AnagramQuestion()
-    with open("flaskr/anagrams.yaml", "r") as infile:
+    with open("flaskr/yaml/anagrams.yaml", "r") as infile:
         anagrams = yaml.safe_load(infile)
     assert anagram_question.anagram in map(lambda i: i["anagram"], anagrams)
     assert anagram_question.correct in map(lambda i: i["correct"], anagrams)

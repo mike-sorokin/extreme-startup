@@ -19,6 +19,7 @@ QUESTION_TYPES = [
         ]
 MAX_ROUND = len(QUESTION_TYPES) // 2
 
+# QuestionFactory is unique to each game and generates questions within a window range dependent on round
 class QuestionFactory:
     def __init__(self, round=1):
         self.round = round

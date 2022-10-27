@@ -1,7 +1,7 @@
 from uuid import uuid4
 import datetime as dt
 
-
+# Event's stored for <player_id> to track historial of player responses
 class Event:
     def __init__(self, player_id, game_id, query, difficulty, points_gained, response_type):
         self.player_id = player_id
@@ -10,7 +10,7 @@ class Event:
         self.difficulty = difficulty
         self.points_gained = points_gained
         self.response_type = response_type
-        self.event_id = str(uuid4())
+        self.event_id = uuid4().hex[:8]
         self.timestamp = dt.datetime.now(dt.timezone.utc).isoformat()
 
     def __str__(self):
