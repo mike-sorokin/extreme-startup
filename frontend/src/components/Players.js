@@ -22,6 +22,7 @@ function Players() {
       }
     }
 
+    getPlayers()
     const timer = setInterval(getPlayers, 2000)
 
     return () => {
