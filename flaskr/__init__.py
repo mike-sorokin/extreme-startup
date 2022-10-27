@@ -93,7 +93,6 @@ def game(game_id):
 
     elif request.method == "PUT":  # update game settings
         r = request.get_json()
-
         if "round" in r:  # increment <game_id>'s round by 1
             games[game_id].question_factory.advance_round()
             games[game_id].round += 1
@@ -101,7 +100,7 @@ def game(game_id):
 
         elif "pause" in r:
             if r["pause"]:  # pause <game_id>
-                pause_successful = games[game_id].pause_wlock.acquire(timeout=15)
+                pause_successful = games[game_id].pause_wlock.acquire(timeout=1)
                 if not pause_successful:
                     return ("Race condition with lock", 429)
                 games[game_id].paused = True
