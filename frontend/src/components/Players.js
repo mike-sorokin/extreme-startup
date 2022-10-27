@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom"
 import { Button, Container, Table } from '@mantine/core'
 
 import { deleteAllPlayers, deletePlayer, fetchAllPlayers } from '../utils/requests'
-import { playersAsArray } from '../utils/utils'
 
 function Players() {
   const [players, setPlayers] = useState([])
@@ -65,7 +64,7 @@ function Players() {
           </tr>
         </thead>
         <tbody>
-          {players.map( player => (
+          {players.map(player => (
             <tr key={player.id} onClick={() => navigate(player.id)}>
               <td>{player.id}</td>
               <td>{player.name}</td>
