@@ -45,8 +45,8 @@ encoder = JSONEncoder()
 QUESTION_TIMEOUT = 10
 QUESTION_DELAY = 5
 DELETE_SUCCESSFUL = ("Successfully deleted", 204)
-NOT_ACCEPTABLE = ("Requested resource not found", 406)
-
+NOT_ACCEPTABLE = ("Unacceptable request - Requested resource not found", 406)
+UNAUTHORIZED = ("Unauthenticated request", 401)
 
 # This is a catch-all function that will redirect anything not caught by the other rules
 # to the react webpages
@@ -71,7 +71,7 @@ def api_index():
     elif request.method == "POST":  # create new game -- initially no players -- passkey for administrators 
         if "password" not in request.get_json():
             return NOT_ACCEPTABLE
-            
+
         password = request.get_json()["password"]
         new_game = Game(password)
 
@@ -84,7 +84,7 @@ def api_index():
     elif request.method == "DELETE":  # delete all games 
         for gid in session['admin']:
             if not is_admin(gid, session):
-                return NOT_ACCEPTABLE
+                return UNAUTHORIZED
 
         remove_players(*[p for g in games.values() for p in g.players])
         # garbage collect each game's question_factory
@@ -115,7 +115,7 @@ def game(game_id):
 
     elif request.method == "PUT":  # update game settings
         if not is_admin(game_id, session):
-            return NOT_ACCEPTABLE
+            return UNAUTHORIZED
 
         r = request.get_json()
 
@@ -144,7 +144,7 @@ def game(game_id):
 
     elif request.method == "DELETE":  # delete game with <game_id>
         if not is_admin(game_id, session):
-            return NOT_ACCEPTABLE
+            return UNAUTHORIZED
 
         remove_players(*games[game_id].players)
 
@@ -193,7 +193,7 @@ def all_players(game_id):
 
     elif request.method == "DELETE":  # deletes all players in <game_id> game instance
         if not is_admin(game_id, session):
-            return NOT_ACCEPTABLE
+            return UNAUTHORIZED
 
         remove_players(*games[game_id].players)
         games[game_id].players.clear()
@@ -221,7 +221,8 @@ def player(game_id, player_id):
 
     elif request.method == "DELETE":  # delete player with id
         if not is_admin(game_id, session):
-            return NOT_ACCEPTABLE
+            return UNAUTHORIZED
+
         games[game_id].players.remove(player_id)
         remove_players(player_id)
         return {"deleted": player_id}
@@ -238,7 +239,7 @@ def player_events(game_id, player_id):
 
     elif request.method == "DELETE":  # delets all events for <player_id>
         if not is_admin(game_id, session):
-            return NOT_ACCEPTABLE
+            return UNAUTHORIZED
 
         players[player_id].events.clear()
         return DELETE_SUCCESSFUL
@@ -263,7 +264,8 @@ def player_event(game_id, player_id, event_id):
 
     elif request.method == "DELETE":  # delete event with <event_id>
         if not is_admin(game_id, session):
-            return NOT_ACCEPTABLE
+            return UNAUTHORIZED
+            
         players[player_id].events.remove(event)
         return DELETE_SUCCESSFUL
 
