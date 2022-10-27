@@ -3,14 +3,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import { Button, Container, Table } from '@mantine/core'
 
 import { deleteAllPlayers, deletePlayer, fetchAllPlayers } from '../utils/requests'
-
-function playersAsArray(playersDict) {
-  const arr = []
-  for (const playerId in playersDict) {
-    arr.push(playersDict[playerId])
-  }
-  return arr
-}
+import { playersAsArray } from '../utils/utils'
 
 function Players() {
   const [players, setPlayers] = useState([])
@@ -22,8 +15,8 @@ function Players() {
   useEffect(() => {
     const getPlayers = async () => {
       try {
-        const response = await fetchAllPlayers(params.gameId)
-        setPlayers(playersAsArray(response))
+        const players = await fetchAllPlayers(params.gameId)
+        setPlayers(players)
       } catch (error) {
         // TODO
       }

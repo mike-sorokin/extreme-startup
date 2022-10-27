@@ -27,3 +27,11 @@ export function showFailureNotification(header, msg) {
     color: "red",
   });
 }
+
+export function playersAsArray(playersDict) {
+  const arr = []
+  for (const playerId in playersDict) {
+    arr.push(playersDict[playerId])
+  }
+  return arr
+}

@@ -1,7 +1,8 @@
 import axios from "axios";
 
 import { homeAPI, gameAPI, playersAPI, playerAPI, playerEventsAPI, eventAPI } from "./urls";
-import { alertError, showFailureNotification } from "./utils";
+import { alertError, showFailureNotification, playersAsArray } from "./utils";
+
 
 const instance = axios.create({
   headers: { "Content-Type": "application/json" },
@@ -148,7 +149,7 @@ export async function deleteGame(gameId) {
 export async function fetchAllPlayers(gameId) {
   try {
     const response = await instance.get(playersAPI(gameId));
-    return response.data.players;
+    return playersAsArray(response.data.players);
   } catch (error) {
     alertError(error);
   }
