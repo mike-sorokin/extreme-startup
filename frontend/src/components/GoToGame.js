@@ -1,16 +1,20 @@
-import React from 'react'
+import { gamePageUrl } from '../utils/urls'
+import React from 'react';
+import { Button } from '@mantine/core';
 import { useNavigate } from 'react-router-dom'
-import { Button } from '@mantine/core'
 
-import { gameUrl } from '../utils/urls'
+function GoToGame(gameIdGetter) {
 
-function GoToGame ({ gameId }) {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
+  const goToGamePage = () => {
+    navigate(gamePageUrl(gameIdGetter.getGameId()))
+  }
 
   return (
     <div>
-      <p>Your game id is: {gameId}</p>
-      <Button type="button" onClick={() => { navigate(gameUrl(gameId)) }}>To Game Page</Button>
+      <p>Your game id is: {gameIdGetter.getGameId()}</p>
+      <Button type="button" onClick={goToGamePage}>To Game Page</Button>
     </div>
   )
 }

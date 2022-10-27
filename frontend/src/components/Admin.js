@@ -1,72 +1,73 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { Button, Container } from '@mantine/core'
+import { useParams } from "react-router-dom"
+import { Button, Container } from "@mantine/core";
+import axios from 'axios'
+import { gameUrl } from '../utils/urls'
 
-import { fetchGame, updateGame } from '../utils/requests'
 
-import '../styles/Admin.css'
+function Admin() {
+  const params = useParams();
+  const [playerNo, setPlayerNo] = useState(0);
+  const [round, setRound] = useState('Warmup')
+  const [refreshTimer, setRefreshTimer] = useState(0)
 
-function Admin () {
-  const [playerNo, setPlayerNo] = useState(0)
-  const [round, setRound] = useState(0)
-
-  const params = useParams()
-
-  // Fetches game data every 2 seconds (current round and number of players)
   useEffect(() => {
-    const getGameData = async () => {
-      try {
-        const response = await fetchGame(params.gameId)
-        setRound(response.round)
-        setPlayerNo(response.players.length)
-      } catch (error) {
-        // TODO
-      }
-    }
+    axios.get(gameUrl(params.gameid))
+      .then(function (response) {
+        console.log(response);
+        setRound(response.data.round === 0 ? 'Warmup' : response.data.round)
+        setPlayerNo(response.data.players.length)
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
 
-    const timer = setInterval(getGameData, 2000)
+    setTimeout(() => setRefreshTimer(prevState => prevState + 1), 1000)
+  }, [refreshTimer]);
 
-    return () => {
-      clearInterval(timer)
-    }
-  }, [params.gameId])
+  function advanceRound() {
+    axios.put(gameUrl(params.gameid))
+      .then(function (response) {
+        console.log(response);
+        setRound(round === 'Warmup' ? 1 : (round + 1))
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
 
-  // Increments round
-  const advanceRound = async () => {
-    try {
-      await updateGame(params.gameId, { round: round + 1 })
-      setRound(round + 1)
-    } catch (error) {
-      // TODO
-    }
+  const roundsBarStyle = {
+    width: "100%",
+    display: "inline-flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
   }
 
   return (
     <Container size="xl" px="xs">
       <h3>Game ID</h3>
-      <h4 className="grey-text">{params.gameId}</h4>
+      <h4 style={{ color: 'grey' }}>{params.gameid}</h4>
       <br />
       <h3>Number of Players</h3>
-      <h4 className="grey-text">{playerNo}</h4>
+      <h4 style={{ color: 'grey' }}>{playerNo}</h4>
       <br />
-      <div className="rounds-bar">
+      <div style={roundsBarStyle}>
         <div>
           <h3>Rounds</h3>
         </div>
-        <Button
-          variant="outline"
+        <Button variant="outline"
           color="dark"
           radius="md"
           size="md"
           style={{
-            marginLeft: '20px'
+            marginLeft: "20px"
           }}
-          onClick={() => advanceRound()}
-        >
+          onClick={() => advanceRound()}>
           Advance Round
         </Button>
       </div>
-      <h4 className="grey-text">{round === 0 ? 'Warmup' : round}</h4>
+      <h4 style={{ color: 'grey' }}>{round}</h4>
     </Container>
   )
 }
