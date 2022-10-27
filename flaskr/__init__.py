@@ -17,12 +17,11 @@ from flaskr.quiz_master import QuizMaster
 from flaskr.json_encoder import JSONEncoder
 from flaskr.questions import *
 import threading
-
-# todo remove later
-import pprint
+import secrets
 
 app = Flask(__name__)
-app.secret_key = b'_5#2L"F4Q8Z\n\xec]/'
+
+app.secret_key = secrets.token_hex()
 
 # games: game_id -> game object
 games = {}
@@ -83,7 +82,7 @@ def api_index():
         add_session_admin(gid, session)
         return encoder.encode(new_game)
 
-    elif request.method == "DELETE":  # delete all games
+    elif request.method == "DELETE":  # delete all games - only for admin of all games
         for gid in session["admin"]:
             if not is_admin(gid, session):
                 return UNAUTHORIZED
@@ -118,7 +117,7 @@ def game(game_id):
     if request.method == "GET":  # fetch game with <game_id>
         return encoder.encode(games[game_id])
 
-    elif request.method == "PUT":  # update game settings
+    elif request.method == "PUT":  # update game settings --- only admin can do this
         if not is_admin(game_id, session):
             return UNAUTHORIZED
 
@@ -192,6 +191,8 @@ def all_players(game_id):
         player_thread.daemon = True
         player_thread.start()
 
+        session["player"] = player.uuid
+
         r = make_response(encoder.encode(player))
         r.mimetype = "application/json"
         return r
@@ -216,6 +217,9 @@ def player(game_id, player_id):
     elif (
         request.method == "PUT"
     ):  # update player (change name/api, NOT event management)
+        if not (is_admin(game_id, session) or is_player(player_id, session)): 
+            return UNAUTHORIZED
+
         if "name" in request.get_json():
             players[player_id].name = request.get_json()["name"]
 
@@ -225,7 +229,7 @@ def player(game_id, player_id):
         return encoder.encode(players[player_id])
 
     elif request.method == "DELETE":  # delete player with id
-        if not is_admin(game_id, session):
+        if not (is_admin(game_id, session) or is_player(player_id, session)):
             return UNAUTHORIZED
 
         games[game_id].players.remove(player_id)
@@ -305,34 +309,8 @@ def add_session_admin(game_id, session):
     else:
         session["admin"] = [game_id]
 
-
 def is_admin(game_id, session):
     return ("admin" in session) and (game_id in session["admin"])
 
-
-# FORGIVE ME
-bot_responses = {n: (f"Bot{n}", 0) for n in range(100)}
-
-# /2/hi  style links, these update the response
-@app.route("/api/bot/<int:bot_id>/<string:resp>", methods=["GET"])
-def _update_response(bot_id, resp):
-    bot_responses[bot_id][0] = resp
-    bot_responses[bot_id][1] += 1
-    return redirect(url_for("api_response", bot_id=bot_id))
-
-
-# Get a response
-@app.route("/api/bot/<int:bot_id>", methods=["GET"])
-def _api_response(bot_id):
-    return bot_responses[bot_id][0]
-
-
-@app.route("/api/bot/cleanup", methods=["GET"])
-def _cleanup():
-    bot_responses = {}
-    return "Restored bots"
-
-
-@app.route("/api/bot/", methods=["GET"])
-def _main_view():
-    return "<br>".join(list(str(x) for x in bot_responses.values()))
+def is_player(player_id, session):
+    return ("player" in session) and (player_id in session["player"]) 
