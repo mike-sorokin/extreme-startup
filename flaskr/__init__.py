@@ -102,7 +102,6 @@ def admin_authentication(game_id): # check if passkey valid for <game_id> and au
         return {"valid": True}
 
     return {"valid": False}
-    
 
 # Managing a specific game
 @app.route("/api/<game_id>", methods=["GET", "PUT", "DELETE"])
@@ -265,7 +264,7 @@ def player_event(game_id, player_id, event_id):
     elif request.method == "DELETE":  # delete event with <event_id>
         if not is_admin(game_id, session):
             return UNAUTHORIZED
-            
+
         players[player_id].events.remove(event)
         return DELETE_SUCCESSFUL
 

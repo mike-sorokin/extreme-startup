@@ -14,6 +14,7 @@ class Scoreboard:
         self.incorrect_tally = {}
         self.request_counts = {}
 
+    # Adjust score for player based on question result, update streak (capped to 6-question past), and log event
     def increment_score_for(self, player, question):
         increment = self.score(question, self.leaderboard_position(player))
         self.scores[player.uuid] += increment
@@ -26,6 +27,7 @@ class Scoreboard:
             self.incorrect_tally[player.uuid] += 1
             player.streak = "0" + player.streak
         
+        self.record_request_for(player)
         player.score = self.scores[player.uuid]
         event = Event(player.uuid, player.game_id, question.as_text(), 0, increment, question.result if question.problem == "" else question.problem)
 
@@ -39,6 +41,7 @@ class Scoreboard:
     def record_request_for(self, player):
         self.request_counts[player.uuid] += 1
 
+    # Initialise new player in scoreboard, default values all to 0 
     def new_player(self, player):
         self.request_counts[player.uuid] = 0
         self.correct_tally[player.uuid] = 0
@@ -63,6 +66,7 @@ class Scoreboard:
     def total_requests_for(self, player):
         return self.request_counts[player.uuid]
 
+    # Sort leaderboard in descending order from BEST PERFORMING PLAYER -> WORST PERFORMING PLAYER 
     def leaderboard(self):
         return {
             k: v
@@ -74,6 +78,7 @@ class Scoreboard:
     def leaderboard_position(self, player):
         return list(self.leaderboard().keys()).index(player.uuid) + 1
 
+    # Identity points delta based on question.result
     def score(self, question, leaderboard_position):
         res, problem = question.result, question.problem
         if res == "CORRECT":
@@ -94,10 +99,13 @@ class Scoreboard:
                 f"!!!!! unrecognized result '#{question.result}' from #{repr(question)} in Scoreboard#score"
             )
 
+    # Based on game mode (lenient), let player "off" for incorrect response
     def allow_passes(self, question, leaderboard_position):
         return (
             0 if question.answer == "" else self.penalty(question, leaderboard_position)
         )
 
+    # Penalty that adjusts based on leadeboard pos
+    # Conceptually, better-ranked players get deducted more for wrong answers than worse-ranked players
     def penalty(self, question, leaderboard_position):
         return -1 * question.points / leaderboard_position
