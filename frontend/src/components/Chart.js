@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { Line, LineChart, CartesianGrid, YAxis, Tooltip } from 'recharts'
+import { MD5 } from 'crypto-js'
 
 import { fetchAllPlayers } from '../utils/requests'
 
@@ -32,6 +33,7 @@ function Chart ({ gameId }) {
 
   // TODO use sockets instead?
   useEffect(() => {
+    stringToColour('d')
     const getScores = async () => {
       const [playerData, scoreData] = await fetchScores()
       setScores(s => [...s, scoreData])
@@ -45,6 +47,12 @@ function Chart ({ gameId }) {
     }
   }, [fetchScores])
 
+  const stringToColour = (str) => {
+    const colour = '#'
+    const hash = MD5(str).toString().substring(0, 6)
+    return colour.concat(hash)
+  }
+
   return (
     <div>
       <LineChart width={750} height={450} data={scores}>
@@ -55,11 +63,12 @@ function Chart ({ gameId }) {
         {players.map((playerDataObj) => {
           // eslint-disable-next-line react/jsx-key
           return <Line
+          key={playerDataObj.id}
           type="monotone"
           animationDuration={300}
           name={playerDataObj.name}
           dataKey={playerDataObj.id}
-          stroke="#8884d8"
+          stroke={stringToColour(playerDataObj.name)}
           dot={false}/>
         })}
         <Tooltip />
