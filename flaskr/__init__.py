@@ -19,6 +19,14 @@ from flaskr.questions import *
 import threading
 import secrets
 
+# PRODUCTION CONSTANT(S)
+QUESTION_TIMEOUT = 10
+QUESTION_DELAY = 5
+DELETE_SUCCESSFUL = ("Successfully deleted", 204)
+NOT_ACCEPTABLE = ("Unacceptable request - Requested resource not found", 406)
+UNAUTHORIZED = ("Unauthenticated request", 401)
+METHOD_NOT_ALLOWED = ("HTTP Method not allowed", 405)
+
 
 def create_app():
     app = Flask(__name__)
@@ -41,13 +49,6 @@ def create_app():
     player_threads = {}
 
     encoder = JSONEncoder()
-
-    # PRODUCTION CONSTANT(S)
-    QUESTION_TIMEOUT = 10
-    QUESTION_DELAY = 5
-    DELETE_SUCCESSFUL = ("Successfully deleted", 204)
-    NOT_ACCEPTABLE = ("Unacceptable request - Requested resource not found", 406)
-    UNAUTHORIZED = ("Unauthenticated request", 401)
 
     # This is a catch-all function that will redirect anything not caught by the other rules
     # to the react webpages
@@ -85,28 +86,35 @@ def create_app():
         elif (
             request.method == "DELETE"
         ):  # delete all games - only for admin of all games
-            for gid in session["admin"]:
+            for gid in games.keys():
                 if not is_admin(gid, session):
                     return UNAUTHORIZED
 
-            remove_players(*[p for g in games.values() for p in g.players])
-            # garbage collect each game's question_factory
-            games.clear()
-            return DELETE_SUCCESSFUL
+                remove_players(*[p for g in games.values() for p in g.players])
+                # garbage collect each game's question_factory
+                games.clear()
+                return DELETE_SUCCESSFUL
 
-    @app.route("/api/<game_id>/auth", methods=["POST"])
+    @app.route("/api/<game_id>/auth", methods=["GET", "POST"])
     def admin_authentication(
         game_id,
     ):  # check if passkey valid for <game_id> and authenticate user with session if yes
-        if game_id not in games or "password" not in request.get_json():
+        if game_id not in games:
             return NOT_ACCEPTABLE
 
-        password = request.get_json()["password"]
-        if password == games[game_id].admin_password:
-            add_session_admin(game_id, session)
-            return {"valid": True}
+        if request.method == "GET":
+            return {"authorized": is_admin(game_id, session)}
 
-        return {"valid": False}
+        elif request.method == "POST":
+            if "password" not in request.get_json():
+                return NOT_ACCEPTABLE
+
+            password = request.get_json()["password"]
+            if password == games[game_id].admin_password:
+                add_session_admin(game_id, session)
+                return {"valid": True}
+
+            return {"valid": False}
 
     # Managing a specific game
     @app.route("/api/<game_id>", methods=["GET", "PUT", "DELETE"])

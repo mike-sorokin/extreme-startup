@@ -241,17 +241,14 @@ def test_event_id_put_throws_an_error(_, cli):
     assert cli.put("/api/someid/players/someid/events/someid").status_code == ERROR_405
 
 
-# @with_setup()
-# def test_auth_get_throws_an_error(_, cli):
-#     assert cli.get("/api/123/auth").status_code == ERROR_405
+@with_setup()
+def test_auth_put_throws_an_error(_, cli):
+    assert cli.put("/api/someid/auth").status_code == ERROR_405
 
-# @with_setup()
-# def test_auth_put_throws_an_error(_, cli):
-#     assert cli.put("/api/someid/auth").status_code == ERROR_405
 
-# @with_setup()
-# def test_auth_delete_throws_an_error(_, cli):
-#     assert cli.delete("/api/someid/auth").status_code == ERROR_405
+@with_setup()
+def test_auth_delete_throws_an_error(_, cli):
+    assert cli.delete("/api/someid/auth").status_code == ERROR_405
 
 
 @with_setup()
@@ -265,6 +262,19 @@ def test_game_creation_requires_password(_, cli):
 
         r_dict = response_as_dict(request_with_password)
         assert r_dict["id"] in session.get("admin")
+
+
+@with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
+def test_auth_get_returns_true_if_authorized(extras, cli):
+    auth_check = response_as_dict_if_sucecssful(cli.get(f"/api/{extras[0]['id']}/auth"))
+    assert auth_check["authorized"]
+
+
+@with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
+def test_auth_get_returns_false_if_unauthorized(extras, cli):
+    cli.cookie_jar.clear()
+    auth_check = response_as_dict_if_sucecssful(cli.get(f"/api/{extras[0]['id']}/auth"))
+    assert not auth_check["authorized"]
 
 
 @with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
@@ -288,17 +298,18 @@ def test_auth_post_success_when_credential_correct(extras, cli):
         assert game_id in session.get("admin")
 
 
-# @with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
-# def test_admin_of_all_games_can_delete_all_games():
-#     assert False
-
-
 @with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
-def test_only_admin_of_game_can_delete_game(extras, cli):
+def test_admin_of_game_can_delete_game(extras, cli):
     game_id = extras[0]["id"]
     cli.cookie_jar.clear()
     non_admin_request = cli.delete(f"/api/{game_id}")
     assert non_admin_request.status_code == UNAUTHORIZED
+
+
+@with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
+def test_non_admin_of_game_can_not_delete_game(extras, cli):
+    game_id = extras[0]["id"]
+    cli.cookie_jar.clear()
 
     with patch("flaskr.session", dict()) as session:
         cli.post(f"/api/{game_id}/auth", json={"password": "dummy_password"})
@@ -311,13 +322,43 @@ def test_only_admin_of_game_can_delete_game(extras, cli):
         assert rd["deleted"] == game_id
 
 
+@with_setup(create_a_couple_of_games)
+def test_admin_of_all_games_can_delete_all_games(extras, cli):
+    delete_request = cli.delete("/api")
+    assert delete_request.status_code == DELETE_SUCCESS
+    
+    rem_games = response_as_dict_if_sucecssful(cli.get("/api"))
+    assert not rem_games
+
+@with_setup(create_a_couple_of_games)
+def test_non_admin_of_all_games_cannot_delete_all_games(extras, cli):
+    id_1 = extras[0]["id"]
+    id_2 = extras[1]["id"]
+
+    cli.cookie_jar.clear()
+
+    # authorize as admin for <id_1> game ONLY
+    cli.post(f"/api/{id_1}/auth", json={"password": "dummy_password"})
+
+    delete_request = cli.delete("/api")
+    assert delete_request.status_code == UNAUTHORIZED
+    
+    rem_games = response_as_dict_if_sucecssful(cli.get("/api"))
+    assert len(rem_games) == 2
+
+
 @with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
-def test_only_admin_of_game_can_update_game(extras, cli):
+def test_admin_of_game_can_update_game(extras, cli):
     game_id = extras[0]["id"]
     cli.cookie_jar.clear()
     non_admin_request = cli.put(f"/api/{game_id}", json={"round": 1})
     assert non_admin_request.status_code == UNAUTHORIZED
 
+@with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
+def test_non_admin_of_game_cannot_update_game(extras, cli):
+    game_id = extras[0]["id"]
+    cli.cookie_jar.clear()
+ 
     with patch("flaskr.session", dict()) as session:
         cli.post(f"/api/{game_id}/auth", json={"password": "dummy_password"})
         admin_request = cli.put(f"/api/{game_id}", json={"round": 1})
