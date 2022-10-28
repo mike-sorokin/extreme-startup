@@ -47,7 +47,7 @@ function Admin () {
     try {
       const response = await updateGame(params.gameId, { pause: (gamePaused ? '' : 'p') })
       console.log(response)
-      setGamePaused(!gamePaused)
+      setGamePaused(response === 'GAME_PAUSED')
     } catch (error) {
       // TODO
     }
