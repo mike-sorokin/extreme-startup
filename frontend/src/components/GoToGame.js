@@ -4,7 +4,7 @@ import { Button } from '@mantine/core'
 
 import { gameUrl } from '../utils/urls'
 
-function GoToGame({ gameId }) {
+function GoToGame ({ gameId }) {
   const navigate = useNavigate()
 
   return (
@@ -16,4 +16,3 @@ function GoToGame({ gameId }) {
 }
 
 export default GoToGame
-

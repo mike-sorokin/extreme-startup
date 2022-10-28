@@ -4,7 +4,7 @@ import { Menu, Button, Burger } from '@mantine/core'
 
 import { playersUrl, adminUrl } from '../utils/urls'
 
-function Game() {
+function Game () {
   const params = useParams()
   const navigate = useNavigate()
 

@@ -3,12 +3,15 @@ import { useParams } from 'react-router-dom'
 import { Button, Container } from '@mantine/core'
 
 import { fetchGame, updateGame } from '../utils/requests'
+import { gameAPI } from '../utils/urls'
+import axios from 'axios'
 
 import '../styles/Admin.css'
 
-function Admin() {
+function Admin () {
   const [playerNo, setPlayerNo] = useState(0)
   const [round, setRound] = useState(0)
+  const [gamePaused, setGamePaused] = useState(false)
 
   const params = useParams()
 
@@ -41,13 +44,36 @@ function Admin() {
     }
   }
 
+  // // Send a {"pause": ""} request to unpause, {"pause": "p"} to pause
+  // const togglePauseRound = async () => {
+  //   try {
+  //     const response = await updateGame(params.gameId, { pause: (gamePaused ? '' : 'p') })
+  //     console.log(response)
+  //     setGamePaused(!gamePaused)
+  //   } catch (error) {
+  //     // TODO
+  //   }
+  // }
+
+  function togglePauseRound () {
+    // Send a {"pause": ""} request to unpause, {"pause": "p"} to pause
+    axios.put(gameAPI(params.gameId), { pause: (gamePaused ? '' : 'p') })
+      .then(function (response) {
+        console.log(response)
+        setGamePaused(response.data === 'GAME_PAUSED')
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+  }
+
   return (
     <Container size="xl" px="xs">
       <h3>Game ID</h3>
       <h4 className="grey-text">{params.gameId}</h4>
       <br />
       <h3>Number of Players</h3>
-      <h4 className="grey-text">{playerNo}</h4>
+      <h4 className='grey-text'>{playerNo}</h4>
       <br />
       <div className="rounds-bar">
         <div>
@@ -64,6 +90,16 @@ function Admin() {
           onClick={() => advanceRound()}
         >
           Advance Round
+        </Button>
+                <Button variant="outline"
+          color="red"
+          radius="md"
+          size="md"
+          style={{
+            marginLeft: '20px'
+          }}
+          onClick={() => togglePauseRound()}>
+          Toggle Pause
         </Button>
       </div>
       <h4 className="grey-text">{round === 0 ? 'Warmup' : round}</h4>

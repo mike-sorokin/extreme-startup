@@ -4,7 +4,7 @@ import { Button, Container, Table } from '@mantine/core'
 
 import { deleteAllPlayers, deletePlayer, fetchAllPlayers } from '../utils/requests'
 
-function Players() {
+function Players () {
   const [players, setPlayers] = useState([])
 
   const params = useParams()

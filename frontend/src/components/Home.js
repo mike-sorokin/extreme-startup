@@ -7,7 +7,7 @@ import { showSuccessNotification } from '../utils/utils'
 import AddPlayer from './AddPlayer'
 import GoToGame from './GoToGame'
 
-function Home() {
+function Home () {
   const [openedCreateGame, setOpenedCreateGame] = useState(false)
   const [openedAddPlayer, setOpenedAddPlayer] = useState(false)
   const [newGameId, setNewGameId] = useState('')
