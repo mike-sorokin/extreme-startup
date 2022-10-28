@@ -45,29 +45,28 @@ flaskr-test:
 
 # The following are done only on master branch.
 
-docker-build:
+docker-build-image:
   stage: build
   script:
     - docker build -t se-xp  .
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
 
-docker-prune-images:
+docker-clear-old-resources:
   stage: kill
   script:
-    - docker image prune --force
+    - docker system prune --filter "until=24h" --force
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
 
-docker-delete-prev-container:
+docker-stop-previous-container:
   stage: kill
   script:
     - docker stop se-xp-container
-    - docker container prune --force
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
 
-docker-deploy:
+docker-run-new-container:
   stage: deploy
   script:
     - docker run --name se-xp-container -d -p80:5000 se-xp
