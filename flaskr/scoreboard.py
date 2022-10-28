@@ -2,7 +2,7 @@ from flaskr.event import Event
 
 PROBLEM_DECREMENT = 50
 
-# Track player's score in a particular game. Scores players based on question type, positioning on scoreboard, and leniency mode.  
+# Track player's score in a particular game. Scores players based on question type, positioning on scoreboard, and leniency mode.
 class Scoreboard:
     def __init__(self, lenient=True):
         self.lenient = lenient
@@ -20,21 +20,21 @@ class Scoreboard:
 
         if increment > 0:
             self.correct_tally[player.uuid] += 1
-            player.streak = "1" + player.streak
+            player.streak = player.streak + "1"
 
         elif increment < 0:
             self.incorrect_tally[player.uuid] += 1
-            player.streak = "0" + player.streak
-        
+            player.streak = player.streak + "0"
+
         player.score = self.scores[player.uuid]
         event = Event(player.uuid, player.game_id, question.as_text(), 0, increment, question.result if question.problem == "" else question.problem)
 
         player.log_event(event)
 
         if question.problem != "":
-            player.streak = "X" + player.streak[1:]
-            
-        player.streak = player.streak[:6]
+            player.streak = player.streak[1:] + "X"
+
+        player.streak = player.streak[-6:]
 
     def record_request_for(self, player):
         self.request_counts[player.uuid] += 1
