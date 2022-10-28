@@ -66,6 +66,14 @@ docker-stop-previous-container:
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
 
+dockerremove-previous-container:
+  stage: kill
+  script:
+    - docker rm se-xp-container
+  rules:
+  - if: $CI_COMMIT_BRANCH == "master"
+  allow_failure: true
+
 docker-run-new-container:
   stage: deploy
   script:
