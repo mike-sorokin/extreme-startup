@@ -36,7 +36,7 @@ function AddPlayer () {
         <Space h="md"></Space>
         <TextInput value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Your URL (http://...)" label="Enter URL:" required />
         <Space h="md"></Space>
-        <Button type="submit">Submit</Button>
+        <Button variant="outline" color="green" type="submit">Join!</Button>
       </form>
     </div>
   )

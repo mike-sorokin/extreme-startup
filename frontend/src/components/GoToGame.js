@@ -3,13 +3,13 @@ import { Button, Space, Title } from '@mantine/core'
 import { useClipboard } from '@mantine/hooks'
 import { useNavigate } from 'react-router-dom'
 
-import { gameUrl } from '../utils/urls'
+import { adminUrl } from '../utils/urls'
 
 function GoToGame (gameIdGetter) {
   const navigate = useNavigate()
 
   const goToGamePage = () => {
-    navigate(gameUrl(gameId))
+    navigate(adminUrl(gameId))
   }
 
   const clipboard = useClipboard({ timeout: 500 })

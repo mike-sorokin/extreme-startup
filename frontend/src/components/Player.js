@@ -1,6 +1,7 @@
 import { React, useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { Container } from '@mantine/core'
+import { Button, Card, Container, Space, Title } from '@mantine/core'
+import { useClipboard } from '@mantine/hooks'
 
 import { fetchPlayer } from '../utils/requests'
 
@@ -9,6 +10,8 @@ import PlayerTable from './PlayerTable'
 function Player () {
   const [playerData, setPlayerData] = useState({})
   const [events, setEvents] = useState([])
+
+  const clipboard = useClipboard({ timeout: 500 })
 
   const params = useParams()
 
@@ -34,24 +37,37 @@ function Player () {
 
   return (
     <Container size="xl" px="xs">
-      <br />
-      <h3>Player ID</h3>
-      <h4 style={{ color: 'grey' }}>{playerData.id}</h4>
-      <br />
-      <h3>Game ID</h3>
-      <h4 style={{ color: 'grey' }}>{playerData.game_id}</h4>
-      <br />
-      <h3>Name</h3>
-      <h4 style={{ color: 'grey' }}>{playerData.name}</h4>
-      <br />
-      <h3>API</h3>
-      <h4 style={{ color: 'grey' }}>{playerData.api}</h4>
-      <br />
-      <h3>Score</h3>
-      <h4 style={{ color: 'grey' }}>{playerData.score}</h4>
-      <br />
-      <h3>Events</h3>
-      <PlayerTable events={events} />
+      <div style={{ display: 'flex' }}>
+        <Title order={1} color="white" weight={1000}>Player:</Title>
+        <Space w="lg" />
+        <Title order={1} color="white" weight={1000}>{playerData.name}</Title>
+      </div>
+      <Space h="md" />
+      <Card shadow="sm" p="lg" radius="md" withBorder>
+        <h3>Player ID</h3>
+        <h4 style={{ color: 'grey' }}>{playerData.id}</h4>
+        <br />
+        <h3>Game ID</h3>
+        <div style={{ display: 'inline-flex', flexDirection: 'row' }}>
+          <Title order={4} color="white" weight={1000}>{playerData.game_id}</Title>
+          <Button compact variant="outline"
+            style={{ marginLeft: '10%', width: '150px' }}
+            color={clipboard.copied ? 'teal' : 'blue'}
+            onClick={() => clipboard.copy(playerData.game_id)}>
+            {clipboard.copied ? 'Game Id Copied!' : 'Copy Game Id'}
+          </Button>
+        </div>
+        <Space h="md" />
+        <br />
+        <h3>API</h3>
+        <h4 style={{ color: 'grey' }}>{playerData.api}</h4>
+        <br />
+        <h3>Score</h3>
+        <Title order={4} color="white" weight={1000}>{playerData.score}</Title>
+        <br />
+        <h3>Events</h3>
+        <PlayerTable events={events} />
+      </Card>
     </Container>
   )
 }
