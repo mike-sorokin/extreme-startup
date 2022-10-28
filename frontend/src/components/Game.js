@@ -17,7 +17,7 @@ function Game () {
     <>
       <Menu shadow="md" width={200}>
         <Menu.Target>
-          <Burger size="lg" />
+          <Burger size="lg" style={{ position: 'relative', left: '1%', marginTop: '1%' }}/>
         </Menu.Target>
 
         <Menu.Dropdown>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Button, Container } from '@mantine/core'
+import { Button, Card, Container, Space, Title } from '@mantine/core'
 import axios from 'axios'
 import { gameAPI } from '../utils/urls'
 
@@ -49,7 +49,7 @@ function Admin () {
   }
 
   function togglePauseButton (color, text) {
-    <Button variant="outline"
+    return <Button variant="outline"
       color={color}
       radius="md"
       size="md"
@@ -71,32 +71,36 @@ function Admin () {
 
   return (
     <Container size="xl" px="xs">
-      <h3>Game ID</h3>
-      <h4 style={{ color: 'grey' }}>{params.gameId}</h4>
-      <br />
-      <h3>Number of Players</h3>
-      <h4 style={{ color: 'grey' }}>{playerNo}</h4>
-      <br />
-      <div style={roundsBarStyle}>
-        <div>
-          <h3>Rounds</h3>
+      <Title order={1} color="white" weight={1000}>Host Page</Title>
+      <Space h="md" />
+      <Card shadow="sm" p="lg" radius="md" withBorder>
+        <h3>Game ID</h3>
+        <h4 style={{ color: 'grey' }}>{params.gameId}</h4>
+        <br />
+        <h3>Number of Players</h3>
+        <h4 style={{ color: 'grey' }}>{playerNo}</h4>
+        <br />
+        <div style={roundsBarStyle}>
+          <div>
+            <h3>Rounds</h3>
+          </div>
+          <Button variant="outline"
+            color="indigo"
+            radius="md"
+            size="md"
+            style={{
+              marginLeft: '20px'
+            }}
+            onClick={() => advanceRound()}>
+            Advance Round
+          </Button>
+          { gamePaused
+            ? togglePauseButton('green', 'Resume')
+            : togglePauseButton('yellow', 'Pause')
+          }
         </div>
-        <Button variant="outline"
-          color="indigo"
-          radius="md"
-          size="md"
-          style={{
-            marginLeft: '20px'
-          }}
-          onClick={() => advanceRound()}>
-          Advance Round
-        </Button>
-        { gamePaused
-          ? togglePauseButton('green', 'Resume')
-          : togglePauseButton('yellow', 'Pause')
-        }
-      </div>
-      {<h4 style={{ color: 'grey' }}>{gamePaused ? 'PAUSED' : round}</h4>}
+        {<h4 style={{ color: 'grey' }}>{gamePaused ? 'PAUSED' : round}</h4>}
+      </Card>
     </Container>
   )
 }
