@@ -90,10 +90,10 @@ def create_app():
                 if not is_admin(gid, session):
                     return UNAUTHORIZED
 
-                remove_players(*[p for g in games.values() for p in g.players])
-                # garbage collect each game's question_factory
-                games.clear()
-                return DELETE_SUCCESSFUL
+            remove_players(*[p for g in games.values() for p in g.players])
+            # garbage collect each game's question_factory
+            games.clear()
+            return DELETE_SUCCESSFUL
 
     @app.route("/api/<game_id>/auth", methods=["GET", "POST"])
     def admin_authentication(
