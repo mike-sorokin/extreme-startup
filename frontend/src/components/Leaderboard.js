@@ -50,7 +50,9 @@ function Leaderboard () {
             <tr>
               <th>ID</th>
               <th>Name</th>
+              <th>Recent events</th>
               <th>Score</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -59,9 +61,9 @@ function Leaderboard () {
                 <tr key={player.id}>
                   <td>{player.id}</td>
                   <td>{player.name}</td>
-                  <td>{player.score}  {[...player.streak].map(createBadge)}
-                  {player.streak === '111111' && (<Badge variant="gradient" gradient={{ from: 'orange', to: 'red' }}> ON FIRE! </Badge>)}
-                  </td>
+                  <td>{[...player.streak].map(createBadge)}</td>
+                  <td>{player.score}</td>
+                  <td>{player.streak === '111111' && (<Badge variant="gradient" gradient={{ from: 'orange', to: 'red' }}> ON FIRE! </Badge>)}</td>
                 </tr>
               ))
             }
