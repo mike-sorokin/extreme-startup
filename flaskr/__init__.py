@@ -49,19 +49,19 @@ NOT_ACCEPTABLE = ("Requested resource not found", 406)
 # This is a catch-all function that will redirect anything not caught by the other rules
 # to the react webpages
 @app.route("/", defaults={"path": ""})
-@app.route("/<path:path>")
+@app.route("/<path:path>/")
 def serve_frontend(path):
     print("path is", path)
     return make_response(render_template("index.html", path=path))
 
 
-@app.route("/favicon.ico")
+@app.route("/favicon.ico/")
 def favicon():
     return send_from_directory(app.root_path, "favicon.ico")
 
 
 # Game Management
-@app.route("/api", methods=["GET", "POST", "DELETE"])
+@app.route("/api/", methods=["GET", "POST", "DELETE"])
 def api_index():
     if request.method == "GET":  # fetch all games
         return encoder.encode(games)
@@ -83,7 +83,7 @@ def api_index():
 
 
 # Managing a specific game
-@app.route("/api/<game_id>", methods=["GET", "PUT", "DELETE"])
+@app.route("/api/<game_id>/", methods=["GET", "PUT", "DELETE"])
 def game(game_id):
     if game_id not in games:
         return NOT_ACCEPTABLE
@@ -125,7 +125,7 @@ def game(game_id):
 
 
 # Managing all players
-@app.route("/api/<game_id>/players", methods=["GET", "POST", "DELETE"])
+@app.route("/api/<game_id>/players/", methods=["GET", "POST", "DELETE"])
 def all_players(game_id):
     if game_id not in games:
         return NOT_ACCEPTABLE
@@ -169,7 +169,7 @@ def all_players(game_id):
 
 
 # Managing <player_id> player
-@app.route("/api/<game_id>/players/<player_id>", methods=["GET", "PUT", "DELETE"])
+@app.route("/api/<game_id>/players/<player_id>/", methods=["GET", "PUT", "DELETE"])
 def player(game_id, player_id):
     if game_id not in games or player_id not in players:
         return NOT_ACCEPTABLE
@@ -193,7 +193,7 @@ def player(game_id, player_id):
 
 
 # Managing events for <player_id>
-@app.route("/api/<game_id>/players/<player_id>/events", methods=["GET", "DELETE"])
+@app.route("/api/<game_id>/players/<player_id>/events/", methods=["GET", "DELETE"])
 def player_events(game_id, player_id):
     if game_id not in games or player_id not in players:
         return NOT_ACCEPTABLE
@@ -208,7 +208,7 @@ def player_events(game_id, player_id):
 
 # Managing one event
 @app.route(
-    "/api/<game_id>/players/<player_id>/events/<event_id>", methods=["GET", "DELETE"]
+    "/api/<game_id>/players/<player_id>/events/<event_id>/", methods=["GET", "DELETE"]
 )
 def player_event(game_id, player_id, event_id):
     if (
@@ -228,20 +228,6 @@ def player_event(game_id, player_id, event_id):
         return DELETE_SUCCESSFUL
 
 
-@app.get("/api/<game_id>/leaderboard")
-def leaderboard(game_id):
-    if game_id not in scoreboards:
-        return NOT_ACCEPTABLE
-
-    score_dict = scoreboards[game_id].leaderboard()
-    res = []
-
-    for k, s in score_dict.items():
-        res.append({"name": players[k].name, "id": k, "score": s})
-
-    return encoder.encode(res)
-
-
 # Mark player as inactive, removes thread from player_threads dict
 def remove_players(*player_id):
     for pid in player_id:
@@ -256,7 +242,7 @@ def remove_players(*player_id):
 bot_responses = {n: (f"Bot{n}", 0) for n in range(100)}
 
 # /2/hi  style links, these update the response
-@app.route("/api/bot/<int:bot_id>/<string:resp>", methods=["GET"])
+@app.route("/api/bot/<int:bot_id>/<string:resp>/", methods=["GET"])
 def _update_response(bot_id, resp):
     bot_responses[bot_id][0] = resp
     bot_responses[bot_id][1] += 1
@@ -264,12 +250,12 @@ def _update_response(bot_id, resp):
 
 
 # Get a response
-@app.route("/api/bot/<int:bot_id>", methods=["GET"])
+@app.route("/api/bot/<int:bot_id>/", methods=["GET"])
 def _api_response(bot_id):
     return bot_responses[bot_id][0]
 
 
-@app.route("/api/bot/cleanup", methods=["GET"])
+@app.route("/api/bot/cleanup/", methods=["GET"])
 def _cleanup():
     bot_responses = {}
     return "Restored bots"
