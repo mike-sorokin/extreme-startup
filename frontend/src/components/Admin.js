@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Button, Container } from '@mantine/core'
+import { Button, Card, Container, Space, Title } from '@mantine/core'
 
 import { fetchGame, updateGame } from '../utils/requests'
 
 import '../styles/Admin.css'
-import { Button, Card, Container, Space, Title } from '@mantine/core'
-import axios from 'axios'
-import { gameAPI } from '../utils/urls'
 
 function Admin () {
   const [playerNo, setPlayerNo] = useState(0)
@@ -22,12 +19,14 @@ function Admin () {
       try {
         const response = await fetchGame(params.gameId)
         setRound(response.round)
+        setGamePaused(response.paused)
         setPlayerNo(response.players.length)
       } catch (error) {
         // TODO
       }
     }
 
+    getGameData()
     const timer = setInterval(getGameData, 2000)
 
     return () => {
@@ -54,6 +53,7 @@ function Admin () {
     } catch (error) {
       // TODO
     }
+  }
   function togglePauseButton (color, text) {
     return <Button variant="outline"
       color={color}
