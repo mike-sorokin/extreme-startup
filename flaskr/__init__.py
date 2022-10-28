@@ -251,7 +251,7 @@ def remove_players(*player_id):
 
 
 # FORGIVE ME
-bot_responses = {n: (f"Bot{n}", 0) for n in range(100)}
+bot_responses = {n: [f"Bot{n}", 0] for n in range(100)}
 
 # /2/hi  style links, these update the response
 @app.route("/api/bot/<int:bot_id>/<string:resp>", methods=["GET"])
