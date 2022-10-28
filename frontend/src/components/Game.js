@@ -2,14 +2,16 @@ import React from 'react'
 import { Outlet, useParams, useNavigate } from 'react-router-dom'
 import { Menu, Button, Burger } from '@mantine/core'
 
-function Game () {
+import { playersUrl, adminUrl } from '../utils/urls'
+
+function Game() {
   const params = useParams()
   const navigate = useNavigate()
 
-  const navButton = (suffix, text, color) => {
-    const url = '/' + params.gameId + suffix
+  // Separate file for navButton?
+  const navButton = (url, text) => {
     return (
-      <Button variant="light" color={color} radius="md" size="md" onClick={() => navigate(url)}>{text}</Button>
+      <Button variant="outline" color="dark" radius="md" size="md" onClick={() => navigate(url)}>{text}</Button>
     )
   }
 
@@ -22,9 +24,9 @@ function Game () {
 
         <Menu.Dropdown>
           <Menu.Label>Menu</Menu.Label>
-          <Menu.Item>{navButton('/admin', 'Host Page')}</Menu.Item>
+          <Menu.Item>{navButton(adminUrl(params.gameId), 'Host Page')}</Menu.Item>
           <Menu.Item>{navButton('', 'Leaderboard')}</Menu.Item>
-          <Menu.Item>{navButton('/players', 'Players')}</Menu.Item>
+          <Menu.Item>{navButton(playersUrl(params.gameId), 'Players')}</Menu.Item>
         </Menu.Dropdown>
       </Menu>
       <Outlet />

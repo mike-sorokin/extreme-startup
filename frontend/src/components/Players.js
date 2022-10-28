@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Button, Container, Table } from '@mantine/core'
-import axios from 'axios'
-import { playersUrl } from '../utils/urls'
 
-import { deletePlayer, fetchAllPlayers } from '../utils/requests'
+import { deleteAllPlayers, deletePlayer, fetchAllPlayers } from '../utils/requests'
 
-function Players () {
+function Players() {
   const [players, setPlayers] = useState([])
-  // const [refreshTimer, setRefreshTimer] = useState(0)
+
   const params = useParams()
   const navigate = useNavigate()
 
@@ -39,21 +37,21 @@ function Players () {
       // TODO
     }
   }
-  function withdrawPlayers () {
-    axios.delete(playersUrl(params.gameid))
-      .then(function (response) {
-        console.log(response)
-      })
-      .catch(function (error) {
-        console.log(error)
-      })
+
+  const withdrawAllPlayers = async () => {
+    try {
+      const response = await deleteAllPlayers(params.gameId)
+      console.log(response)
+    } catch (error) {
+      // TODO
+    }
   }
 
   return (
     <Container size="xl" px="sm">
       <h3>Players</h3>
-      <Button variant="gradient" gradient={{ from: 'orange', to: 'red' }}
-        radius="md" size="lg" onClick={() => withdrawPlayers()}>Withdraw All</Button>
+      <Button variant="outline" color="red" radius="md" size="md"
+        onClick={() => withdrawAllPlayers()}>Withdraw All</Button>
       <hr />
 
       <Table hover>
