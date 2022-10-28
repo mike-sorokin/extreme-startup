@@ -65,6 +65,7 @@ docker-stop-previous-container:
     - docker stop se-xp-container
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
+  allow_failure: true
 
 dockerremove-previous-container:
   stage: kill
