@@ -17,7 +17,11 @@ function Chart ({ gameId }) {
       const playerData = []
       response.forEach(player => {
         scoreData[player.id] = player.score
-        playerData.push(player.id)
+        const playerDataObj = {
+          id: player.id,
+          name: player.name
+        }
+        playerData.push(playerDataObj)
       })
 
       return [playerData, scoreData]
@@ -48,9 +52,12 @@ function Chart ({ gameId }) {
         <YAxis />
         <CartesianGrid stroke="#111" strokeDasharray="5 5" />
 
-        {players.map((player) => {
+        {players.map((playerDataObj) => {
           // eslint-disable-next-line react/jsx-key
-          return <Line type="monotone" dataKey={player} stroke="#8884d8" />
+          return <Line type="monotone"
+                       name={playerDataObj.name}
+                       dataKey={playerDataObj.id}
+                       stroke="#8884d8" />
         })}
         <Tooltip />
       </LineChart>
