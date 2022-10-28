@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Button, Card, Container, Space, Title } from '@mantine/core'
+import { Badge, Button, Card, Container, Space, Title } from '@mantine/core'
+import { useClipboard } from '@mantine/hooks'
 
 import { fetchGame, updateGame } from '../utils/requests'
 
@@ -12,6 +13,8 @@ function Admin () {
   const [gamePaused, setGamePaused] = useState(false)
 
   const params = useParams()
+
+  const clipboard = useClipboard({ timeout: 500 })
 
   // Fetches game data every 2 seconds (current round and number of players)
   useEffect(() => {
@@ -54,25 +57,23 @@ function Admin () {
       // TODO
     }
   }
+
   function togglePauseButton (color, text) {
-    return <Button variant="outline"
+    return <Button compact variant="outline"
       color={color}
       radius="md"
       size="md"
-      style={{
-        marginLeft: '20px', width: '110px'
-      }}
+      style={{ marginLeft: '10%', width: '110px' }}
       onClick={() => togglePauseRound()}>
       {text}
     </Button>
   }
 
-  const roundsBarStyle = {
-    width: '100%',
-    display: 'inline-flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center'
+  function roundBadge (color, text) {
+    return <Badge size="xl" color={color} variant="filled"
+      style={{ width: '200px' }}>
+      {text}
+    </Badge>
   }
 
   return (
@@ -81,22 +82,43 @@ function Admin () {
       <Space h="md" />
       <Card shadow="sm" p="lg" radius="md" withBorder>
         <h3>Game ID</h3>
-        <h4 style={{ color: 'grey' }}>{params.gameId}</h4>
-        <br />
+        <div style={{ display: 'inline-flex', flexDirection: 'row' }}>
+          <Title order={4} color="white" weight={1000}>{params.gameId}</Title>
+          <Button compact variant="outline"
+            style={{ marginLeft: '10%', width: '150px' }}
+            color={clipboard.copied ? 'teal' : 'blue'}
+            onClick={() => clipboard.copy(params.gameId)}>
+            {clipboard.copied ? 'Game Id Copied!' : 'Copy Game Id'}
+          </Button>
+        </div>
+        <Space h="md" /> <br />
         <h3>Number of Players</h3>
         <h4 style={{ color: 'grey' }}>{playerNo}</h4>
         <br />
-        <div style={roundsBarStyle}>
+        <h3>Current Round</h3>
+        <div style={{ display: 'inline-flex', flexDirection: 'row' }}>
+          {gamePaused ? roundBadge('yellow', 'PAUSED') : (round > 0 ? roundBadge('lime', 'Round ' + String(round)) : roundBadge('cyan', 'WARMUP'))}
+          <Button compact variant="outline"
+              style={{ marginLeft: '10%' }}
+              color="indigo"
+              radius="md"
+              size="md"
+              onClick={() => advanceRound()}>
+              Advance Round
+            </Button>
+            { gamePaused
+              ? togglePauseButton('green', 'Resume')
+              : togglePauseButton('yellow', 'Pause')
+            }
+        </div>
+        {/* <div style={roundsBarStyle}>
           <div>
-            <h3>Rounds</h3>
+            <h3>Current Round</h3>
           </div>
           <Button variant="outline"
             color="indigo"
             radius="md"
             size="md"
-            style={{
-              marginLeft: '20px'
-            }}
             onClick={() => advanceRound()}>
             Advance Round
           </Button>
@@ -105,7 +127,7 @@ function Admin () {
             : togglePauseButton('yellow', 'Pause')
           }
         </div>
-        {<h4 style={{ color: 'grey' }}>{gamePaused ? 'PAUSED' : round}</h4>}
+        {<h4 style={{ color: 'grey' }}>{gamePaused ? 'PAUSED' : (round > 0 ? round : 'WARMUP')}</h4>} */}
       </Card>
     </Container>
   )
