@@ -59,7 +59,6 @@ def with_setup(server_setup=None, **callable_setup_kwargs):
                 setup_extras = server_setup(client, **callable_setup_kwargs)
             else:
                 setup_extras = setup_server_with(client, server_setup)
-
             test_func(setup_extras, client)
 
         return wrapper

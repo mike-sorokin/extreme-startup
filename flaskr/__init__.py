@@ -242,7 +242,7 @@ def create_app():
 
             games[game_id].players.remove(player_id)
             remove_players(player_id)
-            return {"deleted": player_id}
+            return ({"deleted": player_id}, 204)
 
     # Managing events for <player_id>
     @app.route("/api/<game_id>/players/<player_id>/events", methods=["GET", "DELETE"])
@@ -309,7 +309,7 @@ def create_app():
 
     def add_session_admin(game_id, session):
         if "admin" in session:
-            session["admin"].append(game_id)
+            session["admin"] += [game_id]
         else:
             session["admin"] = [game_id]
 

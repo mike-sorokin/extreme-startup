@@ -1,4 +1,5 @@
 import json
+from turtle import update
 
 from utils_for_tests import *
 from setups_for_tests import *
@@ -44,7 +45,7 @@ def test_index_put_throws_an_error(_, cli):
 
 
 @with_setup(create_a_couple_of_games)
-def test_index_delete_drops_all_games(_, cli):
+def test_index_delete_drops_all_games(extras, cli):
     r = cli.delete("/api")
     get_response = cli.get("/api")
     assert response_as_dict(get_response) == {}
@@ -215,7 +216,7 @@ def test_player_id_put_update_both_name_and_api(extras, cli):
 def test_player_id_delete_removes_the_player(extras, cli):
     gid = extras["game"]["id"]
     pid = list(extras["players"].keys())[0]
-    rd = response_as_dict_if_sucecssful(cli.delete(f"/api/{gid}/players/{pid}"))
+    rd = response_as_dict(cli.delete(f"/api/{gid}/players/{pid}"))
 
     assert keyset_of(rd).only_contains_the_following_keys("deleted")
     assert rd["deleted"] == pid
@@ -364,18 +365,53 @@ def test_non_admin_of_game_cannot_update_game(extras, cli):
         admin_request = cli.put(f"/api/{game_id}", json={"round": 1})
         assert admin_request.status_code == ALL_GOOD
 
+@with_setup(create_a_game_with_players)
+def test_admin_of_game_can_update_player_fields(extras, cli):
+    player1_id = list(extras["players"].keys())[0]
+    player1_dict = extras["players"][player1_id]
+    cli.cookie_jar.clear() # clear all cookies
+    cli.post(f"/api/{extras['game']['id']}/auth", json={"password": "dummy_password"})
 
-# def test_admin_of_game_can_delete_all_players():
-#     assert False
+    assert player1_dict["name"] == "noname"  # noname == default_name upon creation 
 
-# def test_admin_of_game_can_update_player():
-#     assert False
+    cli.put(f"/api/{extras['game']['id']}/players/{player1_id}", json={"name": "updated_name"})
+    r2 = response_as_dict(cli.get(f"/api/{extras['game']['id']}/players/{player1_id}"))
 
-# def test_player_can_update_name_api():
-#     assert False
+    assert r2["name"] == "updated_name" 
+    assert player1_dict["api"] == "nourl"  # nourl == default api upon creation
 
-# def test_admin_of_game_can_delete_player():
-#     assert False
+    cli.put(f"/api/{extras['game']['id']}/players/{player1_id}", json={"api": "updated_api"})
+    r2 = response_as_dict(cli.get(f"/api/{extras['game']['id']}/players/{player1_id}"))
 
-# def test_player_can_delete_itself():
-#     assert False
+    assert r2["api"] == "updated_api" 
+
+@with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
+def test_player_but_not_admin_of_game_can_update_own_player_fields(extras, cli):
+    cli.cookie_jar.clear() # clear all cookies
+    player = response_as_dict(cli.post(f"/api/{extras[0]['id']}/players", json={"name": "noname", "api": "nourl"})) 
+
+    assert not response_as_dict(cli.get(f"/api/{extras[0]['id']}/auth"))["authorized"]
+    assert player["name"] == "noname"  # noname == default_name upon creation 
+    assert player["api"] == "nourl"
+ 
+    cli.put(f"/api/{extras[0]['id']}/players/{player['id']}", json={"name": "updated_name", "api": "updated_api"})
+    updated_player = response_as_dict(cli.get(f"/api/{extras[0]['id']}/players/{player['id']}"))
+
+    assert updated_player["name"] == "updated_name"
+    assert updated_player["api"] == "updated_api"
+
+@with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
+def test_admin_can_delete_player(extras, cli):
+    player = response_as_dict(cli.post(f"/api/{extras[0]['id']}/players", json={"name": "noname", "api": "nourl"})) 
+    cli.cookie_jar.clear() 
+    cli.post(f"/api/{extras[0]['id']}/auth", json={"password": "dummy_password"})
+    delete_request = cli.delete(f"/api/{extras[0]['id']}/players/{player['id']}")
+
+    assert delete_request.status_code == DELETE_SUCCESS
+
+    get_player_request = cli.get(f"/api/{extras[0]['id']}/players/{player['id']}")
+    assert get_player_request.status_code == NOT_ACCEPTED
+    assert response_as_dict(get_player_request)['deleted'] == player['id']
+
+def test_player_can_delete_itself():
+    assert False

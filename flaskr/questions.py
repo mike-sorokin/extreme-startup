@@ -148,7 +148,7 @@ class MaximumQuestion(SelectFromListOfNumbersQuestion):
         self.points = 40
 
     def as_text(self):
-        return f"which of the following numbers is the largest: {', '.join(map(str, self.numbers))}"
+        return f"Which of the following numbers is the largest: {', '.join(map(str, self.numbers))}?"
 
     def correct_answer(self):
         return max(self.numbers)
@@ -157,7 +157,7 @@ class MaximumQuestion(SelectFromListOfNumbersQuestion):
 # Ask the result of addition of 2 numbers
 class AdditionQuestion(BinaryMathsQuestion):
     def as_text(self):
-        return f"What is {self.n1} plus {self.n2}"
+        return f"What is {self.n1} plus {self.n2}?"
 
     def correct_answer(self):
         return self.n1 + self.n2
@@ -166,7 +166,7 @@ class AdditionQuestion(BinaryMathsQuestion):
 # Ask the result of subtraction of 2 numbers
 class SubtractionQuestion(BinaryMathsQuestion):
     def as_text(self):
-        return f"What is {self.n1} minus {self.n2}"
+        return f"What is {self.n1} minus {self.n2}?"
 
     def correct_answer(self):
         return self.n1 - self.n2
@@ -175,7 +175,7 @@ class SubtractionQuestion(BinaryMathsQuestion):
 # Ask the result of multiplication of 2 numbers
 class MultiplicationQuestion(BinaryMathsQuestion):
     def as_text(self):
-        return f"What is {self.n1} multiplied by {self.n2}"
+        return f"What is {self.n1} multiplied by {self.n2}?"
 
     def correct_answer(self):
         return self.n1 * self.n2
@@ -188,7 +188,7 @@ class AdditionAdditionQuestion(TernaryMathsQuestion):
         self.points = 30
 
     def as_text(self):
-        return f"What is {self.n1} plus {self.n2} plus {self.n3}"
+        return f"What is {self.n1} plus {self.n2} plus {self.n3}?"
 
     def correct_answer(self):
         return self.n1 + self.n2 + self.n3
@@ -214,7 +214,7 @@ class MultiplicationAdditionQuestion(TernaryMathsQuestion):
         self.points = 50
 
     def as_text(self):
-        return f"What is {self.n1} multiplied by {self.n2} plus {self.n3}"
+        return f"What is {self.n1} multiplied by {self.n2} plus {self.n3}?"
 
     def correct_answer(self):
         return self.n1 * self.n2 + self.n3
@@ -227,7 +227,7 @@ class PowerQuestion(BinaryMathsQuestion):
         self.points = 50
 
     def as_text(self):
-        return f"What is {self.n1} to the power of {self.n2}"
+        return f"What is {self.n1} to the power of {self.n2}?"
 
     def correct_answer(self):
         return self.n1**self.n2
@@ -240,7 +240,7 @@ class SquareCubeQuestion(SelectFromListOfNumbersQuestion):
         self.points = 50
 
     def as_text(self):
-        return f"which of the following numbers is both a square and a cube: {', '.join(map(str, self.numbers))}"
+        return f"Which of the following numbers is both a square and a cube: {', '.join(map(str, self.numbers))}?"
 
     def correct_answer(self):
         is_square_cube = (
@@ -256,7 +256,7 @@ class PrimesQuestion(SelectFromListOfNumbersQuestion):
         self.points = 60
 
     def as_text(self):
-        return f"which of the following numbers are primes: {', '.join(map(str, self.numbers))}"
+        return f"Which of the following numbers are primes: {', '.join(map(str, self.numbers))}?"
 
     def correct_answer(self):
         is_prime = (
@@ -289,7 +289,7 @@ class FibonacciQuestion(UnaryyMathsQuestion):
             return "th"
 
     def as_text(self):
-        return f"what is the {str(self.number) + self.ordinal(11)} number in the Fibonacci sequence"
+        return f"What is the {str(self.number) + self.ordinal(11)} number in the Fibonacci sequence?"
 
     def fib(n):
         a, b = 0, 1
@@ -340,7 +340,7 @@ class AnagramQuestion(Question):
 
     def as_text(self):
         possible_words = [self.correct] + self.incorrect
-        return f"which of the following is an anagram of {anagram}: {', '.join(random.shuffle(possible_words))}"
+        return f"Which of the following is an anagram of {anagram}: {', '.join(random.shuffle(possible_words))}?"
 
     def correct_answer(self):
         return self.correct
@@ -388,7 +388,7 @@ class ScrabbleQuestion(Question):
             self.word = word.lower()
 
     def as_text(self):
-        return f"what is the scrabble score of {self.word}"
+        return f"What is the scrabble score of {self.word}?"
 
     def score(word):
         score = 0
