@@ -1,5 +1,4 @@
 import json
-from turtle import update
 
 from utils_for_tests import *
 from setups_for_tests import *
@@ -217,7 +216,6 @@ def test_player_id_delete_removes_the_player(extras, cli):
     gid = extras["game"]["id"]
     pid = list(extras["players"].keys())[0]
     rd = response_as_dict(cli.delete(f"/api/{gid}/players/{pid}"))
-
     assert keyset_of(rd).only_contains_the_following_keys("deleted")
     assert rd["deleted"] == pid
 
@@ -252,6 +250,34 @@ def test_auth_delete_throws_an_error(_, cli):
     assert cli.delete("/api/someid/auth").status_code == ERROR_405
 
 
+@with_setup(create_a_single_game)
+def test_auth_get_is_authorized_for_admin(extras, cli):
+    assert response_as_dict(cli.get(f"/api/{extras[0]['id']}/auth"))["authorized"]
+
+
+@with_setup(create_a_single_game)
+def test_auth_get_is_not_authorized_for_non_admin(extras, cli):
+    cli.cookie_jar.clear()
+    assert not response_as_dict(cli.get(f"/api/{extras[0]['id']}/auth"))["authorized"]
+
+
+@with_setup(create_a_single_game)
+def test_auth_post_requires_password(extras, cli):
+    faulty_auth_request = cli.post(f"/api/{extras[0]['id']}/auth", json={})
+    assert faulty_auth_request.status_code == NOT_ACCEPTED
+
+@with_setup(create_a_single_game)
+def test_auth_post_with_valid_game_password_returns_valid(extras, cli):
+    auth_request = cli.post(f"/api/{extras[0]['id']}/auth", json={"password": "dummy_password"})
+    assert response_as_dict(auth_request)["valid"]
+  
+
+@with_setup(create_a_single_game)
+def test_auth_post_with_invalid_game_password_returns_invalid(extras, cli):
+    auth_request = cli.post(f"/api/{extras[0]['id']}/auth", json={"password": "incorrect_dummy_password"})
+    assert not response_as_dict(auth_request)["valid"]
+  
+
 @with_setup()
 def test_game_creation_requires_password(_, cli):
     empty_request = cli.post(f"/api", json={})
@@ -265,20 +291,20 @@ def test_game_creation_requires_password(_, cli):
         assert r_dict["id"] in session.get("admin")
 
 
-@with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
+@with_setup(create_a_single_game)
 def test_auth_get_returns_true_if_authorized(extras, cli):
     auth_check = response_as_dict_if_sucecssful(cli.get(f"/api/{extras[0]['id']}/auth"))
     assert auth_check["authorized"]
 
 
-@with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
+@with_setup(create_a_single_game)
 def test_auth_get_returns_false_if_unauthorized(extras, cli):
     cli.cookie_jar.clear()
     auth_check = response_as_dict_if_sucecssful(cli.get(f"/api/{extras[0]['id']}/auth"))
     assert not auth_check["authorized"]
 
 
-@with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
+@with_setup(create_a_single_game)
 def test_auth_post_fail_when_password_incorrect(extras, cli):
     game_id = extras[0]["id"]
     auth_request = response_as_dict(
@@ -287,7 +313,7 @@ def test_auth_post_fail_when_password_incorrect(extras, cli):
     assert not auth_request["valid"]
 
 
-@with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
+@with_setup(create_a_single_game)
 def test_auth_post_success_when_credential_correct(extras, cli):
     game_id = extras[0]["id"]
 
@@ -299,7 +325,7 @@ def test_auth_post_success_when_credential_correct(extras, cli):
         assert game_id in session.get("admin")
 
 
-@with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
+@with_setup(create_a_single_game)
 def test_admin_of_game_can_delete_game(extras, cli):
     game_id = extras[0]["id"]
     cli.cookie_jar.clear()
@@ -307,7 +333,7 @@ def test_admin_of_game_can_delete_game(extras, cli):
     assert non_admin_request.status_code == UNAUTHORIZED
 
 
-@with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
+@with_setup(create_a_single_game)
 def test_non_admin_of_game_can_not_delete_game(extras, cli):
     game_id = extras[0]["id"]
     cli.cookie_jar.clear()
@@ -348,15 +374,18 @@ def test_non_admin_of_all_games_cannot_delete_all_games(extras, cli):
     assert len(rem_games) == 2
 
 
-@with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
-def test_admin_of_game_can_update_game(extras, cli):
+@with_setup(create_a_single_game)
+def test_non_admin_of_game_cannot_update_game(extras, cli):
     game_id = extras[0]["id"]
     cli.cookie_jar.clear()
     non_admin_request = cli.put(f"/api/{game_id}", json={"round": 1})
     assert non_admin_request.status_code == UNAUTHORIZED
 
-@with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
-def test_non_admin_of_game_cannot_update_game(extras, cli):
+    non_admin_request = cli.put(f"/api/{game_id}", json={"pause": True})
+    assert non_admin_request.status_code == UNAUTHORIZED
+
+@with_setup(create_a_single_game)
+def test_admin_of_game_can_update_game(extras, cli):
     game_id = extras[0]["id"]
     cli.cookie_jar.clear()
  
@@ -385,7 +414,7 @@ def test_admin_of_game_can_update_player_fields(extras, cli):
 
     assert r2["api"] == "updated_api" 
 
-@with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
+@with_setup(create_a_single_game)
 def test_player_but_not_admin_of_game_can_update_own_player_fields(extras, cli):
     cli.cookie_jar.clear() # clear all cookies
     player = response_as_dict(cli.post(f"/api/{extras[0]['id']}/players", json={"name": "noname", "api": "nourl"})) 
@@ -400,18 +429,66 @@ def test_player_but_not_admin_of_game_can_update_own_player_fields(extras, cli):
     assert updated_player["name"] == "updated_name"
     assert updated_player["api"] == "updated_api"
 
-@with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
+@with_setup(create_a_single_game)
 def test_admin_can_delete_player(extras, cli):
     player = response_as_dict(cli.post(f"/api/{extras[0]['id']}/players", json={"name": "noname", "api": "nourl"})) 
     cli.cookie_jar.clear() 
     cli.post(f"/api/{extras[0]['id']}/auth", json={"password": "dummy_password"})
     delete_request = cli.delete(f"/api/{extras[0]['id']}/players/{player['id']}")
 
-    assert delete_request.status_code == DELETE_SUCCESS
+    assert delete_request.status_code == ALL_GOOD
 
     get_player_request = cli.get(f"/api/{extras[0]['id']}/players/{player['id']}")
     assert get_player_request.status_code == NOT_ACCEPTED
-    assert response_as_dict(get_player_request)['deleted'] == player['id']
 
-def test_player_can_delete_itself():
-    assert False
+
+@with_setup(create_a_single_game)
+def test_player_can_delete_itself(extras, cli):
+    cli.cookie_jar.clear()
+    player = response_as_dict(cli.post(f"/api/{extras[0]['id']}/players", json={"name": "noname", "api": "nourl"})) 
+    delete_request = cli.delete(f"/api/{extras[0]['id']}/players/{player['id']}")
+    
+    assert delete_request.status_code == ALL_GOOD
+
+    get_player_request = cli.get(f"/api/{extras[0]['id']}/players/{player['id']}")
+    assert get_player_request.status_code == NOT_ACCEPTED
+
+
+@with_setup(create_a_single_game)
+def test_admin_can_delete_all_players(extras, cli):
+    for _ in range(10):
+        response_as_dict(cli.post(f"/api/{extras[0]['id']}/players", json={"name": "noname", "api": "nourl"})) 
+   
+    cli.cookie_jar.clear() 
+    cli.post(f"/api/{extras[0]['id']}/auth", json={"password": "dummy_password"})
+    delete_request = cli.delete(f"/api/{extras[0]['id']}/players")
+
+    assert delete_request.status_code == DELETE_SUCCESS
+
+    get_player_request = response_as_dict(cli.get(f"/api/{extras[0]['id']}/players"))
+    assert not get_player_request["players"]
+
+@with_setup(create_a_single_game)
+def test_non_admin_can_not_delete_all_players(extras, cli):
+    for _ in range(10):
+        response_as_dict(cli.post(f"/api/{extras[0]['id']}/players", json={"name": "noname", "api": "nourl"})) 
+   
+    cli.cookie_jar.clear() 
+    delete_request = cli.delete(f"/api/{extras[0]['id']}/players")
+
+    assert delete_request.status_code == UNAUTHORIZED
+
+    get_player_request = response_as_dict(cli.get(f"/api/{extras[0]['id']}/players"))
+    assert len(get_player_request["players"]) == 10
+
+
+@with_setup(create_a_single_game)
+def test_player_can_delete_itself(extras, cli):
+    cli.cookie_jar.clear()
+    player = response_as_dict(cli.post(f"/api/{extras[0]['id']}/players", json={"name": "noname", "api": "nourl"})) 
+    delete_request = cli.delete(f"/api/{extras[0]['id']}/players/{player['id']}")
+    
+    assert delete_request.status_code == ALL_GOOD
+
+    get_player_request = cli.get(f"/api/{extras[0]['id']}/players/{player['id']}")
+    assert get_player_request.status_code == NOT_ACCEPTED

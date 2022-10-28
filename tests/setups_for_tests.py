@@ -66,6 +66,8 @@ def with_setup(server_setup=None, **callable_setup_kwargs):
     return inner
 
 
+
+create_a_single_game = ((POST, "/api", {"password": "dummy_password"}, None),)
 create_a_couple_of_games = ((POST, "/api", {"password": "dummy_password"}, None),) * 2
 
 
@@ -80,3 +82,4 @@ def create_a_game_with_players(cli, num_players=2):
         # players.append(create_player(cli, gid))
 
     return {"game": game, "players": players}
+

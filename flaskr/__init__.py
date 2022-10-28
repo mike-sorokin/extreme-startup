@@ -9,6 +9,7 @@ from flask import (
     url_for,
     send_from_directory,
     session,
+    jsonify
 )
 from flaskr.player import Player
 from flaskr.game import Game
@@ -22,6 +23,16 @@ import secrets
 # PRODUCTION CONSTANT(S)
 QUESTION_TIMEOUT = 10
 QUESTION_DELAY = 5
+
+# HTTP CODES
+ALL_GOOD = 200
+FAULTY_REQUEST = 400
+NOT_FOUND = 404
+NOT_ACCEPTED = 406
+ERROR_405 = 405
+DELETE_SUCCESS = 204
+UNAUTHORIZED_CODE = 401
+
 DELETE_SUCCESSFUL = ("Successfully deleted", 204)
 NOT_ACCEPTABLE = ("Unacceptable request - Requested resource not found", 406)
 UNAUTHORIZED = ("Unauthenticated request", 401)
@@ -242,7 +253,7 @@ def create_app():
 
             games[game_id].players.remove(player_id)
             remove_players(player_id)
-            return ({"deleted": player_id}, 204)
+            return {"deleted": player_id}
 
     # Managing events for <player_id>
     @app.route("/api/<game_id>/players/<player_id>/events", methods=["GET", "DELETE"])
