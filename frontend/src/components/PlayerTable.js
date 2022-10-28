@@ -1,7 +1,7 @@
 import React from 'react'
 import { Table, Badge } from '@mantine/core'
 
-function PlayerTable({ events }) {
+function PlayerTable ({ events }) {
   return (
     <Table>
       <thead>

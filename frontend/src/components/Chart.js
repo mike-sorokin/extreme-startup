@@ -50,7 +50,12 @@ function Chart ({ gameId }) {
 
         {players.map((player) => {
           // eslint-disable-next-line react/jsx-key
-          return <Line type="monotone" dataKey={player} stroke="#8884d8" />
+          return <Line
+          type="monotone"
+          animationDuration={300}
+          dataKey={player}
+          stroke="#8884d8"
+          dot={false}/>
         })}
         <Tooltip />
       </LineChart>
