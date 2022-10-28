@@ -26,10 +26,10 @@ function Home () {
       <Modal centered
         opened={openedCreateGame}
         onClose={() => setOpenedCreateGame(false)}
-        title="Your game is ready!">
+        withCloseButton={false}>
         <GoToGame getGameId={() => newGameId} />
       </Modal>
-      <Modal centered
+      <Modal centered size="lg"
         opened={openedAddPlayer}
         onClose={() => setOpenedAddPlayer(false)}
         title="Join a Game!">

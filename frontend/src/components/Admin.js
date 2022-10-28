@@ -48,6 +48,19 @@ function Admin () {
       })
   }
 
+  function togglePauseButton (color, text) {
+    <Button variant="outline"
+      color={color}
+      radius="md"
+      size="md"
+      style={{
+        marginLeft: '20px'
+      }}
+      onClick={() => togglePauseRound()}>
+      {text}
+    </Button>
+  }
+
   const roundsBarStyle = {
     width: '100%',
     display: 'inline-flex',
@@ -78,16 +91,10 @@ function Admin () {
           onClick={() => advanceRound()}>
           Advance Round
         </Button>
-        <Button variant="outline"
-          color="red"
-          radius="md"
-          size="md"
-          style={{
-            marginLeft: '20px'
-          }}
-          onClick={() => togglePauseRound()}>
-          Toggle Pause
-        </Button>
+        { gamePaused
+          ? togglePauseButton('green', 'Resume')
+          : togglePauseButton('yellow', 'Pause')
+        }
       </div>
       {<h4 style={{ color: 'grey' }}>{gamePaused ? 'PAUSED' : round}</h4>}
     </Container>
