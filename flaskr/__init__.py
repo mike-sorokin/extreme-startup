@@ -258,7 +258,7 @@ bot_responses = {n: [f"Bot{n}", 0] for n in range(100)}
 def _update_response(bot_id, resp):
     bot_responses[bot_id][0] = resp
     bot_responses[bot_id][1] += 1
-    return redirect(url_for("api_response", bot_id=bot_id))
+    return redirect(url_for("_api_response", bot_id=bot_id))
 
 
 # Get a response
