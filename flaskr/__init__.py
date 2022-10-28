@@ -17,10 +17,8 @@ from flaskr.json_encoder import JSONEncoder
 from flaskr.questions import *
 import threading
 
-# todo remove later
-import pprint
-
 app = Flask(__name__)
+app.url_map.strict_slashes = False
 
 # games: game_id -> game object
 games = {}
