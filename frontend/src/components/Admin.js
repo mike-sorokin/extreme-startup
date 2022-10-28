@@ -1,40 +1,59 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Button, Container } from '@mantine/core'
-import axios from 'axios'
+
+import { fetchGame, updateGame } from '../utils/requests'
 import { gameAPI } from '../utils/urls'
+import axios from 'axios'
+
+import '../styles/Admin.css'
 
 function Admin () {
-  const params = useParams()
   const [playerNo, setPlayerNo] = useState(0)
-  const [round, setRound] = useState('Warmup')
+  const [round, setRound] = useState(0)
   const [gamePaused, setGamePaused] = useState(false)
-  const [refreshTimer, setRefreshTimer] = useState(0)
 
+  const params = useParams()
+
+  // Fetches game data every 2 seconds (current round and number of players)
   useEffect(() => {
-    axios.get(gameAPI(params.gameId))
-      .then(function (response) {
-        console.log(response)
-        setRound(response.data.round === 0 ? 'Warmup' : response.data.round)
-        setPlayerNo(response.data.players.length)
-      })
-      .catch(function (error) {
-        console.log(error)
-      })
+    const getGameData = async () => {
+      try {
+        const response = await fetchGame(params.gameId)
+        setRound(response.round)
+        setPlayerNo(response.players.length)
+      } catch (error) {
+        // TODO
+      }
+    }
 
-    setTimeout(() => setRefreshTimer(prevState => prevState + 1), 1000)
-  }, [refreshTimer])
+    const timer = setInterval(getGameData, 2000)
 
-  function advanceRound () {
-    axios.put(gameAPI(params.gameId), { round: '' })
-      .then(function (response) {
-        console.log(response)
-        setRound(round === 'Warmup' ? 1 : (round + 1))
-      })
-      .catch(function (error) {
-        console.log(error)
-      })
+    return () => {
+      clearInterval(timer)
+    }
+  }, [params.gameId])
+
+  // Increments round
+  const advanceRound = async () => {
+    try {
+      await updateGame(params.gameId, { round: round + 1 })
+      setRound(round + 1)
+    } catch (error) {
+      // TODO
+    }
   }
+
+  // // Send a {"pause": ""} request to unpause, {"pause": "p"} to pause
+  // const togglePauseRound = async () => {
+  //   try {
+  //     const response = await updateGame(params.gameId, { pause: (gamePaused ? '' : 'p') })
+  //     console.log(response)
+  //     setGamePaused(!gamePaused)
+  //   } catch (error) {
+  //     // TODO
+  //   }
+  // }
 
   function togglePauseRound () {
     // Send a {"pause": ""} request to unpause, {"pause": "p"} to pause
@@ -48,37 +67,31 @@ function Admin () {
       })
   }
 
-  const roundsBarStyle = {
-    width: '100%',
-    display: 'inline-flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  }
-
   return (
     <Container size="xl" px="xs">
       <h3>Game ID</h3>
-      <h4 style={{ color: 'grey' }}>{params.gameId}</h4>
+      <h4 className="grey-text">{params.gameId}</h4>
       <br />
       <h3>Number of Players</h3>
-      <h4 style={{ color: 'grey' }}>{playerNo}</h4>
+      <h4 className='grey-text'>{playerNo}</h4>
       <br />
-      <div style={roundsBarStyle}>
+      <div className="rounds-bar">
         <div>
           <h3>Rounds</h3>
         </div>
-        <Button variant="outline"
-          color="indigo"
+        <Button
+          variant="outline"
+          color="dark"
           radius="md"
           size="md"
           style={{
             marginLeft: '20px'
           }}
-          onClick={() => advanceRound()}>
+          onClick={() => advanceRound()}
+        >
           Advance Round
         </Button>
-        <Button variant="outline"
+                <Button variant="outline"
           color="red"
           radius="md"
           size="md"
@@ -89,7 +102,7 @@ function Admin () {
           Toggle Pause
         </Button>
       </div>
-      {<h4 style={{ color: 'grey' }}>{gamePaused ? 'PAUSED' : round}</h4>}
+      <h4 className="grey-text">{round === 0 ? 'Warmup' : round}</h4>
     </Container>
   )
 }
