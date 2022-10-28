@@ -4,7 +4,7 @@ import sys
 
 sys.path.append(".")
 
-from flaskr import app
+from flaskr import create_app
 
 GET = 0
 POST = 1
@@ -50,6 +50,7 @@ def with_setup(server_setup=None, **callable_setup_kwargs):
     def inner(test_func):
         def wrapper():
             # Connect to our flask app.
+            app = create_app()
             app.config.update({"TESTING": True})
             client = app.test_client()
 
