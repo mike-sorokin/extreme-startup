@@ -19,14 +19,14 @@ function Game () {
     <>
       <Menu shadow="md" width={200}>
         <Menu.Target>
-          <Burger size="lg" />
+          <Burger size="lg" style={{ position: 'relative', left: '1%', marginTop: '1%' }}/>
         </Menu.Target>
 
         <Menu.Dropdown>
-          <Menu.Label>Menu</Menu.Label>
-          <Menu.Item>{navButton(adminUrl(params.gameId), 'Host Page')}</Menu.Item>
-          <Menu.Item>{navButton('', 'Leaderboard')}</Menu.Item>
-          <Menu.Item>{navButton(playersUrl(params.gameId), 'Players')}</Menu.Item>
+          <Menu.Label>Game Menu</Menu.Label>
+          <Menu.Item>{navButton('/admin', 'Host Page', 'grape')}</Menu.Item>
+          <Menu.Item>{navButton('', 'Leaderboard', 'indigo')}</Menu.Item>
+          <Menu.Item>{navButton('/players', 'Players', 'pink')}</Menu.Item>
         </Menu.Dropdown>
       </Menu>
       <Outlet />
