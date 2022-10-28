@@ -3,8 +3,6 @@ import { useParams } from 'react-router-dom'
 import { Button, Container } from '@mantine/core'
 
 import { fetchGame, updateGame } from '../utils/requests'
-import { gameAPI } from '../utils/urls'
-import axios from 'axios'
 
 import '../styles/Admin.css'
 
@@ -44,27 +42,15 @@ function Admin () {
     }
   }
 
-  // // Send a {"pause": ""} request to unpause, {"pause": "p"} to pause
-  // const togglePauseRound = async () => {
-  //   try {
-  //     const response = await updateGame(params.gameId, { pause: (gamePaused ? '' : 'p') })
-  //     console.log(response)
-  //     setGamePaused(!gamePaused)
-  //   } catch (error) {
-  //     // TODO
-  //   }
-  // }
-
-  function togglePauseRound () {
-    // Send a {"pause": ""} request to unpause, {"pause": "p"} to pause
-    axios.put(gameAPI(params.gameId), { pause: (gamePaused ? '' : 'p') })
-      .then(function (response) {
-        console.log(response)
-        setGamePaused(response.data === 'GAME_PAUSED')
-      })
-      .catch(function (error) {
-        console.log(error)
-      })
+  // Send a {"pause": ""} request to unpause, {"pause": "p"} to pause
+  const togglePauseRound = async () => {
+    try {
+      const response = await updateGame(params.gameId, { pause: (gamePaused ? '' : 'p') })
+      console.log(response)
+      setGamePaused(!gamePaused)
+    } catch (error) {
+      // TODO
+    }
   }
 
   return (
