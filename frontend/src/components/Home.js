@@ -31,7 +31,7 @@ function Home () {
         opened={openedCreateGame}
         onClose={() => setOpenedCreateGame(false)}
         title="Your game is ready!">
-        <GoToGame getGameId={() => newGameId} />
+        <GoToGame gameId={newGameId} />
       </Modal>
       <Modal centered
         opened={openedAddPlayer}
