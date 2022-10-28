@@ -62,6 +62,7 @@ docker-prune-images:
 docker-delete-prev-container:
   stage: kill
   script:
+    - docker stop se-xp-container
     - docker container prune --force
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
