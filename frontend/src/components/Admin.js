@@ -60,7 +60,7 @@ function Admin () {
       radius="md"
       size="md"
       style={{
-        marginLeft: '20px'
+        marginLeft: '20px', width: '110px'
       }}
       onClick={() => togglePauseRound()}>
       {text}

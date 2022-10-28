@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Container, Table, Badge } from '@mantine/core'
+import { Badge, Container, Table, Title } from '@mantine/core'
 
 import { fetchAllPlayers } from '../utils/requests'
 
@@ -42,7 +42,7 @@ function Leaderboard () {
 
   return (
     <Container size="xl" px="sm">
-      <h2>Leaderboard</h2>
+      <Title order={1} color="white" weight={1000}>Leaderboard</Title>
       <Chart gameId={params.gameId} />
       {
         <Table>
@@ -63,7 +63,7 @@ function Leaderboard () {
                   <td>{player.name}</td>
                   <td>{[...player.streak].map(createBadge)}</td>
                   <td>{player.score}</td>
-                  <td>{player.streak === '111111' && (<Badge color="red"> On fire! </Badge>)}</td>
+                  <td>{player.streak === '111111' && (<Badge variant="gradient" gradient={{ from: 'orange', to: 'red' }}> ON FIRE! </Badge>)}</td>
                 </tr>
               ))
             }
