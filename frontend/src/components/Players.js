@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Button, Container, Table } from '@mantine/core'
+import { Button, Container, Table, Title } from '@mantine/core'
 
 import { deleteAllPlayers, deletePlayer, fetchAllPlayers } from '../utils/requests'
 
@@ -49,9 +49,12 @@ function Players () {
 
   return (
     <Container size="xl" px="sm">
-      <h3>Players</h3>
-      <Button variant="outline" color="red" radius="md" size="md"
-        onClick={() => withdrawAllPlayers()}>Withdraw All</Button>
+      <Title order={1} color="white" weight={1000}>Players</Title>
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <Button variant="outline" color="red" radius="md" size="md"
+          onClick={() => withdrawAllPlayers()}>Withdraw All
+        </Button>
+      </div>
       <hr />
 
       <Table hover>
