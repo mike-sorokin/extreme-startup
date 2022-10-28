@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Badge, Container, Table, Title } from '@mantine/core'
+import { Badge, ColorSwatch, Container, Group, Table, Title } from '@mantine/core'
 
 import { fetchAllPlayers } from '../utils/requests'
 
@@ -24,7 +24,7 @@ function Leaderboard () {
     }
 
     const timer = setInterval(getLeaderboard, 2000)
-
+    getLeaderboard()
     return () => {
       clearInterval(timer)
     }
@@ -32,11 +32,11 @@ function Leaderboard () {
 
   function createBadge (ch) {
     if (ch === '1') {
-      return <Badge color="green" variant="filled"></Badge>
+      return <ColorSwatch color="green"/>
     } else if (ch === '0') {
-      return <Badge color="red" variant="filled"></Badge>
+      return <ColorSwatch color="red"/>
     } else {
-      return <Badge color="orange" variant="filled"></Badge>
+      return <ColorSwatch color="orange"/>
     }
   }
 
@@ -61,7 +61,12 @@ function Leaderboard () {
                 <tr key={player.id}>
                   <td>{player.id}</td>
                   <td>{player.name}</td>
-                  <td>{[...player.streak].map(createBadge)}</td>
+
+                  <td><Group position="right" spacing="xs">
+                  {[...player.streak].map(createBadge)}
+                  </Group>
+                  </td>
+
                   <td>{player.score}</td>
                   <td>{player.streak === '111111' && (<Badge variant="gradient" gradient={{ from: 'orange', to: 'red' }}> ON FIRE! </Badge>)}</td>
                 </tr>
