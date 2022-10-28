@@ -2,7 +2,8 @@ import json
 
 from utils_for_tests import *
 from setups_for_tests import *
-from unittest.mock import patch 
+from unittest.mock import patch
+
 
 @with_setup()
 def test_index_blank_get(_, cli):
@@ -129,8 +130,7 @@ def test_players_post_creates_a_new_player(extras, cli):
     players = extras["players"]
     initial_num_players = len(players)
     response = cli.post(
-        f"/api/{gid}/players",
-        json={"name": "John_Doe", "api": "abc.com"}
+        f"/api/{gid}/players", json={"name": "John_Doe", "api": "abc.com"}
     )
     rd = response_as_dict_if_sucecssful(response)
     assert is_valid_player_json(rd)
@@ -240,32 +240,101 @@ def test_event_id_post_throws_an_error(_, cli):
 def test_event_id_put_throws_an_error(_, cli):
     assert cli.put("/api/someid/players/someid/events/someid").status_code == ERROR_405
 
+
+# @with_setup()
+# def test_auth_get_throws_an_error(_, cli):
+#     assert cli.get("/api/123/auth").status_code == ERROR_405
+
+# @with_setup()
+# def test_auth_put_throws_an_error(_, cli):
+#     assert cli.put("/api/someid/auth").status_code == ERROR_405
+
+# @with_setup()
+# def test_auth_delete_throws_an_error(_, cli):
+#     assert cli.delete("/api/someid/auth").status_code == ERROR_405
+
+
 @with_setup()
 def test_game_creation_requires_password(_, cli):
     empty_request = cli.post(f"/api", json={})
     assert empty_request.status_code == NOT_ACCEPTED
 
-    with patch("flaskr.session", dict()) as session: 
+    with patch("flaskr.session", dict()) as session:
         request_with_password = cli.post(f"/api", json={"password": "password"})
         assert request_with_password.status_code == ALL_GOOD
 
         r_dict = response_as_dict(request_with_password)
         assert r_dict["id"] in session.get("admin")
-    
-'''
-@with_setup()
-def test_auth_fail_when_game_id_incorrect():
-    assert False
 
-@with_setup()
-def test_auth_fail_when_password_incorrect():
-    assert False
 
-@with_setup()
-def test_auth_success_when_credential_correct():
-    assert False
+@with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
+def test_auth_post_fail_when_password_incorrect(extras, cli):
+    game_id = extras[0]["id"]
+    auth_request = response_as_dict(
+        cli.post(f"/api/{game_id}/auth", json={"password": "wrong_password"})
+    )
+    assert not auth_request["valid"]
 
-@with_setup()
-def test_admin_of_game_can_delete_game():
-    assert False
-'''
+
+@with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
+def test_auth_post_success_when_credential_correct(extras, cli):
+    game_id = extras[0]["id"]
+
+    with patch("flaskr.session", dict()) as session:
+        auth_request = response_as_dict_if_sucecssful(
+            cli.post(f"/api/{game_id}/auth", json={"password": "dummy_password"})
+        )
+        assert auth_request["valid"]
+        assert game_id in session.get("admin")
+
+
+# @with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
+# def test_admin_of_all_games_can_delete_all_games():
+#     assert False
+
+
+@with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
+def test_only_admin_of_game_can_delete_game(extras, cli):
+    game_id = extras[0]["id"]
+    cli.cookie_jar.clear()
+    non_admin_request = cli.delete(f"/api/{game_id}")
+    assert non_admin_request.status_code == UNAUTHORIZED
+
+    with patch("flaskr.session", dict()) as session:
+        cli.post(f"/api/{game_id}/auth", json={"password": "dummy_password"})
+        rd = response_as_dict_if_sucecssful(
+            cli.delete(
+                f"/api/{game_id}",
+            )
+        )
+        assert keyset_of(rd).only_contains_the_following_keys("deleted")
+        assert rd["deleted"] == game_id
+
+
+@with_setup([(POST, "/api", {"password": "dummy_password"}, None)])
+def test_only_admin_of_game_can_update_game(extras, cli):
+    game_id = extras[0]["id"]
+    cli.cookie_jar.clear()
+    non_admin_request = cli.put(f"/api/{game_id}", json={"round": 1})
+    assert non_admin_request.status_code == UNAUTHORIZED
+
+    with patch("flaskr.session", dict()) as session:
+        cli.post(f"/api/{game_id}/auth", json={"password": "dummy_password"})
+        admin_request = cli.put(f"/api/{game_id}", json={"round": 1})
+        assert admin_request.status_code == ALL_GOOD
+
+
+# def test_admin_of_game_can_delete_all_players():
+#     assert False
+
+# def test_admin_of_game_can_update_player():
+#     assert False
+
+# def test_player_can_update_name_api():
+#     assert False
+
+# def test_admin_of_game_can_delete_player():
+#     assert False
+
+# def test_player_can_delete_itself():
+#     assert False

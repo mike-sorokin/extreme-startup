@@ -17,6 +17,7 @@ NOT_FOUND = 404
 NOT_ACCEPTED = 406
 ERROR_405 = 405
 DELETE_SUCCESS = 204
+UNAUTHORIZED = 401
 
 
 def setup_server_with(client, server_setup):
