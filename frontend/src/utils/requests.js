@@ -115,7 +115,7 @@ export async function fetchGame (gameId) {
  */
 export async function updateGame (gameId, data) {
   try {
-    const response = await instance.put(gameAPI(gameId, data))
+    const response = await instance.put(gameAPI(gameId), data)
     return response.data
   } catch (error) {
     alertError(error)
