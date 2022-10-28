@@ -1,28 +1,32 @@
 import React, { useState } from 'react'
-import { Button, Card, Modal, Stack, Title } from '@mantine/core'
-
-import AddPlayer from './AddPlayer'
-import GoToGame from './GoToGame'
+import { Button, Modal, Card, Stack, Title } from '@mantine/core'
 
 import { createNewGame } from '../utils/requests'
 import { showSuccessNotification } from '../utils/utils'
+
+import AddPlayer from './AddPlayer'
+import GoToGame from './GoToGame'
 
 function Home () {
   const [openedCreateGame, setOpenedCreateGame] = useState(false)
   const [openedAddPlayer, setOpenedAddPlayer] = useState(false)
   const [newGameId, setNewGameId] = useState('')
 
-  const createGameButtonAction = () => {
-    return createNewGame()
-      .then(game => {
-        showSuccessNotification('Successfully Created Game!')
-        setNewGameId(game.id)
-        setOpenedCreateGame(true)
-      })
+  // Creates a new game
+  const handleCreateGame = async () => {
+    setOpenedCreateGame(true)
+
+    try {
+      const response = await createNewGame()
+      showSuccessNotification('Successfully Created Game!')
+      setNewGameId(response.id)
+    } catch (error) {
+      // TODO
+    }
   }
 
   return (
-    <div className="Home">
+<div className="Home">
       <Modal centered
         opened={openedCreateGame}
         onClose={() => setOpenedCreateGame(false)}
@@ -47,11 +51,12 @@ function Home () {
         }}>
         <Stack align="center" spacing="xl">
           <Title order={1} color="white" weight={1000}>🔥 Extreme Startup 🔥</Title>
-          <Button variant="outline" color="green" radius="md" size="lg" onClick={createGameButtonAction}>Create a Game!</Button>
+          <Button variant="outline" color="green" radius="md" size="lg" onClick={handleCreateGame}>Create a Game!</Button>
           <Button variant="outline" color="orange" radius="md" size="lg" onClick={() => { setOpenedAddPlayer(true) }}>Join a Game!</Button>
         </Stack>
       </Card>
     </div>
+
   )
 }
 

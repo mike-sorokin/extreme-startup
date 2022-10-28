@@ -1,8 +1,9 @@
-import { gameUrl } from '../utils/urls'
 import React from 'react'
 import { Button, Space, Title } from '@mantine/core'
 import { useClipboard } from '@mantine/hooks'
 import { useNavigate } from 'react-router-dom'
+
+import { gameUrl } from '../utils/urls'
 
 function GoToGame (gameIdGetter) {
   const navigate = useNavigate()

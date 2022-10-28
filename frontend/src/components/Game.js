@@ -6,6 +6,7 @@ function Game () {
   const params = useParams()
   const navigate = useNavigate()
 
+  // Separate file for navButton?
   const navButton = (suffix, text, color) => {
     const url = '/' + params.gameId + suffix
     return (

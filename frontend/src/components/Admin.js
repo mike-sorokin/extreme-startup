@@ -1,53 +1,59 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Button, Card, Container, Space, Title } from '@mantine/core'
-import axios from 'axios'
-import { gameAPI } from '../utils/urls'
+
+import { fetchGame, updateGame } from '../utils/requests'
+
+import '../styles/Admin.css'
 
 function Admin () {
-  const params = useParams()
   const [playerNo, setPlayerNo] = useState(0)
-  const [round, setRound] = useState('Warmup')
+  const [round, setRound] = useState(0)
   const [gamePaused, setGamePaused] = useState(false)
-  const [refreshTimer, setRefreshTimer] = useState(0)
 
+  const params = useParams()
+
+  // Fetches game data every 2 seconds (current round and number of players)
   useEffect(() => {
-    axios.get(gameAPI(params.gameId))
-      .then(function (response) {
-        console.log(response)
-        setRound(response.data.round === 0 ? 'Warmup' : response.data.round)
-        setPlayerNo(response.data.players.length)
-      })
-      .catch(function (error) {
-        console.log(error)
-      })
+    const getGameData = async () => {
+      try {
+        const response = await fetchGame(params.gameId)
+        setRound(response.round)
+        setGamePaused(response.paused)
+        setPlayerNo(response.players.length)
+      } catch (error) {
+        // TODO
+      }
+    }
 
-    setTimeout(() => setRefreshTimer(prevState => prevState + 1), 1000)
-  }, [refreshTimer])
+    getGameData()
+    const timer = setInterval(getGameData, 2000)
 
-  function advanceRound () {
-    axios.put(gameAPI(params.gameId), { round: '' })
-      .then(function (response) {
-        console.log(response)
-        setRound(round === 'Warmup' ? 1 : (round + 1))
-      })
-      .catch(function (error) {
-        console.log(error)
-      })
+    return () => {
+      clearInterval(timer)
+    }
+  }, [params.gameId])
+
+  // Increments round
+  const advanceRound = async () => {
+    try {
+      await updateGame(params.gameId, { round: round + 1 })
+      setRound(round + 1)
+    } catch (error) {
+      // TODO
+    }
   }
 
-  function togglePauseRound () {
-    // Send a {"pause": ""} request to unpause, {"pause": "p"} to pause
-    axios.put(gameAPI(params.gameId), { pause: (gamePaused ? '' : 'p') })
-      .then(function (response) {
-        console.log(response)
-        setGamePaused(response.data === 'GAME_PAUSED')
-      })
-      .catch(function (error) {
-        console.log(error)
-      })
+  // Send a {"pause": ""} request to unpause, {"pause": "p"} to pause
+  const togglePauseRound = async () => {
+    try {
+      const response = await updateGame(params.gameId, { pause: (gamePaused ? '' : 'p') })
+      console.log(response)
+      setGamePaused(response === 'GAME_PAUSED')
+    } catch (error) {
+      // TODO
+    }
   }
-
   function togglePauseButton (color, text) {
     return <Button variant="outline"
       color={color}
