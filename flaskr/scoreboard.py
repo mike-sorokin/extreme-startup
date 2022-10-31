@@ -23,9 +23,13 @@ class Scoreboard:
             self.correct_tally[player.uuid] += 1
             player.streak = player.streak + "1"
 
-        elif increment < 0 and question.problem == "":
+        elif increment < 0:
             self.incorrect_tally[player.uuid] += 1
-            player.streak = player.streak + "0"
+
+            if question.problem == "ERROR_RESPONSE":
+                player.streak = player.streak + "0"
+            else:
+                player.streak = player.streak + "X"
 
         self.record_request_for(player)
         player.score = self.scores[player.uuid]
@@ -39,9 +43,6 @@ class Scoreboard:
         )
 
         player.log_event(event)
-
-        if question.problem != "":
-            player.streak = player.streak + "X"
 
         player.streak = player.streak[-6:]
 
