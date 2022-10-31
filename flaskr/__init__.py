@@ -9,7 +9,7 @@ from flask import (
     url_for,
     send_from_directory,
     session,
-    jsonify
+    jsonify,
 )
 from flaskr.player import Player
 from flaskr.game import Game

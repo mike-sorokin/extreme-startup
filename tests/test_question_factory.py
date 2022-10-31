@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append(".")
 
 from flaskr.question_factory import QuestionFactory, MAX_ROUND
@@ -36,10 +37,12 @@ def test_1st_round_asks_1st_2nd_question_only():
     assert first_round.window_end == 2
     assert first_round.window_start == 0
 
+
 def test_2st_round_asks_1st_to_4th_question_only():
     second_round = QuestionFactory(2)
     assert second_round.window_end == 4
     assert second_round.window_start == 0
+
 
 def test_n_plus_first_round_shifts_nth_round_window_by_two():
     n = random.randint(2, MAX_ROUND - 1)

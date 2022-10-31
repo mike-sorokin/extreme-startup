@@ -23,14 +23,14 @@ class QuizMaster:
         while self.player.active:
             self.administer_question()
 
-    # Administer question involving: 
-    # (1) acquiring r_lock, 
-    # (2) send question to user HTTP get, 
+    # Administer question involving:
+    # (1) acquiring r_lock,
+    # (2) send question to user HTTP get,
     # (3) adjust scoreboard/rate_controller based on response
     def administer_question(self):
         question = self.question_factory.next_question()
 
-        self.rlock.acquire()   # If wlock acquired (paused), sleep here until wlock released. Many rlock acquires possible for players
+        self.rlock.acquire()  # If wlock acquired (paused), sleep here until wlock released. Many rlock acquires possible for players
         question.ask(self.player)
         if self.rlock.locked():
             self.rlock.release()

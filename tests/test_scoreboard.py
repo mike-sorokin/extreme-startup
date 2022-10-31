@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append(".")
 
 from flaskr.scoreboard import Scoreboard
@@ -7,9 +8,11 @@ import pytest
 
 PROBLEM_DECREMENT = 50
 
+
 @pytest.fixture()
-def game_setup(): # (scoreboard, player, question)
+def game_setup():  # (scoreboard, player, question)
     return (Scoreboard(), MagicMock())
+
 
 @pytest.fixture()
 def game_with_player_setup():
@@ -17,12 +20,14 @@ def game_with_player_setup():
     sb.new_player(player)
     return (sb, player)
 
+
 @pytest.fixture()
 def full_game_setup():
-    sb, player, question= Scoreboard(), MagicMock(), Mock()
+    sb, player, question = Scoreboard(), MagicMock(), Mock()
     sb.new_player(player)
     yield (sb, player, question)
     del sb
+
 
 def test_scoreboard_can_add_new_player(game_setup):
     scoreboard, player = game_setup
@@ -41,6 +46,7 @@ def test_scoreboard_can_add_new_player(game_setup):
     assert scoreboard.correct_tally[player.uuid] == 0
     assert scoreboard.incorrect_tally[player.uuid] == 0
 
+
 def test_scoreboard_can_delete_player(game_with_player_setup):
     scoreboard, player = game_with_player_setup
     scoreboard.delete_player(player)
@@ -50,6 +56,7 @@ def test_scoreboard_can_delete_player(game_with_player_setup):
     assert len(scoreboard.request_counts) == 0
     assert len(scoreboard.correct_tally) == 0
     assert len(scoreboard.incorrect_tally) == 0
+
 
 def test_scoreboard_can_have_multiple_players(game_setup):
     scoreboard, _ = game_setup
@@ -63,6 +70,7 @@ def test_scoreboard_can_have_multiple_players(game_setup):
     assert len(scoreboard.correct_tally) == num_players
     assert len(scoreboard.incorrect_tally) == num_players
 
+
 def test_can_increment_score_for_player_with_correct_result(full_game_setup):
     scoreboard, player, question = full_game_setup
     points = 10
@@ -73,6 +81,7 @@ def test_can_increment_score_for_player_with_correct_result(full_game_setup):
     assert scoreboard.correct_tally[player.uuid] == 1
     player.log_event.assert_called_once()
 
+
 def test_can_decrement_score_for_player_with_incorrect_result(full_game_setup):
     scoreboard, player, question = full_game_setup
     points = 10
@@ -82,6 +91,7 @@ def test_can_decrement_score_for_player_with_incorrect_result(full_game_setup):
     assert scoreboard.scores[player.uuid] == -1 * points
     assert scoreboard.incorrect_tally[player.uuid] == 1
     player.log_event.assert_called_once()
+
 
 def test_decrements_score_for_question_with_error_response(full_game_setup):
     scoreboard, player, question = full_game_setup
@@ -116,6 +126,7 @@ def test_leaderboard_orders_players_by_decreasing_socre(full_game_setup):
 
     assert scoreboard.leaderboard_position(player2) == 1
     assert scoreboard.leaderboard_position(player1) == 2
+
 
 def test_scoreboard_penalises_higher_ranking_players_more(full_game_setup):
     scoreboard, better_player, question = full_game_setup

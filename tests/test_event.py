@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append(".")
 
 from flaskr.event import Event
@@ -10,9 +11,12 @@ DIFFICULTY = 0
 POINTS_GAINED = 10
 RESPONSE_TYPE = "response_type"
 
+
 def test_event_string_representation_is_correct():
     event = Event(PLAYER_ID, GAME_ID, QUERY, DIFFICULTY, POINTS_GAINED, RESPONSE_TYPE)
-    assert event.__str__() == f"""
+    assert (
+        event.__str__()
+        == f"""
         Player: {PLAYER_ID},
         Game: {GAME_ID},
         Query: {QUERY},
@@ -20,3 +24,4 @@ def test_event_string_representation_is_correct():
         Points: {POINTS_GAINED}
         Timestamp: {event.timestamp}
         """
+    )
