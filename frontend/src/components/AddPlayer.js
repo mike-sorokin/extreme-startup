@@ -41,7 +41,7 @@ function AddPlayer () {
         showSuccessNotification('Successfully Joined as Moderator!')
         navigate(adminUrl(gameId))
       } else {
-        showFailureNotification('Error Creating Moderator', 'Game password incorrect!')
+        showFailureNotification('Error creating moderator', 'Game password incorrect!')
       }
     } catch (error) {
       // TODO

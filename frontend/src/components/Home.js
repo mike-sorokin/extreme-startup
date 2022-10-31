@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button, Modal, Card, Stack, Title } from '@mantine/core'
+import { Button, Modal, Card, Stack, Space, Title, PasswordInput } from '@mantine/core'
 
 import { createNewGame } from '../utils/requests'
 import { showSuccessNotification } from '../utils/utils'
@@ -8,16 +8,20 @@ import AddPlayer from './AddPlayer'
 import GoToGame from './GoToGame'
 
 function Home () {
+  const [openedChoosePwd, setOpenedChoosePwd] = useState(false)
   const [openedCreateGame, setOpenedCreateGame] = useState(false)
   const [openedAddPlayer, setOpenedAddPlayer] = useState(false)
   const [newGameId, setNewGameId] = useState('')
+  const [pwd, setPwd] = useState('')
 
   // Creates a new game
-  const handleCreateGame = async () => {
+  const handleCreateGame = async (event) => {
+    event.preventDefault()
+    setOpenedChoosePwd(false)
     setOpenedCreateGame(true)
 
     try {
-      const response = await createNewGame({ password: 'password123' })
+      const response = await createNewGame({ password: pwd })
       showSuccessNotification('Successfully Created Game!')
       setNewGameId(response.id)
     } catch (error) {
@@ -27,6 +31,20 @@ function Home () {
 
   return (
 <div className="Home">
+      <Modal centered
+        opened={openedChoosePwd}
+        onClose={() => setOpenedChoosePwd(false)}
+        title="Choose a password"
+        withCloseButton={false}>
+        <div>
+          <form onSubmit={handleCreateGame}>
+            <PasswordInput value={pwd} onChange={(e) => setPwd(e.target.value)}
+              placeholder="Game password" label="Enter game password:" required />
+              <Space h="md"></Space>
+            <Button variant="outline" color="green" type="submit">Create Game!</Button>
+          </form>
+        </div>
+      </Modal>
       <Modal centered
         opened={openedCreateGame}
         onClose={() => setOpenedCreateGame(false)}
@@ -51,7 +69,7 @@ function Home () {
         }}>
         <Stack align="center" spacing="xl">
           <Title order={1} color="white" weight={1000}>🔥 Extreme Startup 🔥</Title>
-          <Button variant="outline" color="green" radius="md" size="lg" onClick={handleCreateGame}>Create a Game!</Button>
+          <Button variant="outline" color="green" radius="md" size="lg" onClick={() => setOpenedChoosePwd(true) }>Create a Game!</Button>
           <Button variant="outline" color="orange" radius="md" size="lg" onClick={() => { setOpenedAddPlayer(true) }}>Join a Game!</Button>
         </Stack>
       </Card>
