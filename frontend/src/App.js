@@ -15,7 +15,7 @@ function App () {
   return (
 
     <MantineProvider theme={{ colorScheme: 'dark' }} withGlobalStyles withNormalizeCSS>
-      <NotificationsProvider position='top-right'>
+      <NotificationsProvider position='top-right' limit={1}>
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />
