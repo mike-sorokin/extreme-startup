@@ -137,6 +137,24 @@ export async function deleteGame (gameId) {
   }
 }
 
+// Requests to "/api/(game_id)/scores"
+
+/**
+ * Fetches all scores in a given game
+ * @async
+ * @param  {string} gameId
+ * @return {Promise<Array<obj(time:timestamp, player1: player1score, ..., playerN: playerNscores)>>}
+ * List of all score records corresponding to a timestamp
+ */
+export async function fetchScores (gameId) {
+  try {
+    const response = await instance.get(scoresAPI(gameId))
+    return rsponse.data
+  } catch (error) {
+    alertError(error)
+  }
+}
+
 // Requests to "/api/(game_id)/players"
 
 /**

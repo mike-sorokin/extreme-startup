@@ -37,6 +37,11 @@ export function gameAPI (gameId) {
 }
 
 // Management of all players in a game
+export function scoresAPI (gameId) {
+  return `${API_PREFIX}/${gameId}/scores`
+}
+
+// Management of all players in a game
 export function playersAPI (gameId) {
   return `${API_PREFIX}/${gameId}/players`
 }
