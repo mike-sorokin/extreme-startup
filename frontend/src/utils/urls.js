@@ -36,6 +36,11 @@ export function gameAPI (gameId) {
   return `${API_PREFIX}/${gameId}`
 }
 
+// Management of authentication in a game
+export function authAPI (gameId) {
+  return `${API_PREFIX}/${gameId}/auth`
+}
+
 // Management of all players in a game
 export function scoresAPI (gameId) {
   return `${API_PREFIX}/${gameId}/scores`
