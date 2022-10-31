@@ -69,6 +69,7 @@ class Scoreboard:
         self.scores[player.uuid] = 0 
         self.incorrect_tally[player.uuid] = 0
         self.correct_tally[player.uuid] = 0
+        player.score = 0 
         # NO request_count reset 
 
     def current_total_correct(self, player):
