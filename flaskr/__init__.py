@@ -176,6 +176,15 @@ def create_app():
             del games[game_id]
             return {"deleted": game_id}
 
+    @app.route("/api/<game_id>/scores", methods=["GET"])
+    def game_scores(game_id):
+        if request.method != "GET":
+            return NOT_ACCEPTABLE
+
+        r = make_response(encoder.encode(games[game_id].get_scores()))
+        r.mimetype = "application/json"
+        return r
+
     # Managing all players
     @app.route("/api/<game_id>/players", methods=["GET", "POST", "DELETE"])
     def all_players(game_id):
