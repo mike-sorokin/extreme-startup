@@ -30,6 +30,7 @@ class QuizMaster:
     def administer_question(self, e):
         if e.is_set():
             self.reset_scoreboard_and_rc() 
+            e.clear()
 
         question = self.question_factory.next_question()
 
@@ -47,7 +48,7 @@ class QuizMaster:
         )
 
     def reset_scoreboard_and_rc(self):
-        self.scoreboard.reset(self.player)
+        self.scoreboard.reset_player(self.player)
         self.rate_controller.reset()
     
     def player_passed(self):

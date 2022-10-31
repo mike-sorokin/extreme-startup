@@ -65,12 +65,12 @@ class Scoreboard:
     def current_score(self, player):
         return self.scores[player.uuid]
     
-    def reset(self, player):
+    def reset_player(self, player):
         self.scores[player.uuid] = 0 
         self.incorrect_tally[player.uuid] = 0
         self.correct_tally[player.uuid] = 0
         player.score = 0 
-        # NO request_count reset 
+        # NO request_count reset   
 
     def current_total_correct(self, player):
         return self.correct_tally[player.uuid]
