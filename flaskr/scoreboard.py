@@ -1,6 +1,7 @@
 from flaskr.event import Event
 
 PROBLEM_DECREMENT = 50
+STREAK_LENGTH = 30
 
 # Track player's score in a particular game. Scores players based on question type, positioning on scoreboard, and leniency mode.
 class Scoreboard:
@@ -44,7 +45,7 @@ class Scoreboard:
 
         player.log_event(event)
 
-        player.streak = player.streak[-6:]
+        player.streak = player.streak[-STREAK_LENGTH:]
 
     def record_request_for(self, player):
         self.request_counts[player.uuid] += 1

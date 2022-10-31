@@ -86,11 +86,10 @@ def create_app():
             password = request.get_json()["password"]
             new_game = Game(password)
             gid = new_game.id
-
-            spawn_game_monitor(new_game)
-
             scoreboards[gid] = Scoreboard()
             games[gid] = new_game
+            
+            spawn_game_monitor(new_game)
             add_session_admin(gid, session)
             return encoder.encode(new_game)
 
@@ -149,8 +148,7 @@ def create_app():
                 games[game_id].round += 1 # for event logging
 
                 # wake up all sleeping threads in game if going from WARMUP -> ROUND 1 
-                if games[game_id].round == 1: 
-                    games[game_id].first_round_event.set()
+                games[game_id].first_round_event.set()
 
                 return ("ROUND_INCREMENTED", 200)
 
@@ -330,7 +328,7 @@ def create_app():
             del games[curr_gid]
     
     def spawn_game_monitor(game):
-        game_monitor_thread = threading.Thread(target=game.monitor)
+        game_monitor_thread = threading.Thread(target=game.monitor, args=[players, scoreboards[game.id]])
         game_monitor_thread.daemon = True  # for test termination
         game_monitor_thread.start()
 

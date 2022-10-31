@@ -4,6 +4,8 @@ from readerwriterlock import rwlock
 import threading
 import time
 
+ADVANCE_RATIO = 0.2 
+
 # Most fundamental object in application -- stores information of players, scoreboard, questions gen., etc.
 class Game:
     def __init__(self, admin_password, round=0):
@@ -23,9 +25,36 @@ class Game:
     def new_player(self, player_id):
         self.players.append(player_id)
     
-    # Automatation of round advancement 
-    # Aim of this monitor: (1) Identify teams that are finding current round "too easy", (2) balance catching-up after a drought of points vs.
-    # escaping with the lead. In the latter case we would want to increment round. 
-    def monitor(self):
+    # Automatation of round advancement & "Player-in-need" identification 
+    # Aim of this monitor: 
+    #   (1) Identify teams that are finding current round "too easy", 
+    #   (2) balance catching-up after a drought of points vs. escaping with the lead. 
+    # In the latter case we would want to increment round. Also in charge of informing game administrators 
+    def monitor(self, players_dict, scoreboard):
         while not self.paused:
-            time.sleep(5) 
+            advance_treshold = 0.3 
+            num_players = len(self.players)
+
+            if num_players:
+                num_advancable = 0 
+            
+                if num_players < 2:
+                    advance_treshold = 1
+                elif num_players < 5:
+                    advance_threshold *= 2
+
+                for pid in self.players: 
+                    curr_player = players_dict[pid]
+                    position, streak = scoreboard.leaderboard_position(curr_player), curr_player.streak
+                    abs_streak = len(streak) - max(streak.rfind('X'), streak.rfind('0')) - 1
+                    
+                    advancable_score = float(abs_streak) / position
+                    if advancable_score > advance_threshold:
+                        num_advancable += 1 
+
+                if float(num_advancable) / num_players > ADVANCE_RATIO:
+                    self.question_factory.advance_round()
+                    self.round += 1
+                    self.first_round_event.set()
+
+            time.sleep(5)
