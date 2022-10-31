@@ -18,7 +18,8 @@ def game_setup():  # (scoreboard, player, question)
 def game_with_player_setup():
     sb, player = Scoreboard(), MagicMock()
     sb.new_player(player)
-    return (sb, player)
+    yield (sb, player)
+    del sb, player
 
 
 @pytest.fixture()
@@ -26,7 +27,7 @@ def full_game_setup():
     sb, player, question = Scoreboard(), MagicMock(), Mock()
     sb.new_player(player)
     yield (sb, player, question)
-    del sb
+    del sb, player, question
 
 
 def test_scoreboard_can_add_new_player(game_setup):
@@ -147,4 +148,28 @@ def test_scoreboard_penalises_higher_ranking_players_more(full_game_setup):
     assert diff_for_better_player == -1 * float(points)
     assert diff_for_better_player < diff_for_worse_player
 
-# Test Delay 
+
+def test_reseting_player_sets_score_and_tally_to_zero_but_retain_request_count(
+    full_game_setup,
+):
+    scoreboard, player, question = full_game_setup
+    scoreboard.new_player(player)
+    question.result, question.problem, question.points = "CORRECT", "", 10
+
+    scoreboard.increment_score_for(player, question)
+    assert scoreboard.scores[player.uuid] == 10
+    assert scoreboard.correct_tally[player.uuid] == 1
+    assert scoreboard.incorrect_tally[player.uuid] == 0
+    assert scoreboard.request_counts[player.uuid] == 1
+    assert player.score == 10
+
+    scoreboard.reset_player(player)
+
+    assert scoreboard.correct_tally[player.uuid] == 0
+    assert scoreboard.request_counts[player.uuid] == 1
+
+    assert scoreboard.scores[player.uuid] == 0
+    assert player.score == 0
+
+
+# Test Delay
