@@ -7,7 +7,8 @@ from unittest.mock import Mock
 
 
 def test_quiz_master_sends_questions_while_player_active():
-    player, rc, question_factory, scoreboard, lock = (
+    player, rc, question_factory, scoreboard, lock, e = (
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -19,7 +20,7 @@ def test_quiz_master_sends_questions_while_player_active():
     lock.acquire.return_value = True
     lock.release.return_value = True
 
-    quiz_master.administer_question()
+    quiz_master.administer_question(e)
 
     # assertion(s)
     scoreboard.record_request_for.assert_called()

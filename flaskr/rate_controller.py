@@ -35,8 +35,8 @@ class RateController:
 
         return self.delay
 
-    def wait_for_next_request(self, question):
-        time.sleep(self.delay_before_next_request(question))
+    def wait_for_next_request(self, question, e):
+        e.wait(timeout=self.delay_before_next_request(question))
 
     def update_algorithm_based_on_score(self, score):
         return self

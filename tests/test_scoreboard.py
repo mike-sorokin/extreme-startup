@@ -146,3 +146,5 @@ def test_scoreboard_penalises_higher_ranking_players_more(full_game_setup):
     assert diff_for_worse_player == -1 * float(points) / num_players
     assert diff_for_better_player == -1 * float(points)
     assert diff_for_better_player < diff_for_worse_player
+
+# Test Delay 

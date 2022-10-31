@@ -1,6 +1,7 @@
 from uuid import uuid4
 from flaskr.question_factory import QuestionFactory
 from readerwriterlock import rwlock
+import threading
 
 # Most fundamental object in application -- stores information of players, scoreboard, questions gen., etc.
 class Game:
@@ -10,6 +11,7 @@ class Game:
         self.round = round
         self.question_factory = QuestionFactory(round)
         self.paused = False
+        self.first_round_event = threading.Event()
         pauser = rwlock.RWLockWrite()
         self.pause_rlock, self.pause_wlock = pauser.gen_rlock(), pauser.gen_wlock()
         self.admin_password = admin_password

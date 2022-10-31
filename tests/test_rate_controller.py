@@ -54,6 +54,14 @@ def test_maintains_delay_on_problem_if_current_delay_less_than_avg():
     delayed_controller.delay_before_next_request(question)
     assert delayed_controller.delay == AVG_DELAY + 5
 
+def test_resets_delay_to_default_delay():
+    warmed_up_controller = RateController(DEFAULT_DELAY - 2)
+    assert warmed_up_controller.delay != DEFAULT_DELAY
+
+    warmed_up_controller.reset()
+    
+    assert warmed_up_controller.delay == DEFAULT_DELAY 
+
 
 # TODO: Updates algorithm based on score
 # TODO: Advanced/specialised RateController(s) tests

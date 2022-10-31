@@ -145,7 +145,12 @@ def create_app():
 
             if "round" in r:  # increment <game_id>'s round by 1
                 games[game_id].question_factory.advance_round()
-                games[game_id].round += 1 # for event logging 
+                games[game_id].round += 1 # for event logging
+
+                # wake up all sleeping threads in game if going from WARMUP -> ROUND 1 
+                if games[game_id].round == 1: 
+                    games[game_id].first_round_event.set()
+
                 return ("ROUND_INCREMENTED", 200)
 
             elif "pause" in r:
@@ -205,7 +210,7 @@ def create_app():
                 games[game_id].pause_rlock,
             )
 
-            player_thread = threading.Thread(target=quiz_master.start)
+            player_thread = threading.Thread(target=quiz_master.start, args=(games[game_id].first_round_event,))
             player_threads[player.uuid] = player_thread
             player_thread.daemon = True
             player_thread.start()
