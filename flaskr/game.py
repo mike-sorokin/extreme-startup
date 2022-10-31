@@ -43,6 +43,6 @@ class Game:
 
             cummulative_datas.extend(datas)
 
-        chrono_datas = sorted(events, key=lambda d: d.["time"])
+        chrono_datas = sorted(events, key=lambda d: d["time"])
 
         return list(map(to_score_data, events))

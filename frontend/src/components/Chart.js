@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Line, LineChart, CartesianGrid, YAxis, Tooltip } from 'recharts'
+import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts'
 import { MD5 } from 'crypto-js'
 
-import { fetchAllPlayers } from '../utils/requests'
+import { fetchAllPlayers, fetchGameScores } from '../utils/requests'
 
 function Chart ({ gameId }) {
   const [players, setPlayers] = useState([])
@@ -31,6 +31,10 @@ function Chart ({ gameId }) {
     }
   }, [gameId])
 
+  const getInitialScores = async () => {
+    setScores(await fetchGameScores(gameId))
+  }
+
   // TODO use sockets instead?
   useEffect(() => {
     stringToColour('d')
@@ -40,6 +44,7 @@ function Chart ({ gameId }) {
       setPlayers(playerData)
     }
 
+    getInitialScores()
     const timer = setInterval(getScores, 2000)
 
     return () => {
@@ -56,19 +61,21 @@ function Chart ({ gameId }) {
   return (
     <div>
       <LineChart width={750} height={450} data={scores}>
-        {/* <XAxis dataKey="name" /> */}
-        <YAxis />
+        <XAxis dataKey="time" type="number" />
+        <YAxis type="number" yAxisId={1}/>
         <CartesianGrid stroke="#111" strokeDasharray="5 5" />
 
         {players.map((playerDataObj) => {
           // eslint-disable-next-line react/jsx-key
           return <Line
           key={playerDataObj.id}
+          connectNulls
           type="monotone"
           animationDuration={300}
           name={playerDataObj.name}
           dataKey={playerDataObj.id}
           stroke={stringToColour(playerDataObj.name)}
+          yAxisId={1}
           dot={false}/>
         })}
         <Tooltip />
