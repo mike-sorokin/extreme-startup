@@ -17,6 +17,7 @@ class QuizMaster:
         self.question_factory = question_factory
         self.scoreboard = scoreboard
         self.rlock = rlock
+        self.is_warmup = (self.question_factory.round == 0) 
 
     # Continuous loop, administering questions to self.player at a rate specified by RateController
     def start(self):
@@ -28,6 +29,10 @@ class QuizMaster:
     # (2) send question to user HTTP get,
     # (3) adjust scoreboard/rate_controller based on response
     def administer_question(self):
+        if self.is_warmup and self.question_factory.round == 1:
+            self.is_warmup = False
+            self.reset_scoreboard_and_rc() 
+
         question = self.question_factory.next_question()
 
         self.rlock.acquire()  # If wlock acquired (paused), sleep here until wlock released. Many rlock acquires possible for players
@@ -42,5 +47,9 @@ class QuizMaster:
             self.scoreboard.current_score(self.player)
         )
 
+    def reset_scoreboard_and_rc(self):
+        self.scoreboard.reset(self.player)
+        self.rate_controller.reset()
+    
     def player_passed(self):
         pass

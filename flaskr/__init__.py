@@ -145,7 +145,7 @@ def create_app():
 
             if "round" in r:  # increment <game_id>'s round by 1
                 games[game_id].question_factory.advance_round()
-                games[game_id].round += 1
+                games[game_id].round += 1 # for event logging 
                 return ("ROUND_INCREMENTED", 200)
 
             elif "pause" in r:
