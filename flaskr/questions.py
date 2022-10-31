@@ -15,8 +15,8 @@ class Question:
         self.result = ""
         self.problem = ""
 
+    # Ask player a question and store the result/problem in attribute
     def ask(self, player):
-        print(f"Asking {player} ==> {self.as_text()}")
         if isinstance(self, WarmupQuestion):
             self.player_name = player.name.strip().lower()
 
@@ -33,6 +33,7 @@ class Question:
 
         self.get_result()
 
+    # Store answer result in attribute
     def get_result(self):
         if self.answer is None:
             self.result = self.problem
@@ -43,6 +44,7 @@ class Question:
         else:
             self.result = "WRONG"
 
+    # Delay interval depending on result
     def delay_before_next(self):
         if self.result == "CORRECT":
             return 5
@@ -59,16 +61,20 @@ class Question:
     def __str__(self):
         return f"{self.uuid}: {self.as_text()}"
 
+    # abstract function to be overwritten
     def as_text(self):
         return "Basic Question Class"
 
+    # Check the player answered correctly
     def answered_correctly(self):
         return self.answer == self.correct_answer()
 
+    # abstract function to be overwritten
     def correct_answer(self):
         pass
 
 
+# A warmup question which ask players's name
 class WarmupQuestion(Question):
     def __init__(self, player_name="default_name"):
         self.player_name = player_name
@@ -81,6 +87,8 @@ class WarmupQuestion(Question):
         return "What is your name?"
 
 
+# An abstract class which involve a number, generating a random number if number
+# not provided during construction
 class UnaryyMathsQuestion(Question):
     def __init__(self, *number):
         super().__init__()
@@ -91,6 +99,8 @@ class UnaryyMathsQuestion(Question):
             self.number = random.randrange(1, 100)
 
 
+# An abstract question class which involve two numbers, generating two random number if numbers
+# not provided during construction
 class BinaryMathsQuestion(Question):
     def __init__(self, *numbers):
         super().__init__()
@@ -103,6 +113,8 @@ class BinaryMathsQuestion(Question):
             self.n2 = random.randrange(1, 100)
 
 
+# An abstract question class which involve three numbers, generating three random number if numbers
+# not provided during construction
 class TernaryMathsQuestion(Question):
     def __init__(self, *numbers):
         super().__init__()
@@ -113,6 +125,8 @@ class TernaryMathsQuestion(Question):
             self.n1, self.n2, self.n3 = random.sample(range(1, 100), 3)
 
 
+# An abstract question class which involve list of numbers, generating list of random number
+# of lenght 1 to 9 if numbers not provided during construction
 class SelectFromListOfNumbersQuestion(Question):
     def __init__(self, *numbers):
         super().__init__()
@@ -127,54 +141,60 @@ class SelectFromListOfNumbersQuestion(Question):
         return super().correct_answer()
 
 
+# Ask the maximum number from a list of numbers
 class MaximumQuestion(SelectFromListOfNumbersQuestion):
     def __init__(self, *numbers):
         super().__init__(*numbers)
         self.points = 40
 
     def as_text(self):
-        return f"which of the following numbers is the largest: {', '.join(map(str, self.numbers))}"
+        return f"Which of the following numbers is the largest: {', '.join(map(str, self.numbers))}?"
 
     def correct_answer(self):
         return max(self.numbers)
 
 
+# Ask the result of addition of 2 numbers
 class AdditionQuestion(BinaryMathsQuestion):
     def as_text(self):
-        return f"What is {self.n1} plus {self.n2}"
+        return f"What is {self.n1} plus {self.n2}?"
 
     def correct_answer(self):
         return self.n1 + self.n2
 
 
+# Ask the result of subtraction of 2 numbers
 class SubtractionQuestion(BinaryMathsQuestion):
     def as_text(self):
-        return f"What is {self.n1} minus {self.n2}"
+        return f"What is {self.n1} minus {self.n2}?"
 
     def correct_answer(self):
         return self.n1 - self.n2
 
 
+# Ask the result of multiplication of 2 numbers
 class MultiplicationQuestion(BinaryMathsQuestion):
     def as_text(self):
-        return f"What is {self.n1} multiplied by {self.n2}"
+        return f"What is {self.n1} multiplied by {self.n2}?"
 
     def correct_answer(self):
         return self.n1 * self.n2
 
 
+# Ask the result of addition of 3 numbers
 class AdditionAdditionQuestion(TernaryMathsQuestion):
     def __init__(self, *numbers):
         super().__init__(*numbers)
         self.points = 30
 
     def as_text(self):
-        return f"What is {self.n1} plus {self.n2} plus {self.n3}"
+        return f"What is {self.n1} plus {self.n2} plus {self.n3}?"
 
     def correct_answer(self):
         return self.n1 + self.n2 + self.n3
 
 
+# Ask the result of addition followed by multiplication
 class AdditionMultiplicationQuestion(TernaryMathsQuestion):
     def __init__(self, *numbers):
         super().__init__(*numbers)
@@ -187,37 +207,40 @@ class AdditionMultiplicationQuestion(TernaryMathsQuestion):
         return self.n1 + self.n2 * self.n3
 
 
+# Ask the result of multiplication followed by addition
 class MultiplicationAdditionQuestion(TernaryMathsQuestion):
     def __init__(self, *numbers):
         super().__init__(*numbers)
         self.points = 50
 
     def as_text(self):
-        return f"What is {self.n1} multiplied by {self.n2} plus {self.n3}"
+        return f"What is {self.n1} multiplied by {self.n2} plus {self.n3}?"
 
     def correct_answer(self):
         return self.n1 * self.n2 + self.n3
 
 
+# Ask the result of multiplication followed by addition
 class PowerQuestion(BinaryMathsQuestion):
     def __init__(self, *numbers):
         super().__init__(*numbers)
         self.points = 50
 
     def as_text(self):
-        return f"What is {self.n1} to the power of {self.n2}"
+        return f"What is {self.n1} to the power of {self.n2}?"
 
     def correct_answer(self):
         return self.n1**self.n2
 
 
+# Ask which number from list if numbers is a square number and a cube number
 class SquareCubeQuestion(SelectFromListOfNumbersQuestion):
     def __init__(self, *numbers):
         super().__init__(*numbers)
         self.points = 50
 
     def as_text(self):
-        return f"which of the following numbers is both a square and a cube: {', '.join(map(str, self.numbers))}"
+        return f"Which of the following numbers is both a square and a cube: {', '.join(map(str, self.numbers))}?"
 
     def correct_answer(self):
         is_square_cube = (
@@ -226,13 +249,14 @@ class SquareCubeQuestion(SelectFromListOfNumbersQuestion):
         return ", ".join(map(str, filter(is_square_cube, self.numbers)))
 
 
+# Ask which number from list if numbers is a prime number
 class PrimesQuestion(SelectFromListOfNumbersQuestion):
     def __init__(self, *numbers):
         super().__init__(*numbers)
         self.points = 60
 
     def as_text(self):
-        return f"which of the following numbers are primes: {', '.join(map(str, self.numbers))}"
+        return f"Which of the following numbers are primes: {', '.join(map(str, self.numbers))}?"
 
     def correct_answer(self):
         is_prime = (
@@ -241,6 +265,7 @@ class PrimesQuestion(SelectFromListOfNumbersQuestion):
         return ", ".join(map(str, filter(is_prime, self.numbers)))
 
 
+# Ask the n-th Fibonacci number
 class FibonacciQuestion(UnaryyMathsQuestion):
     def __init__(self, *numbers):
         super().__init__(*numbers)
@@ -264,7 +289,7 @@ class FibonacciQuestion(UnaryyMathsQuestion):
             return "th"
 
     def as_text(self):
-        return f"what is the {str(self.number) + self.ordinal(11)} number in the Fibonacci sequence"
+        return f"What is the {str(self.number) + self.ordinal(11)} number in the Fibonacci sequence?"
 
     def fib(n):
         a, b = 0, 1
@@ -277,6 +302,7 @@ class FibonacciQuestion(UnaryyMathsQuestion):
         return FibonacciQuestion.fib(self.number)
 
 
+# Ask a general knowledge questions from a file
 class GeneralKnowledgeQuestion(Question):
     def __init__(self, question="", answer=""):
         super().__init__
@@ -298,6 +324,7 @@ class GeneralKnowledgeQuestion(Question):
         return self.answer
 
 
+# Ask the anagram of a word given a list of correct and incorrect anagram
 class AnagramQuestion(Question):
     def __init__(self, anagram="", correct="", incorrect=[]):
         super().__init__
@@ -313,12 +340,13 @@ class AnagramQuestion(Question):
 
     def as_text(self):
         possible_words = [self.correct] + self.incorrect
-        return f"which of the following is an anagram of {anagram}: {', '.join(random.shuffle(possible_words))}"
+        return f"Which of the following is an anagram of {anagram}: {', '.join(random.shuffle(possible_words))}?"
 
     def correct_answer(self):
         return self.correct
 
 
+# Ask the scrabble score of a word
 class ScrabbleQuestion(Question):
     SCRABBLE_SCORES = {
         "a": 1,
@@ -360,7 +388,7 @@ class ScrabbleQuestion(Question):
             self.word = word.lower()
 
     def as_text(self):
-        return f"what is the scrabble score of {self.word}"
+        return f"What is the scrabble score of {self.word}?"
 
     def score(word):
         score = 0
@@ -373,6 +401,7 @@ class ScrabbleQuestion(Question):
         return ScrabbleQuestion.score(self.word)
 
 
+# utilities function to check constructor argument is valid and have the correct lenght
 def valid_num_arguments(arg_num, numbers):
     return len(list(numbers)) == arg_num and all(
         isinstance(num, int) for num in numbers

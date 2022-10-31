@@ -4,9 +4,11 @@ sys.path.append(".")
 from flaskr.game import Game
 import pytest
 
+PASSWORD = "dummy_password"
+
 @pytest.fixture()
 def basic_game():
-    return Game()
+    return Game(PASSWORD)
 
 def test_game_initialises_with_no_players(basic_game):
     assert len(basic_game.players) == 0

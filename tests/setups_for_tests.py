@@ -4,7 +4,7 @@ import sys
 
 sys.path.append(".")
 
-from flaskr import app
+from flaskr import create_app
 
 GET = 0
 POST = 1
@@ -17,6 +17,7 @@ NOT_FOUND = 404
 NOT_ACCEPTED = 406
 ERROR_405 = 405
 DELETE_SUCCESS = 204
+UNAUTHORIZED = 401
 
 
 def setup_server_with(client, server_setup):
@@ -26,8 +27,8 @@ def setup_server_with(client, server_setup):
     for (method, url, data, query_str) in server_setup:
         get_response_by_request_method = {
             GET: lambda: client.get(url, query_string=query_str),
-            POST: lambda: client.post(url, data=data, query_string=query_str),
-            PUT: lambda: client.put(url, data=data, query_string=query_str),
+            POST: lambda: client.post(url, json=data, query_string=query_str),
+            PUT: lambda: client.put(url, json=data, query_string=query_str),
             DELETE: lambda: client.delete(url, query_string=query_str),
         }
         rd = response_as_dict(get_response_by_request_method[method]())
@@ -49,6 +50,7 @@ def with_setup(server_setup=None, **callable_setup_kwargs):
     def inner(test_func):
         def wrapper():
             # Connect to our flask app.
+            app = create_app()
             app.config.update({"TESTING": True})
             client = app.test_client()
 
@@ -57,7 +59,6 @@ def with_setup(server_setup=None, **callable_setup_kwargs):
                 setup_extras = server_setup(client, **callable_setup_kwargs)
             else:
                 setup_extras = setup_server_with(client, server_setup)
-
             test_func(setup_extras, client)
 
         return wrapper
@@ -65,7 +66,9 @@ def with_setup(server_setup=None, **callable_setup_kwargs):
     return inner
 
 
-create_a_couple_of_games = ((POST, "/api/", None, None), (POST, "/api/", None, None))
+
+create_a_single_game = ((POST, "/api", {"password": "dummy_password"}, None),)
+create_a_couple_of_games = ((POST, "/api", {"password": "dummy_password"}, None),) * 2
 
 
 def create_a_game_with_players(cli, num_players=2):
