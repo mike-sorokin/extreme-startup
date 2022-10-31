@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Space, TextInput } from '@mantine/core'
+import { Button, Space, Switch, PasswordInput, TextInput } from '@mantine/core'
 
-import { createPlayer } from '../utils/requests'
-import { playerUrl } from '../utils/urls'
-import { showSuccessNotification } from '../utils/utils'
+import { createPlayer, createModerator } from '../utils/requests'
+import { adminUrl, playerUrl } from '../utils/urls'
+import { showFailureNotification, showSuccessNotification } from '../utils/utils'
 
 function AddPlayer () {
+  const [mod, setMod] = useState(false)
+  const [pwd, setPwd] = useState('')
   const [gameId, setGameId] = useState('')
   const [name, setName] = useState('')
   const [url, setUrl] = useState('')
@@ -14,7 +16,7 @@ function AddPlayer () {
   const navigate = useNavigate()
 
   // Adds a new player to the game
-  const handleSubmit = async (event) => {
+  const submitPlayer = async (event) => {
     event.preventDefault()
 
     try {
@@ -27,17 +29,53 @@ function AddPlayer () {
     }
   }
 
+  // Adds a new moderator to the game
+  const submitModerator = async (event) => {
+    event.preventDefault()
+
+    try {
+      const response = await createModerator(gameId, { password: pwd })
+      console.log(response)
+
+      if (response.valid) {
+        showSuccessNotification('Successfully Joined as Moderator!')
+        navigate(adminUrl(gameId))
+      } else {
+        showFailureNotification('Error Creating Moderator', 'Game password incorrect!')
+      }
+    } catch (error) {
+      // TODO
+    }
+  }
+
   return (
     <div>
-      <form onSubmit={handleSubmit}>
-        <TextInput value={gameId} onChange={(e) => setGameId(e.target.value)} placeholder="Game id (e.g. abcd1234)" label="Enter game id:" required />
-        <Space h="md"></Space>
-        <TextInput value={name} onChange={(e) => setName(e.target.value)} placeholder="Your player name" label="Enter player name:" required />
-        <Space h="md"></Space>
-        <TextInput value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Your URL (http://...)" label="Enter URL:" required />
-        <Space h="md"></Space>
-        <Button variant="outline" color="green" type="submit">Join!</Button>
-      </form>
+      <Switch
+        label="Join as Moderator"
+        size="md"
+        color="teal"
+        checked={mod} onChange={(e) => setMod(e.currentTarget.checked)}
+      />
+      <Space h="md"></Space>
+      {
+        mod
+          ? <form onSubmit={submitModerator}>
+          <TextInput value={gameId} onChange={(e) => setGameId(e.target.value)} placeholder="Game id (e.g. abcd1234)" label="Enter game id:" required />
+          <Space h="md"></Space>
+          <PasswordInput value={pwd} onChange={(e) => setPwd(e.target.value)} placeholder="Game password" label="Enter game password:" required />
+          <Space h="md"></Space>
+          <Button variant="outline" color="grape" type="submit">Join as Moderator!</Button>
+        </form>
+          : <form onSubmit={submitPlayer}>
+          <TextInput value={gameId} onChange={(e) => setGameId(e.target.value)} placeholder="Game id (e.g. abcd1234)" label="Enter game id:" required />
+          <Space h="md"></Space>
+          <TextInput value={name} onChange={(e) => setName(e.target.value)} placeholder="Your player name" label="Enter player name:" required />
+          <Space h="md"></Space>
+          <TextInput value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Your URL (http://...)" label="Enter URL:" required />
+          <Space h="md"></Space>
+          <Button variant="outline" color="green" type="submit">Join!</Button>
+        </form>
+      }
     </div>
   )
 }

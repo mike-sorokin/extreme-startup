@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { homeAPI, gameAPI, playersAPI, playerAPI, playerEventsAPI, eventAPI } from './urls'
+import { homeAPI, gameAPI, authAPI, playersAPI, playerAPI, playerEventsAPI, eventAPI } from './urls'
 import { alertError, showFailureNotification, playersAsArray } from './utils'
 
 const instance = axios.create({
@@ -132,6 +132,32 @@ export async function updateGame (gameId, data) {
 export async function deleteGame (gameId) {
   try {
     const response = await instance.delete(gameAPI(gameId))
+    return response.data
+  } catch (error) {
+    alertError(error)
+  }
+}
+
+/**
+ * Adds a moderator to game
+ * @async
+ * @param  {string} gameId
+ * @param  {{"password": string}} data Object containing the password string
+ * @return {Promise<{"valid": boolean}>} Boolean detailing whether password correct or not
+ */
+export async function createModerator (gameId, data) {
+  // Check gameId exists
+  try {
+    const response = await fetchGame(gameId)
+    console.log(response)
+  } catch (error) {
+    showFailureNotification('Error creating moderator', 'Game id does not exist!')
+    console.error('Invalid data submitted')
+    throw new Error('Invalid data submitted')
+  }
+
+  try {
+    const response = await instance.post(authAPI(gameId), data)
     return response.data
   } catch (error) {
     alertError(error)
