@@ -17,7 +17,7 @@ function Home () {
     setOpenedCreateGame(true)
 
     try {
-      const response = await createNewGame()
+      const response = await createNewGame({ password: 'password123' })
       showSuccessNotification('Successfully Created Game!')
       setNewGameId(response.id)
     } catch (error) {

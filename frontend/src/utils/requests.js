@@ -61,11 +61,12 @@ export async function fetchAllGames () {
 /**
  * Creates a new game and returns its game JSON object
  * @async
+ * @param  {{"password": string}} data Object containing the password string
  * @return {Promise<Game>} Game object of newly created game
  */
-export async function createNewGame () {
+export async function createNewGame (data) {
   try {
-    const response = await instance.post(homeAPI())
+    const response = await instance.post(homeAPI(), data)
     return response.data
   } catch (error) {
     alertError(error)
