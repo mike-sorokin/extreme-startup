@@ -1,5 +1,4 @@
 import sys
-from flaskr import rate_controller, scoreboard
 
 sys.path.append(".")
 

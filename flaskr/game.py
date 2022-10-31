@@ -24,7 +24,7 @@ class Game:
         self.players.append(player_id)
     
     # Automatation of round advancement 
-    # Aim of this monitoring-bot: (1) Identify teams that are finding current round "too easy", (2) balance catching-up after a drought of points vs.
+    # Aim of this monitor: (1) Identify teams that are finding current round "too easy", (2) balance catching-up after a drought of points vs.
     # escaping with the lead. In the latter case we would want to increment round. 
     def monitor(self):
         while not self.paused:
