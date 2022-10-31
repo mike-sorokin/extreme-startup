@@ -29,8 +29,8 @@ class QuizMaster:
     # (1) acquiring r_lock,
     # (2) send question to user HTTP get,
     # (3) adjust scoreboard/rate_controller based on response
-    def administer_question(self, e):
-        if self.is_warmup and e.is_set():
+    def administer_question(self, warmup_over):
+        if self.is_warmup and warmup_over.is_set():
             self.is_warmup = False
             self.reset_stats_and_rc()
 
@@ -44,7 +44,7 @@ class QuizMaster:
 
         self.scoreboard.record_request_for(self.player)
         self.scoreboard.increment_score_for(self.player, question)
-        self.rate_controller.wait_for_next_request(question, e)
+        self.rate_controller.wait_for_next_request(question, warmup_over)
         self.rate_controller = self.rate_controller.update_algorithm_based_on_score(
             self.scoreboard.current_score(self.player)
         )

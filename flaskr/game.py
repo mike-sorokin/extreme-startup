@@ -2,6 +2,7 @@ from uuid import uuid4
 from flaskr.question_factory import QuestionFactory
 from readerwriterlock import rwlock
 import threading
+import time
 
 # Most fundamental object in application -- stores information of players, scoreboard, questions gen., etc.
 class Game:
@@ -21,3 +22,10 @@ class Game:
 
     def new_player(self, player_id):
         self.players.append(player_id)
+    
+    # Automatation of round advancement 
+    # Aim of this monitoring-bot: (1) Identify teams that are finding current round "too easy", (2) balance catching-up after a drought of points vs.
+    # escaping with the lead. In the latter case we would want to increment round. 
+    def monitor(self):
+        while not self.paused:
+            time.sleep(5) 
