@@ -149,6 +149,9 @@ export async function deleteGame (gameId) {
 export async function fetchGameScores (gameId) {
   try {
     const response = await instance.get(scoresAPI(gameId))
+    response.data.forEach((pt) => {
+      pt.time = (new Date(pt.time)).getTime()
+    })
     return response.data
   } catch (error) {
     alertError(error)

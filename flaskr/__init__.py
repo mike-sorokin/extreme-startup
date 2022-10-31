@@ -9,7 +9,7 @@ from flask import (
     url_for,
     send_from_directory,
     session,
-    jsonify
+    jsonify,
 )
 from flaskr.player import Player
 from flaskr.game import Game
@@ -17,6 +17,7 @@ from flaskr.scoreboard import Scoreboard
 from flaskr.quiz_master import QuizMaster
 from flaskr.json_encoder import JSONEncoder
 from flaskr.questions import *
+from datetime import datetime
 import threading
 import secrets
 
@@ -178,10 +179,33 @@ def create_app():
 
     @app.route("/api/<game_id>/scores", methods=["GET"])
     def game_scores(game_id):
-        if request.method != "GET":
+        if game_id not in games:
             return NOT_ACCEPTABLE
 
-        r = make_response(encoder.encode(games[game_id].get_scores()))
+        player_ids = games[game_id].players
+        all_events = [e for pid in player_ids for e in players[pid].events]
+        all_events.sort(key=lambda e: e.timestamp)
+
+        # [{time: <time>, p1: s1, p2:s2.. }]
+        if not all_events:
+            return make_response(encoder.encode([]))
+        cumulative_sums = [{pid: 0 for pid in player_ids}]
+        cumulative_sums[0]["time"] = all_events[0].timestamp
+
+        current_scores = {pid: 0 for pid in player_ids}
+        for event in all_events:
+            next = {}
+            next["time"] = event.timestamp
+
+            old_score = current_scores[event.player_id]
+            new_score = old_score + event.points_gained
+
+            current_scores[event.player_id] = new_score
+            next[event.player_id] = new_score
+
+            cumulative_sums.append(next)
+
+        r = make_response(encoder.encode(cumulative_sums))
         r.mimetype = "application/json"
         return r
 
@@ -318,6 +342,30 @@ def create_app():
             res.append({"name": players[k].name, "id": k, "score": s})
 
         return encoder.encode(res)
+
+    # FORGIVE ME
+    bot_responses = {n: [f"Bot{n}", 0] for n in range(100)}
+
+    # /2/hi  style links, these update the response
+    @app.route("/api/bot/<int:bot_id>/<string:resp>", methods=["GET"])
+    def _update_response(bot_id, resp):
+        bot_responses[bot_id][0] = resp
+        bot_responses[bot_id][1] += 1
+        return redirect(url_for("_api_response", bot_id=bot_id))
+
+    # Get a response
+    @app.route("/api/bot/<int:bot_id>", methods=["GET"])
+    def _api_response(bot_id):
+        return bot_responses[bot_id][0]
+
+    @app.route("/api/bot/cleanup", methods=["GET"])
+    def _cleanup():
+        bot_responses = {}
+        return "Restored bots"
+
+    @app.route("/api/bot/", methods=["GET"])
+    def _main_view():
+        return "<br>".join(list(str(x) for x in bot_responses.values()))
 
     # Mark player as inactive, removes thread from player_threads dict
     def remove_players(*player_id):

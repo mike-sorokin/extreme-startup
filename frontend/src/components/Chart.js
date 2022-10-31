@@ -1,56 +1,39 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts'
+import React, { useState, useEffect } from 'react'
+import { Line, LineChart, CartesianGrid, XAxis, YAxis, Legend } from 'recharts'
 import { MD5 } from 'crypto-js'
 
 import { fetchAllPlayers, fetchGameScores } from '../utils/requests'
 
 function Chart ({ gameId }) {
-  const [players, setPlayers] = useState([])
-  const [scores, setScores] = useState([])
+  const [chartData, setChartData] = useState([])
+  const [playerIds, setPlayerIds] = useState([])
 
-  // Gets list of players objects and returns list of players
-  // and an object with key-value pairs, where the keys are all the player id's
-  // and the values are the player's scores
-  const fetchScores = useCallback(async () => {
-    try {
-      const response = await fetchAllPlayers(gameId)
-      const scoreData = {}
-      const playerData = []
-      response.forEach(player => {
-        scoreData[player.id] = player.score
-        const playerDataObj = {
-          id: player.id,
-          name: player.name
-        }
-        playerData.push(playerDataObj)
-      })
-
-      return [playerData, scoreData]
-    } catch (err) {
-      // TODO
-    }
-  }, [gameId])
-
-  const getInitialScores = async () => {
-    setScores(await fetchGameScores(gameId))
-  }
-
-  // TODO use sockets instead?
+  // Update chartData to up-to-date scorelist by refetching it from Flask backend
+  // Also refetch the entire player list, just in case
   useEffect(() => {
-    stringToColour('d')
-    const getScores = async () => {
-      const [playerData, scoreData] = await fetchScores()
-      setScores(s => [...s, scoreData])
-      setPlayers(playerData)
+    const getChartData = async () => {
+      try {
+        const pResponse = await fetchAllPlayers(gameId)
+        setPlayerIds(pResponse.map((p) => ({ id: p.id, name: p.name })))
+
+        const response = await fetchGameScores(gameId)
+        const startTime = response[0].time
+
+        response.forEach((pt) => {
+          pt.time -= startTime
+        })
+        setChartData(response)
+      } catch (error) {
+        console.log(error)
+      }
     }
 
-    getInitialScores()
-    const timer = setInterval(getScores, 2000)
-
+    getChartData()
+    const timer = setInterval(getChartData, 2000)
     return () => {
       clearInterval(timer)
     }
-  }, [fetchScores])
+  }, [])
 
   const stringToColour = (str) => {
     const colour = '#'
@@ -60,25 +43,24 @@ function Chart ({ gameId }) {
 
   return (
     <div>
-      <LineChart width={750} height={450} data={scores}>
-        <XAxis dataKey="time" type="number" />
+      <LineChart width={750} height={450} data={chartData}>
+        <XAxis dataKey="time" type="number"/>
         <YAxis type="number" yAxisId={1}/>
         <CartesianGrid stroke="#111" strokeDasharray="5 5" />
 
-        {players.map((playerDataObj) => {
-          // eslint-disable-next-line react/jsx-key
+        {playerIds.map((p) => {
           return <Line
-          key={playerDataObj.id}
+          key={p.id}
           connectNulls
           type="monotone"
           animationDuration={300}
-          name={playerDataObj.name}
-          dataKey={playerDataObj.id}
-          stroke={stringToColour(playerDataObj.name)}
+          name={p.name}
+          dataKey={p.id}
+          stroke={stringToColour(p.name)}
           yAxisId={1}
           dot={false}/>
         })}
-        <Tooltip />
+        <Legend/>
       </LineChart>
     </div>
   )
