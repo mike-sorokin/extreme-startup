@@ -30,7 +30,7 @@ function Home () {
   }
 
   return (
-<div className="Home">
+    <div className="Home">
       <Modal centered
         opened={openedChoosePwd}
         onClose={() => setOpenedChoosePwd(false)}
