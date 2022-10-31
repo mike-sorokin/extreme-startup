@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { homeAPI, gameAPI, playersAPI, playerAPI, playerEventsAPI, eventAPI } from './urls'
+import { homeAPI, gameAPI, playersAPI, playerAPI, playerEventsAPI, eventAPI, scoresAPI } from './urls'
 import { alertError, showFailureNotification, playersAsArray } from './utils'
 
 const instance = axios.create({
@@ -131,6 +131,27 @@ export async function updateGame (gameId, data) {
 export async function deleteGame (gameId) {
   try {
     const response = await instance.delete(gameAPI(gameId))
+    return response.data
+  } catch (error) {
+    alertError(error)
+  }
+}
+
+// Requests to "/api/(game_id)/scores"
+
+/**
+ * Fetches all scores in a given game
+ * @async
+ * @param  {string} gameId
+ * @return {Promise<Array<obj(time:timestamp, player1: player1score, ..., playerN: playerNscores)>>}
+ * List of all score records corresponding to a timestamp
+ */
+export async function fetchGameScores (gameId) {
+  try {
+    const response = await instance.get(scoresAPI(gameId))
+    response.data.forEach((pt) => {
+      pt.time = (new Date(pt.time)).getTime()
+    })
     return response.data
   } catch (error) {
     alertError(error)
