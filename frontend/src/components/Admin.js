@@ -111,23 +111,6 @@ function Admin () {
               : togglePauseButton('yellow', 'Pause')
             }
         </div>
-        {/* <div style={roundsBarStyle}>
-          <div>
-            <h3>Current Round</h3>
-          </div>
-          <Button variant="outline"
-            color="indigo"
-            radius="md"
-            size="md"
-            onClick={() => advanceRound()}>
-            Advance Round
-          </Button>
-          { gamePaused
-            ? togglePauseButton('green', 'Resume')
-            : togglePauseButton('yellow', 'Pause')
-          }
-        </div>
-        {<h4 style={{ color: 'grey' }}>{gamePaused ? 'PAUSED' : (round > 0 ? round : 'WARMUP')}</h4>} */}
       </Card>
     </Container>
   )
