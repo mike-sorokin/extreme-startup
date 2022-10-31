@@ -50,7 +50,10 @@
   },
   "proxy": "http://localhost:5000",
   "devDependencies": {
+    "@babel/core": "^7.19.6",
     "@babel/eslint-parser": "^7.5.4",
+    "@babel/preset-env": "^7.19.4",
+    "babel-jest": "^29.2.2",
     "eslint": "^8.26.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
