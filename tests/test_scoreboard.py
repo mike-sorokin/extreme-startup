@@ -1,3 +1,6 @@
+import sys
+sys.path.append(".")
+
 from flaskr.scoreboard import Scoreboard
 from unittest.mock import Mock, MagicMock
 import pytest
