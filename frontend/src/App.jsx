@@ -11,9 +11,9 @@ import Leaderboard from './components/Leaderboard'
 
 import './App.css'
 
-function App () {
-  return (
+function App() {
 
+  return (
     <MantineProvider theme={{ colorScheme: 'dark' }} withGlobalStyles withNormalizeCSS>
       <NotificationsProvider position='top-right' limit={1}>
         <Router>
@@ -29,7 +29,6 @@ function App () {
         </Router>
       </NotificationsProvider>
     </MantineProvider>
-
   )
 }
 
