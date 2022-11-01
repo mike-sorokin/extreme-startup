@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { homeAPI, gameAPI, playersAPI, playerAPI, playerEventsAPI, eventAPI } from './urls'
+import { homeAPI, gameAPI, authAPI, playersAPI, playerAPI, playerEventsAPI, eventAPI, scoresAPI } from './urls'
 import { alertError, showFailureNotification, playersAsArray } from './utils'
 
 const instance = axios.create({
@@ -61,11 +61,12 @@ export async function fetchAllGames () {
 /**
  * Creates a new game and returns its game JSON object
  * @async
+ * @param  {{"password": string}} data Object containing the password string
  * @return {Promise<Game>} Game object of newly created game
  */
-export async function createNewGame () {
+export async function createNewGame (data) {
   try {
-    const response = await instance.post(homeAPI())
+    const response = await instance.post(homeAPI(), data)
     return response.data
   } catch (error) {
     alertError(error)
@@ -131,6 +132,53 @@ export async function updateGame (gameId, data) {
 export async function deleteGame (gameId) {
   try {
     const response = await instance.delete(gameAPI(gameId))
+    return response.data
+  } catch (error) {
+    alertError(error)
+  }
+}
+
+/**
+ * Adds a moderator to game
+ * @async
+ * @param  {string} gameId
+ * @param  {{"password": string}} data Object containing the password string
+ * @return {Promise<{"valid": boolean}>} Boolean detailing whether password correct or not
+ */
+export async function createModerator (gameId, data) {
+  // Check gameId exists
+  try {
+    const response = await fetchGame(gameId)
+    console.log(response)
+  } catch (error) {
+    showFailureNotification('Error creating moderator', 'Game id does not exist!')
+    console.error('Invalid data submitted')
+    throw new Error('Invalid data submitted')
+  }
+
+  try {
+    const response = await instance.post(authAPI(gameId), data)
+    return response.data
+  } catch (error) {
+    alertError(error)
+  }
+}
+
+// Requests to "/api/(game_id)/scores"
+
+/**
+ * Fetches all scores in a given game
+ * @async
+ * @param  {string} gameId
+ * @return {Promise<Array<obj(time:timestamp, player1: player1score, ..., playerN: playerNscores)>>}
+ * List of all score records corresponding to a timestamp
+ */
+export async function fetchGameScores (gameId) {
+  try {
+    const response = await instance.get(scoresAPI(gameId))
+    response.data.forEach((pt) => {
+      pt.time = (new Date(pt.time)).getTime()
+    })
     return response.data
   } catch (error) {
     alertError(error)

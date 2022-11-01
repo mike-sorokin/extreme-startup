@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append(".")
 
 from flaskr.questions import *
@@ -78,7 +79,9 @@ def test_select_numbers_question_random(q):
 
 def test_fibonacci_question():
     fib_question = FibonacciQuestion(11)
-    assert fib_question.as_text() == "What is the 11th number in the Fibonacci sequence?"
+    assert (
+        fib_question.as_text() == "What is the 11th number in the Fibonacci sequence?"
+    )
     assert fib_question.points == 50
     assert fib_question.correct_answer() == 89
 
@@ -168,7 +171,8 @@ def test_square_cube_question_no_ans():
 def test_prime_question():
     prime_question = PrimesQuestion(2, 4, 9)
     assert (
-        prime_question.as_text() == "Which of the following numbers are primes: 2, 4, 9?"
+        prime_question.as_text()
+        == "Which of the following numbers are primes: 2, 4, 9?"
     )
     assert prime_question.points == 60
     assert prime_question.correct_answer() == "2"

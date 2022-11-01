@@ -1,3 +1,7 @@
+import sys
+
+sys.path.append(".")
+
 from flaskr.quiz_master import QuizMaster
 from unittest.mock import Mock
 

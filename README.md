@@ -19,6 +19,7 @@ Run this if you don't want to install Docker (for whatever reason).
 cd frontend
 npm ci
 npm run build
+mv dist ../flaskr/vite
 
 # Launch flask server
 cd ..
@@ -42,9 +43,9 @@ flask --app flaskr --debug run
 ##### Terminal 2
 WARNING: If you use WSL, make sure the project is in the Linux file directory, not the Windows one. Otherwise it doesn't live update for some reason.
 
-This launches the React app on **localhost:3000**, which lets you see the UI updates as soon as you edit the source. Its interactions with the API on port 5000 should work.
+This launches the React app on **localhost:5173**, which lets you see the UI updates as soon as you edit the source. Its interactions with the API on port 5000 should work.
 ```
 cd frontend
-npm ci
-npm start
+npm ci  // Note - this needs to be ran only when new packages are added
+npm run dev
 ```

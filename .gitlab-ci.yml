@@ -4,18 +4,13 @@ stages:
 - kill
 - deploy
 
-testing:
-  stage: test
-  script:
-    - echo testing
-
 .preamble: &preamble
   - python3 -m venv venv
   - source venv/bin/activate
   - pip install -r test/requirements.txt
   - pip install -r flaskr/requirements.txt
 
-sanity-test:
+hello-world-test:
   stage: test
   script:
     - *preamble
@@ -41,6 +36,59 @@ flaskr-test:
     - *preamble
     - pytest tests/test_flaskr.py
 
+event-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_event.py
+
+game-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_game.py
+
+player-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_player.py
+
+question-factory-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_question_factory.py
+
+question-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_question.py
+
+questions-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_questions.py
+
+quiz-master-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_quiz_master.py
+
+rate-controller-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_rate_controller.py
+
+scoreboard-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_scoreboard.py
 
 
 # The following are done only on master branch.
