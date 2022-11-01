@@ -4,6 +4,7 @@ import { homeAPI, gameAPI, authAPI, playersAPI, playerAPI, playerEventsAPI, even
 import { alertError, showFailureNotification, playersAsArray } from './utils'
 
 const instance = axios.create({
+  baseURL: 'http://localhost:5000',
   headers: { 'Content-Type': 'application/json' }
 })
 
