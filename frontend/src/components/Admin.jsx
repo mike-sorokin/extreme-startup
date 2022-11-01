@@ -5,8 +5,6 @@ import { useClipboard } from '@mantine/hooks'
 
 import { fetchGame, updateGame } from '../utils/requests'
 
-import '../styles/Admin.css'
-
 function Admin () {
   const [playerNo, setPlayerNo] = useState(0)
   const [round, setRound] = useState(0)
@@ -99,17 +97,17 @@ function Admin () {
         <div style={{ display: 'inline-flex', flexDirection: 'row' }}>
           {gamePaused ? roundBadge('yellow', 'PAUSED') : (round > 0 ? roundBadge('lime', 'Round ' + String(round)) : roundBadge('cyan', 'WARMUP'))}
           <Button compact variant="outline"
-              style={{ marginLeft: '10%' }}
-              color="indigo"
-              radius="md"
-              size="md"
-              onClick={() => advanceRound()}>
-              Advance Round
-            </Button>
-            { gamePaused
-              ? togglePauseButton('green', 'Resume')
-              : togglePauseButton('yellow', 'Pause')
-            }
+            style={{ marginLeft: '10%' }}
+            color="indigo"
+            radius="md"
+            size="md"
+            onClick={() => advanceRound()}>
+            Advance Round
+          </Button>
+          {gamePaused
+            ? togglePauseButton('green', 'Resume')
+            : togglePauseButton('yellow', 'Pause')
+          }
         </div>
         {/* <div style={roundsBarStyle}>
           <div>
