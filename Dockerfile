@@ -12,8 +12,7 @@ FROM python:3
 COPY ./flaskr ./flaskr
 
 # Copy pre-compiled node stuff
-COPY --from=node-build ./flaskr/static ./flaskr/static
-COPY --from=node-build ./flaskr/templates ./flaskr/templates
+COPY --from=node-build ./frontend/dist ./flaskr/vite
 
 # Install reqs
 RUN pip install --upgrade pip
