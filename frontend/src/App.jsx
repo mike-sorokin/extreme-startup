@@ -1,6 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { MantineProvider } from '@mantine/core'
-import { NotificationsProvider } from '@mantine/notifications'
 import { React } from 'react'
 import Home from './components/Home'
 import Game from './components/Game'
@@ -11,21 +9,17 @@ import Leaderboard from './components/Leaderboard'
 
 function App () {
   return (
-    <MantineProvider theme={{ colorScheme: 'dark' }} withGlobalStyles withNormalizeCSS>
-      <NotificationsProvider position='top-right' limit={1}>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/:gameId" element={<Game />} >
-              <Route path="players" element={<Players />} />
-              <Route path="players/:id" element={<Player />} />
-              <Route path="admin" element={<Admin />} />
-              <Route index element={<Leaderboard />} />
-            </Route>
-          </Routes>
-        </Router>
-      </NotificationsProvider>
-    </MantineProvider>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/:gameId" element={<Game />} >
+          <Route path="players" element={<Players />} />
+          <Route path="players/:id" element={<Player />} />
+          <Route path="admin" element={<Admin />} />
+          <Route index element={<Leaderboard />} />
+        </Route>
+      </Routes>
+    </Router>
   )
 }
 
