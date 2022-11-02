@@ -73,7 +73,7 @@ create_a_couple_of_games = ((POST, "/api", {"password": "dummy_password"}, None)
 def create_a_game_with_players(cli, num_players=2):
     game = create_game(cli)
     gid = game["id"]
-
+    
     players = {}
     for _ in range(num_players):
         curr_player = create_player(cli, gid)

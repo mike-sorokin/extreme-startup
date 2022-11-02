@@ -33,7 +33,7 @@ function Leaderboard () {
   function createBadge (ch) {
     if (ch === '1') {
       return <ColorSwatch color="green"/>
-    } else if (ch === '0') {
+    } else if (ch === 'X') {
       return <ColorSwatch color="red"/>
     } else {
       return <ColorSwatch color="orange"/>
@@ -66,12 +66,12 @@ function Leaderboard () {
 
                   <td style={{ width: '300px' }}>
                   <Group position="left" spacing="xs" >
-                    {[...player.streak].map(createBadge)}
+                    {[...player.streak].slice(-6).map(createBadge)}
                   </Group>
                   </td>
 
                   <td>{player.score}</td>
-                  <td>{player.streak === '111111' && (<Badge variant="gradient" gradient={{ from: 'orange', to: 'red' }}> ON FIRE! </Badge>)}</td>
+                  <td>{player.streak.slice(-6) === '111111' && (<Badge variant="gradient" gradient={{ from: 'orange', to: 'red' }}> ON FIRE! </Badge>)}</td>
                 </tr>
               ))
             }
