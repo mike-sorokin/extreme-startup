@@ -147,7 +147,7 @@ def create_app():
 
             if "round" in r:  # increment <game_id>'s round by 1
                 games[game_id].question_factory.advance_round()
-                games[game_id].round += 1 # for event logging
+                games[game_id].round += 1  # for event logging
 
                 # wake up all sleeping threads in game if going from WARMUP -> ROUND 1
                 games[game_id].first_round_event.set()
@@ -160,10 +160,10 @@ def create_app():
                     if not pause_successful:
                         return ("Race condition with lock", 429)
 
-                    games[game_id].paused = True # Kill monitor thread
+                    games[game_id].paused = True  # Kill monitor thread
                     return ("GAME_PAUSED", 200)
 
-                else: # Unpause the game
+                else:  # Unpause the game
                     try:
                         games[game_id].pause_wlock.release()
                         games[game_id].paused = False
@@ -189,29 +189,7 @@ def create_app():
         if game_id not in games:
             return NOT_ACCEPTABLE
 
-        player_ids = games[game_id].players
-        all_events = [e for pid in player_ids for e in players[pid].events]
-        all_events.sort(key=lambda e: e.timestamp)
-
-        # [{time: <time>, p1: s1, p2:s2.. }]
-        if not all_events:
-            return make_response(encoder.encode([]))
-        cumulative_sums = [{pid: 0 for pid in player_ids}]
-        cumulative_sums[0]["time"] = all_events[0].timestamp
-
-        current_scores = {pid: 0 for pid in player_ids}
-        for event in all_events:
-            next = {}
-            next["time"] = event.timestamp
-
-            old_score = current_scores[event.player_id]
-            new_score = old_score + event.points_gained
-
-            current_scores[event.player_id] = new_score
-            next[event.player_id] = new_score
-
-            cumulative_sums.append(next)
-
+        cumulative_sums = scoreboards[game_id].running_totals
         r = make_response(encoder.encode(cumulative_sums))
         r.mimetype = "application/json"
         return r
@@ -245,7 +223,9 @@ def create_app():
                 games[game_id].pause_rlock,
             )
 
-            player_thread = threading.Thread(target=quiz_master.start, args=(games[game_id].first_round_event,))
+            player_thread = threading.Thread(
+                target=quiz_master.start, args=(games[game_id].first_round_event,)
+            )
             player_thread.daemon = True  # for test termination
             player_thread.start()
 
@@ -336,19 +316,6 @@ def create_app():
             players[player_id].events.remove(event)
             return DELETE_SUCCESSFUL
 
-    @app.get("/api/<game_id>/leaderboard")
-    def leaderboard(game_id):
-        if game_id not in scoreboards:
-            return NOT_ACCEPTABLE
-
-        score_dict = scoreboards[game_id].leaderboard()
-        res = []
-
-        for k, s in score_dict.items():
-            res.append({"name": players[k].name, "id": k, "score": s})
-
-        return encoder.encode(res)
-
     # FORGIVE ME
     bot_responses = {n: [f"Bot{n}", 0] for n in range(100)}
 
@@ -386,7 +353,9 @@ def create_app():
             del games[curr_gid]
 
     def spawn_game_monitor(game):
-        game_monitor_thread = threading.Thread(target=game.monitor, args=[players, scoreboards[game.id]])
+        game_monitor_thread = threading.Thread(
+            target=game.monitor, args=[players, scoreboards[game.id]]
+        )
         game_monitor_thread.daemon = True  # for test termination
         game_monitor_thread.start()
 
