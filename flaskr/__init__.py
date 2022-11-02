@@ -60,9 +60,6 @@ def create_app():
     # scoreboards: game_id -> Scoreboard
     scoreboards = {}
 
-    # player_threads: player_id -> player_thread
-    player_threads = {}
-
     encoder = JSONEncoder()
 
     # This is a catch-all function that will redirect anything not caught by the other rules
@@ -90,23 +87,26 @@ def create_app():
 
             password = request.get_json()["password"]
             new_game = Game(password)
-
             gid = new_game.id
             scoreboards[gid] = Scoreboard()
             games[gid] = new_game
+
+            spawn_game_monitor(new_game)
             add_session_admin(gid, session)
             return encoder.encode(new_game)
 
         elif (
             request.method == "DELETE"
         ):  # delete all games - only for admin of all games
-            for gid in games.keys():
+            all_gids = list(games.keys())
+            for gid in all_gids:
                 if not is_admin(gid, session):
                     return UNAUTHORIZED
 
             remove_players(*[p for g in games.values() for p in g.players])
+
             # garbage collect each game's question_factory
-            games.clear()
+            remove_games(*all_gids)
             return DELETE_SUCCESSFUL
 
     @app.route("/api/<game_id>/auth", methods=["GET", "POST"])
@@ -147,7 +147,11 @@ def create_app():
 
             if "round" in r:  # increment <game_id>'s round by 1
                 games[game_id].question_factory.advance_round()
-                games[game_id].round += 1
+                games[game_id].round += 1 # for event logging
+
+                # wake up all sleeping threads in game if going from WARMUP -> ROUND 1
+                games[game_id].first_round_event.set()
+
                 return ("ROUND_INCREMENTED", 200)
 
             elif "pause" in r:
@@ -155,13 +159,15 @@ def create_app():
                     pause_successful = games[game_id].pause_wlock.acquire(timeout=15)
                     if not pause_successful:
                         return ("Race condition with lock", 429)
-                    games[game_id].paused = True
+
+                    games[game_id].paused = True # Kill monitor thread
                     return ("GAME_PAUSED", 200)
 
-                else:
+                else: # Unpause the game
                     try:
                         games[game_id].pause_wlock.release()
                         games[game_id].paused = False
+                        spawn_game_monitor(games[game_id])
                     except RuntimeError:
                         return ("Race condition wtih lock", 429)
                     return ("GAME_UNPAUSED", 200)
@@ -175,7 +181,7 @@ def create_app():
             remove_players(*games[game_id].players)
 
             # garbage collect the question_factory
-            del games[game_id]
+            remove_games(game_id)
             return {"deleted": game_id}
 
     @app.route("/api/<game_id>/scores", methods=["GET"])
@@ -239,9 +245,8 @@ def create_app():
                 games[game_id].pause_rlock,
             )
 
-            player_thread = threading.Thread(target=quiz_master.start)
-            player_threads[player.uuid] = player_thread
-            player_thread.daemon = True
+            player_thread = threading.Thread(target=quiz_master.start, args=(games[game_id].first_round_event,))
+            player_thread.daemon = True  # for test termination
             player_thread.start()
 
             session["player"] = player.uuid
@@ -368,14 +373,22 @@ def create_app():
     def _main_view():
         return "<br>".join(list(str(x) for x in bot_responses.values()))
 
-    # Mark player as inactive, removes thread from player_threads dict
+    # Mark player as inactive. Thread will be killed automatically when target function returns
     def remove_players(*player_id):
         for pid in player_id:
-            assert pid in player_threads
             players[pid].active = False
-
-            del player_threads[pid]
             del players[pid]
+
+    # Mark game as paused. Monitor thread will be killed automatically when target function returns.
+    def remove_games(*gid):
+        for curr_gid in gid:
+            games[curr_gid].paused = True
+            del games[curr_gid]
+
+    def spawn_game_monitor(game):
+        game_monitor_thread = threading.Thread(target=game.monitor, args=[players, scoreboards[game.id]])
+        game_monitor_thread.daemon = True  # for test termination
+        game_monitor_thread.start()
 
     def add_session_admin(game_id, session):
         if "admin" in session:

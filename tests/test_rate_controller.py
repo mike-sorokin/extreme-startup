@@ -3,7 +3,7 @@ import sys
 sys.path.append(".")
 
 from flaskr.rate_controller import RateController
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 import pytest
 
 DEFAULT_DELAY = 5
@@ -53,6 +53,16 @@ def test_maintains_delay_on_problem_if_current_delay_less_than_avg():
 
     delayed_controller.delay_before_next_request(question)
     assert delayed_controller.delay == AVG_DELAY + 5
+
+
+def test_resets_delay_to_default_delay():
+    warmed_up_controller = RateController(DEFAULT_DELAY - 2)
+    assert warmed_up_controller.delay != DEFAULT_DELAY
+
+    with patch("time.sleep", return_value=None) as _:
+        warmed_up_controller.reset()
+
+    assert warmed_up_controller.delay == DEFAULT_DELAY
 
 
 # TODO: Updates algorithm based on score
