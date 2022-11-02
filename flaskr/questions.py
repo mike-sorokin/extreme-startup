@@ -6,6 +6,8 @@ import yaml
 import os
 import requests
 
+ALLOW_CHEATING = True
+
 # Basic question object. Questions asked to players are instances of subclasses. Should be treated as abstract class
 class Question:
     def __init__(self, points=10):
@@ -37,6 +39,9 @@ class Question:
     def get_result(self):
         if self.answer is None:
             self.result = self.problem
+
+        elif ALLOW_CHEATING and self.answer == "CHEAT":
+            self.result = "CORRECT"
 
         elif self.answered_correctly():
             self.result = "CORRECT"
