@@ -9,8 +9,6 @@ import Players from './components/Players'
 import Admin from './components/Admin'
 import Leaderboard from './components/Leaderboard'
 
-import './App.css'
-
 function App () {
   return (
     <MantineProvider theme={{ colorScheme: 'dark' }} withGlobalStyles withNormalizeCSS>

@@ -23,7 +23,7 @@ function Game () {
 
         <Menu.Dropdown>
           <Menu.Label>Game Menu</Menu.Label>
-          <Menu.Item>{navButton('/admin', 'Host Page', 'grape')}</Menu.Item>
+          <Menu.Item>{navButton('/admin', 'Admin Page', 'grape')}</Menu.Item>
           <Menu.Item>{navButton('', 'Leaderboard', 'indigo')}</Menu.Item>
           <Menu.Item>{navButton('/players', 'Players', 'pink')}</Menu.Item>
         </Menu.Dropdown>
