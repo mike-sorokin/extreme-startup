@@ -6,6 +6,7 @@ import { rest } from 'msw'
 
 expect.extend(matchers)
 
+// Need to mock the window.matchMedia property for some reason
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation(query => ({
@@ -20,6 +21,7 @@ Object.defineProperty(window, 'matchMedia', {
   }))
 })
 
+// Mock backend and intercept requests (may need to move this to individual test files as it interferes with testing requests)
 const games = {
   '9bc9304c': { id: '9bc9304c', round: 0, players: [], paused: false }
 }

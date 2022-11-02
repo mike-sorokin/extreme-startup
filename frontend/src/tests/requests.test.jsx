@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { fetchAllGames } from '../utils/requests'
+// import { fetchAllGames } from '../utils/requests'
 
 describe('Main API requests', () => {
   it('fetches all games', async () => {

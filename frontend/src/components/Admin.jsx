@@ -38,7 +38,8 @@ function Admin () {
   // Increments round
   const advanceRound = async () => {
     try {
-      await updateGame(params.gameId, { round: round + 1 })
+      const response = await updateGame(params.gameId, { round: round + 1 })
+      console.log(response)
       setRound(round + 1)
     } catch (error) {
       // TODO

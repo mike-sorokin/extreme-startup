@@ -2,7 +2,7 @@
 import { describe, expect, test } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { setup } from '@testing-library/user-event'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom'
 
 import Home from '../components/Home'
 
@@ -20,13 +20,15 @@ describe('Home', () => {
   })
 
   test('submitting password creates game and displays game id', async () => {
-    render(
-      <BrowserRouter >
-        <Routes>
-          <Route path="*" element={<Home />} />
-        </Routes>
-      </BrowserRouter>
-    )
+    // render(
+    //   <BrowserRouter >
+    //     <Routes>
+    //       <Route path="*" element={<Home />} />
+    //     </Routes>
+    //   </BrowserRouter>
+    // )
+
+    render(<Home />, { wrapper: BrowserRouter })
 
     await user.click(screen.getByRole('button', { name: 'Create a Game!' }))
 
