@@ -32,16 +32,14 @@ describe('Home page', () => {
     cy.get('form > .mantine-Button-root').click()
 
     // Verify request was sent and returned response with status code 200
-    // cy.wait('@create-game').its('response.statusCode').should('equal', 200)
-    // cy.wait('@create-game').its('request.body').should('deep.equal', { password: 'test' })
-    cy.wait('@create-game').then((interception) => {
-      expect(interception.request.body).to.deep.equal({ password: 'test' })
-      expect(interception.response.statusCode).to.equal(200)
+    cy.wait('@create-game').then(({ request, response }) => {
+      expect(request.body).to.deep.equal({ password: 'test' })
+      expect(response.statusCode).to.equal(200)
       // Weirdly the response is not in JSON?
-      expect(JSON.parse(interception.response.body)).to.have.property('id')
+      expect(JSON.parse(response.body)).to.have.property('id')
     })
 
-    // save gameId of created game
+    // save gameId of created game under alias gameId for tests to use later
     cy.get('.mantine-1mwlxyv').invoke('text').as('gameId')
   })
 
@@ -70,33 +68,121 @@ describe('Home page', () => {
     cy.get('[data-cy="game-id-input"]').clear()
     cy.get('[data-cy="game-id-input"]').type(this.gameId)
     cy.get('[data-cy="player-name-input"]').clear()
-    cy.get('[data-cy="player-name-input"]').type('dev ')
+    cy.get('[data-cy="player-name-input"]').type('walter ')
     cy.get('[data-cy="url-input"]').clear()
     cy.get('[data-cy="url-input"]').type('https://www.google.com')
     cy.get('form > .mantine-UnstyledButton-root').click()
 
     // Assert that player name and url is visible
-    cy.contains('dev').should('be.visible')
+    cy.contains('walter').should('be.visible')
     cy.contains('https://www.google.com').should('be.visible')
 
     // Assert that a mantine notification is displayed with title 'Success'
     cy.get('.mantine-Notification-title').should('have.text', 'Success')
 
     // Assert that response contains all info we need
-    cy.wait('@join-game').then((interception) => {
-      expect(interception.request.body).to.deep.equal({ name: 'dev', api: 'https://www.google.com' })
-      expect(interception.response.statusCode).to.equal(200)
-      expect(interception.response.body).to.have.property('id')
-      expect(interception.response.body).to.have.property('score')
-      expect(interception.response.body.api).to.equal('https://www.google.com')
-      expect(interception.response.body.name).to.equal('dev')
-      expect(interception.response.body.game_id).to.equal(this.gameId)
+    cy.wait('@join-game').then(({ request, response }) => {
+      expect(request.body).to.deep.equal({ name: 'walter', api: 'https://www.google.com' })
+      expect(response.statusCode).to.equal(200)
+      expect(response.body).to.have.property('id')
+      expect(response.body).to.have.property('score')
+      expect(response.body.api).to.equal('https://www.google.com')
+      expect(response.body.name).to.equal('walter')
+      expect(response.body.game_id).to.equal(this.gameId)
     })
 
     cy.url().should('include', this.gameId + '/players')
   })
 
-  it.only('join game as moderator', function () {
+  it('joining game with invalid game id, invalid url or empty name', function () {
+    // Go back to home page
+    cy.visit('localhost:5173')
+
+    cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
+
+    // Enter details to join the newly created game
+    cy.contains('Join').click()
+    cy.get('[data-cy="game-id-input"]').clear()
+    cy.get('[data-cy="game-id-input"]').type('invalid-id')
+    cy.get('[data-cy="player-name-input"]').clear()
+    cy.get('[data-cy="player-name-input"]').type('walter ')
+    cy.get('[data-cy="url-input"]').clear()
+    cy.get('[data-cy="url-input"]').type('https://www.google.com')
+    cy.get('form > .mantine-UnstyledButton-root').click()
+
+    // Assert mantine error is shown
+    // cy.get('.mantine-Notification-description').invoke('text').should('include', 'Game id does not exist')
+    cy.contains('Game id does not exist').should('be.visible')
+
+    cy.wait(3000)
+
+    // This time enter an empty name
+    cy.get('[data-cy="game-id-input"]').clear()
+    cy.get('[data-cy="game-id-input"]').type(this.gameId)
+    cy.get('[data-cy="player-name-input"]').clear()
+    cy.get('[data-cy="player-name-input"]').type(' ')
+    cy.get('form > .mantine-UnstyledButton-root').click()
+
+    // Assert mantine error is shown
+    // cy.get('.mantine-Notification-description').invoke('text').should('include', 'Your name cannot be empty')
+    cy.contains('Your name cannot be empty').should('be.visible')
+
+    cy.wait(3000)
+
+    cy.get('[data-cy="player-name-input"]').clear()
+    cy.get('[data-cy="player-name-input"]').type('walter')
+    cy.get('[data-cy="url-input"]').clear()
+    cy.get('[data-cy="url-input"]').type('www.google.com')
+    cy.get('form > .mantine-UnstyledButton-root').click()
+
+    // Assert mantine error is shown
+    cy.contains('invalid URL').should('be.visible')
+
+    // Assert join-game request was not sent
+    cy.get('@join-game').should('equal', null)
+  })
+
+  it('joining game with non-unique name or url', function () {
+    // Go back to home page
+    cy.visit('localhost:5173')
+
+    cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
+
+    // Enter details to join the newly created game
+    cy.contains('Join').click()
+    cy.get('[data-cy="game-id-input"]').clear()
+    cy.get('[data-cy="game-id-input"]').type(this.gameId)
+    cy.get('[data-cy="player-name-input"]').clear()
+    cy.get('[data-cy="player-name-input"]').type('walter')
+    cy.get('[data-cy="url-input"]').clear()
+    cy.get('[data-cy="url-input"]').type('https://www.google.com')
+    cy.get('form > .mantine-UnstyledButton-root').click()
+
+    cy.visit('localhost:5173')
+
+    cy.contains('Join').click()
+    cy.get('[data-cy="game-id-input"]').clear()
+    cy.get('[data-cy="game-id-input"]').type(this.gameId)
+    cy.get('[data-cy="player-name-input"]').clear()
+    cy.get('[data-cy="player-name-input"]').type('walter')
+    cy.get('[data-cy="url-input"]').clear()
+    cy.get('[data-cy="url-input"]').type('https://www.google.com')
+    cy.get('form > .mantine-UnstyledButton-root').click()
+
+    // Assert mantine error is shown
+    cy.contains('Your name already exists').should('be.visible')
+
+    cy.wait(3000)
+
+    cy.get('[data-cy="player-name-input"]').clear()
+    cy.get('[data-cy="player-name-input"]').type('jesse')
+    cy.get('form > .mantine-UnstyledButton-root').click()
+
+    // Assert mantine error is shown
+    cy.contains('Your url already exists').should('be.visible')
+  })
+
+  it('join game as moderator', function () {
     // Go back to home page
     cy.visit('localhost:5173')
 
@@ -111,5 +197,13 @@ describe('Home page', () => {
     // (Game password was given as test in the beforeEach hook)
     cy.get('[data-cy="mod-pwd-input"]').type('test')
     cy.get('form > .mantine-Button-root').click()
+
+    cy.wait('@join-game-as-mod').then(({ request, response }) => {
+      expect(request.body).to.deep.equal({ password: 'test' })
+      expect(response.statusCode).to.equal(200)
+      expect(response.body).to.deep.equal({ valid: true })
+    })
+
+    cy.url().should('include', this.gameId + '/admin')
   })
 })

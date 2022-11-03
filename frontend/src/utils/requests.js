@@ -274,7 +274,7 @@ async function validateData (gameId, data) {
     // Check player name is unique in a game
     const names = players.map(player => player.name)
 
-    if (name in names) {
+    if (names.includes(name)) {
       showFailureNotification('Error creating player', 'Your name already exists in the game!')
       return false
     }
@@ -290,7 +290,7 @@ async function validateData (gameId, data) {
     // Check api url is unique in a game
     const apis = players.map(player => player.api)
 
-    if (data.api in apis) {
+    if (apis.includes(data.api)) {
       showFailureNotification('Error creating player', 'Your url already exists in the game!')
       return false
     }
