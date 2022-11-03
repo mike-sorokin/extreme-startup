@@ -4,7 +4,6 @@ import { homeAPI, gameAPI, authAPI, playersAPI, playerAPI, playerEventsAPI, even
 import { alertError, showFailureNotification, playersAsArray } from './utils'
 
 const instance = axios.create({
-  baseURL: 'http://localhost:5000',
   headers: { 'Content-Type': 'application/json' }
 })
 
@@ -46,6 +45,7 @@ const instance = axios.create({
 // Main page requests - ("/api")
 
 /**
+ * (GET, "/api")
  * Fetches all games
  * @async
  * @return {Promise<{gameId: Game, ...}>} Object containing all Game objects
@@ -60,6 +60,7 @@ export async function fetchAllGames () {
 }
 
 /**
+ * (POST, "/api")
  * Creates a new game and returns its game JSON object
  * @async
  * @param  {{"password": string}} data Object containing the password string
@@ -75,6 +76,7 @@ export async function createNewGame (data) {
 }
 
 /**
+ * (DELETE, "/api")
  * Drops all games, ids, events
  * @async
  * @return unsure
@@ -91,6 +93,7 @@ export async function deleteAllGames () {
 // Requests to "/api/(gameId)"
 
 /**
+ * (GET, "/api/(gameId)")
  * Fetches game JSON object for a given game ID
  * @async
  * @param  {string} gameId
@@ -106,6 +109,7 @@ export async function fetchGame (gameId) {
 }
 
 /**
+ * (PUT, "/api/(gameId)")
  * Updates game by either updating the round, or by pausing/unpausing the game
  *
  * Sending an object containing {"round": roundNum} will advance the game to roundNum
@@ -125,6 +129,7 @@ export async function updateGame (gameId, data) {
 }
 
 /**
+ * (DELETE, "/api/(gameId)")
  * Drops a given game
  * @async
  * @param  {string} gameId
@@ -139,7 +144,10 @@ export async function deleteGame (gameId) {
   }
 }
 
+// Requests to "/api/(gameId)/auth"
+
 /**
+ * (POST, "/api/(gameId)/auth")
  * Adds a moderator to game
  * @async
  * @param  {string} gameId
@@ -168,6 +176,7 @@ export async function createModerator (gameId, data) {
 // Requests to "/api/(game_id)/scores"
 
 /**
+ * (GET, "/api/(game_id)/scores")
  * Fetches all scores in a given game
  * @async
  * @param  {string} gameId
@@ -189,6 +198,7 @@ export async function fetchGameScores (gameId) {
 // Requests to "/api/(game_id)/players"
 
 /**
+ * (GET, "/api/(game_id)/players")
  * Fetches all players in a given game
  * @async
  * @param  {string} gameId
@@ -204,6 +214,7 @@ export async function fetchAllPlayers (gameId) {
 }
 
 /**
+ * (POST, "/api/(game_id)/players")
  * Validates user submission and creates new player if valid
  * @async
  * @param  {string} gameId
@@ -289,6 +300,7 @@ async function validateData (gameId, data) {
 }
 
 /**
+ * (DELETE, "/api/(game_id)/players")
  * Deletes all players in a game
  * @param  {string} gameId
  * @return unsure
@@ -305,6 +317,7 @@ export async function deleteAllPlayers (gameId) {
 // Requests to "/api/(game_id)/players/(player_id)"
 
 /**
+ * (GET, "/api/(game_id)/players/(player_id)")
  * Returns player JSON object for a given player in a given game
  * @async
  * @param  {string} gameId
@@ -321,6 +334,7 @@ export async function fetchPlayer (gameId, playerId) {
 }
 
 /**
+ * (PUT, "/api/(game_id)/players/(player_id)")
  * Updates a player's name and/or api url
  * @async
  * @param  {string} gameId
@@ -345,6 +359,7 @@ export async function updatePlayer (gameId, playerId, data) {
 }
 
 /**
+ * (DELETE, "/api/(game_id)/players/(player_id)")
  * Drops a player
  * @async
  * @param  {string} gameId
@@ -363,6 +378,7 @@ export async function deletePlayer (gameId, playerId) {
 // "/api/(game_id)/players/(player_id)/events"
 
 /**
+ * (GET, "/api/(game_id)/players/(player_id)/events")
  * Returns a list of all event JSON objects for a given player
  * @async
  * @param  {string} gameId
@@ -379,6 +395,7 @@ export async function fetchAllEvents (gameId, playerId) {
 }
 
 /**
+ * (DELETE, "/api/(game_id)/players/(player_id)/events")
  * Deletes all events for a given player
  * @async
  * @param  {string} gameId
@@ -397,6 +414,7 @@ export async function deleteAllEvents (gameId, playerId) {
 // "/api/(game_id)/players/(player_id)/events/(event_id)"
 
 /**
+ * (GET, "/api/(game_id)/players/(player_id)/events/(event_id)")
  * Returns the event JSON object for a given eventId
  * @async
  * @param  {string} gameId
@@ -414,6 +432,7 @@ export async function fetchEvent (gameId, playerId, eventId) {
 }
 
 /**
+ * (DELETE, "/api/(game_id)/players/(player_id)/events/(event_id)")
  * Drops a given event
  * @async
  * @param  {string} gameId
