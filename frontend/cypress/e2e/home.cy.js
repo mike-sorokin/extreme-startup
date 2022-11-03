@@ -43,12 +43,12 @@ describe('Home page', () => {
     cy.get('.mantine-1mwlxyv').invoke('text').as('gameId')
   })
 
+  // must use a function so we can use aliases with this
   it('creating game displays game id, success notification and navigates to correct url', function () {
     // Assert that a game id is visible
     cy.get('.mantine-1mwlxyv').should('be.visible')
 
-    // Assert that a mantine notification is displayed with title 'Success'
-    cy.get('.mantine-Notification-title').should('have.text', 'Success')
+    cy.contains('Created Game').should('be.visible')
 
     // Click to go to game page
     cy.get('[data-cy="to-game-page"]').click()
@@ -56,7 +56,6 @@ describe('Home page', () => {
     cy.url().should('include', this.gameId + '/admin')
   })
 
-  // using a function here so we can use aliases with this
   it('joining a game', function () {
     // Go back to home page
     cy.visit('localhost:5173')
@@ -77,8 +76,7 @@ describe('Home page', () => {
     cy.contains('walter').should('be.visible')
     cy.contains('https://www.google.com').should('be.visible')
 
-    // Assert that a mantine notification is displayed with title 'Success'
-    cy.get('.mantine-Notification-title').should('have.text', 'Success')
+    cy.contains('Created Player').should('be.visible')
 
     // Assert that response contains all info we need
     cy.wait('@join-game').then(({ request, response }) => {
@@ -100,7 +98,7 @@ describe('Home page', () => {
 
     cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
 
-    // Enter details to join the newly created game
+    // Enter invalid id
     cy.contains('Join').click()
     cy.get('[data-cy="game-id-input"]').clear()
     cy.get('[data-cy="game-id-input"]').type('invalid-id')
@@ -110,7 +108,7 @@ describe('Home page', () => {
     cy.get('[data-cy="url-input"]').type('https://www.google.com')
     cy.get('form > .mantine-UnstyledButton-root').click()
 
-    // Assert mantine error is shown
+    // Assert error is shown
     // cy.get('.mantine-Notification-description').invoke('text').should('include', 'Game id does not exist')
     cy.contains('Game id does not exist').should('be.visible')
 
@@ -123,30 +121,31 @@ describe('Home page', () => {
     cy.get('[data-cy="player-name-input"]').type(' ')
     cy.get('form > .mantine-UnstyledButton-root').click()
 
-    // Assert mantine error is shown
+    // Assert error is shown
     // cy.get('.mantine-Notification-description').invoke('text').should('include', 'Your name cannot be empty')
     cy.contains('Your name cannot be empty').should('be.visible')
 
     cy.wait(3000)
 
+    // This time enter an invalid url
     cy.get('[data-cy="player-name-input"]').clear()
     cy.get('[data-cy="player-name-input"]').type('walter')
     cy.get('[data-cy="url-input"]').clear()
     cy.get('[data-cy="url-input"]').type('www.google.com')
     cy.get('form > .mantine-UnstyledButton-root').click()
 
-    // Assert mantine error is shown
+    // Assert error is shown
     cy.contains('invalid URL').should('be.visible')
 
     // Assert join-game request was not sent
     cy.get('@join-game').should('equal', null)
+
+    cy.url().should('not.include', this.gameId + '/players')
   })
 
   it('joining game with non-unique name or url', function () {
     // Go back to home page
     cy.visit('localhost:5173')
-
-    cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
 
     // Enter details to join the newly created game
     cy.contains('Join').click()
@@ -160,6 +159,9 @@ describe('Home page', () => {
 
     cy.visit('localhost:5173')
 
+    cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
+
+    // Try and enter game with same name as above
     cy.contains('Join').click()
     cy.get('[data-cy="game-id-input"]').clear()
     cy.get('[data-cy="game-id-input"]').type(this.gameId)
@@ -169,17 +171,23 @@ describe('Home page', () => {
     cy.get('[data-cy="url-input"]').type('https://www.google.com')
     cy.get('form > .mantine-UnstyledButton-root').click()
 
-    // Assert mantine error is shown
+    // Assert error is shown
     cy.contains('Your name already exists').should('be.visible')
 
     cy.wait(3000)
 
+    // This time try and enter game with already existing url
     cy.get('[data-cy="player-name-input"]').clear()
     cy.get('[data-cy="player-name-input"]').type('jesse')
     cy.get('form > .mantine-UnstyledButton-root').click()
 
     // Assert mantine error is shown
     cy.contains('Your url already exists').should('be.visible')
+
+    // Assert join-game request was not sent
+    cy.get('@join-game').should('equal', null)
+
+    cy.url().should('not.include', this.gameId + '/players')
   })
 
   it('join game as moderator', function () {
@@ -198,6 +206,7 @@ describe('Home page', () => {
     cy.get('[data-cy="mod-pwd-input"]').type('test')
     cy.get('form > .mantine-Button-root').click()
 
+    // Assert correct request/response was sent/received
     cy.wait('@join-game-as-mod').then(({ request, response }) => {
       expect(request.body).to.deep.equal({ password: 'test' })
       expect(response.statusCode).to.equal(200)
@@ -205,5 +214,29 @@ describe('Home page', () => {
     })
 
     cy.url().should('include', this.gameId + '/admin')
+  })
+
+  it('join game as moderator with incorrect password', function () {
+    // Go back to home page
+    cy.visit('localhost:5173')
+
+    cy.intercept('POST', '/api/' + this.gameId + '/auth').as('join-game-as-mod')
+
+    // Join game as moderator
+    cy.contains('Join').click()
+    cy.get('.mantine-8jlqcf').click()
+    cy.get('[data-cy="mod-game-id-input"]').clear()
+    cy.get('[data-cy="mod-game-id-input"]').type(this.gameId)
+    cy.get('[data-cy="mod-pwd-input"]').clear()
+    cy.get('[data-cy="mod-pwd-input"]').type('incorrect-password')
+    cy.get('form > .mantine-Button-root').click()
+
+    // Assert correct request/response was sent/received
+    cy.wait('@join-game-as-mod').then(({ request, response }) => {
+      expect(response.statusCode).to.equal(200)
+      expect(response.body).to.deep.equal({ valid: false })
+    })
+
+    cy.url().should('not.include', this.gameId + '/admin')
   })
 })
