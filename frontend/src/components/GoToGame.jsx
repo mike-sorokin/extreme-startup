@@ -33,7 +33,8 @@ function GoToGame (gameIdGetter) {
         <Button variant="gradient"
           style={{ marginLeft: '5%' }}
           gradient={{ from: 'teal', to: 'lime', deg: 105 }}
-          onClick={goToGamePage}>To Game Page
+          onClick={goToGamePage}
+          data-cy="to-game-page">To Game Page
         </Button>
       </div>
     </div>

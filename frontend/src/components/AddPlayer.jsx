@@ -55,14 +55,15 @@ function AddPlayer () {
         size="md"
         color="teal"
         checked={mod} onChange={(e) => setMod(e.currentTarget.checked)}
+        data-cy="moderator-toggle"
       />
       <Space h="md"></Space>
       {
         mod
           ? <form onSubmit={submitModerator}>
-          <TextInput value={gameId} onChange={(e) => setGameId(e.target.value)} placeholder="Game id (e.g. abcd1234)" label="Enter game id:" required />
+          <TextInput value={gameId} onChange={(e) => setGameId(e.target.value)} placeholder="Game id (e.g. abcd1234)" label="Enter game id:" required data-cy="mod-game-id-input"/>
           <Space h="md"></Space>
-          <PasswordInput value={pwd} onChange={(e) => setPwd(e.target.value)} placeholder="Game password" label="Enter game password:" required />
+          <PasswordInput value={pwd} onChange={(e) => setPwd(e.target.value)} placeholder="Game password" label="Enter game password:" required data-cy="mod-pwd-input" />
           <Space h="md"></Space>
           <Button variant="outline" color="grape" type="submit">Join as Moderator!</Button>
         </form>

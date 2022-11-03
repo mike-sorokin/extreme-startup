@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /// <reference types="cypress" />
 
 context('Actions', () => {
@@ -17,9 +18,9 @@ context('Actions', () => {
       .type('{del}{selectall}{backspace}')
 
       // .type() with key modifiers
-      .type('{alt}{option}') //these are equivalent
-      .type('{ctrl}{control}') //these are equivalent
-      .type('{meta}{command}{cmd}') //these are equivalent
+      .type('{alt}{option}') // these are equivalent
+      .type('{ctrl}{control}') // these are equivalent
+      .type('{meta}{command}{cmd}') // these are equivalent
       .type('{shift}')
 
       // Delay each keypress by 0.1 sec
