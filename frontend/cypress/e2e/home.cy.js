@@ -6,11 +6,18 @@ describe('Home page', () => {
   // Visit 'localhost:5173' and create a game with password before each test
   beforeEach(() => {
     cy.visit('localhost:5173')
+
+    // Setup request intercept
+    cy.intercept('POST', '/api').as('create-game')
+
     // Type a password and create a game
     cy.contains('Create').click()
     cy.get('[data-cy="password-input"]').clear()
     cy.get('[data-cy="password-input"]').type('test')
     cy.get('form > .mantine-Button-root').click()
+
+    // Verify request was sent and returned response with status code 200
+    cy.wait('@create-game').its('response.statusCode').should('equal', 200)
   })
 
   it('creating game with pwd displays game id and success notification', () => {
