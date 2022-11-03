@@ -112,6 +112,7 @@ describe('Home page', () => {
     // cy.get('.mantine-Notification-description').invoke('text').should('include', 'Game id does not exist')
     cy.contains('Game id does not exist').should('be.visible')
 
+    // wait for mantine notification to go away
     cy.wait(3000)
 
     // This time enter an empty name
@@ -125,6 +126,7 @@ describe('Home page', () => {
     // cy.get('.mantine-Notification-description').invoke('text').should('include', 'Your name cannot be empty')
     cy.contains('Your name cannot be empty').should('be.visible')
 
+    // wait for mantine notification to go away
     cy.wait(3000)
 
     // This time enter an invalid url
@@ -174,6 +176,7 @@ describe('Home page', () => {
     // Assert error is shown
     cy.contains('Your name already exists').should('be.visible')
 
+    // wait for mantine notification to go away
     cy.wait(3000)
 
     // This time try and enter game with already existing url
