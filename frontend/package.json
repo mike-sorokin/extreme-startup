@@ -45,6 +45,5 @@
     "msw": "^0.47.4",
     "vite": "^3.2.0",
     "vitest": "^0.24.4"
-  },
-  "proxy": "http://localhost:5000"
+  }
 }

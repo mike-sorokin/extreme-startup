@@ -29,6 +29,25 @@ function Home () {
     }
   }
 
+  // Dynamic styling for card to make sure it is not visible once a different modal is open
+  const cardStyle = () => {
+    const styles = {
+      backgroundColor: '#2C2E33',
+      width: 'fit-content',
+      position: 'absolute',
+      left: '50%',
+      top: '50%',
+      transform: 'translate(-50%, -50%)'
+    }
+
+    // Sets visibility to hidden if another modal is open
+    if (openedChoosePwd || openedAddPlayer || openedCreateGame) {
+      styles.display = 'none'
+    }
+
+    return styles
+  }
+
   return (
     <div className="Home">
       <Modal centered
@@ -39,7 +58,7 @@ function Home () {
         <div>
           <form onSubmit={handleCreateGame}>
             <PasswordInput value={pwd} onChange={(e) => setPwd(e.target.value)}
-              placeholder="Game password" label="Enter game password:" required />
+              placeholder="Game password" label="Enter game password:" required data-cy="password-input"/>
               <Space h="md"></Space>
             <Button variant="outline" color="green" type="submit">Create Game!</Button>
           </form>
@@ -58,15 +77,7 @@ function Home () {
         <AddPlayer setOpened={setOpenedAddPlayer} />
       </Modal>
 
-      <Card shadow="sm" p="lg" radius="md" withBorder
-        style={{
-          backgroundColor: '#2C2E33',
-          width: 'fit-content',
-          position: 'absolute',
-          left: '50%',
-          top: '50%',
-          transform: 'translate(-50%, -50%)'
-        }}>
+      <Card shadow="sm" p="lg" radius="md" withBorder sx={cardStyle}>
         <Stack align="center" spacing="xl">
           <Title order={1} color="white" weight={1000}>🔥 Extreme Startup 🔥</Title>
           <Button variant="outline" color="green" radius="md" size="lg" onClick={() => setOpenedChoosePwd(true) }>Create a Game!</Button>

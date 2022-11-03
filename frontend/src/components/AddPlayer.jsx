@@ -67,11 +67,11 @@ function AddPlayer () {
           <Button variant="outline" color="grape" type="submit">Join as Moderator!</Button>
         </form>
           : <form onSubmit={submitPlayer}>
-          <TextInput value={gameId} onChange={(e) => setGameId(e.target.value)} placeholder="Game id (e.g. abcd1234)" label="Enter game id:" required />
+          <TextInput value={gameId} onChange={(e) => setGameId(e.target.value)} placeholder="Game id (e.g. abcd1234)" label="Enter game id:" required data-cy="game-id-input" />
           <Space h="md"></Space>
-          <TextInput value={name} onChange={(e) => setName(e.target.value)} placeholder="Your player name" label="Enter player name:" required />
+          <TextInput value={name} onChange={(e) => setName(e.target.value)} placeholder="Your player name" label="Enter player name:" required data-cy="player-name-input"/>
           <Space h="md"></Space>
-          <TextInput value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Your URL (http://...)" label="Enter URL:" required />
+          <TextInput value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Your URL (http://...)" label="Enter URL:" required data-cy="url-input"/>
           <Space h="md"></Space>
           <Button variant="outline" color="green" type="submit">Join!</Button>
         </form>
