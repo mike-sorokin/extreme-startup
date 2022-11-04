@@ -34,13 +34,13 @@ class QuizMaster:
             self.is_warmup = False
             self.reset_stats_and_rc()
 
-        question = self.question_factory.next_question()
-
         self.rlock.acquire()  # If wlock acquired (paused), sleep here until wlock released. Many rlock acquires possible for players
-        question.ask(self.player)
-
         if self.rlock.locked():
             self.rlock.release()
+
+        question = self.question_factory.next_question()
+
+        question.ask(self.player)
 
         self.scoreboard.record_request_for(self.player)
         self.scoreboard.increment_score_for(self.player, question)
