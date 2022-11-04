@@ -42,9 +42,7 @@ METHOD_NOT_ALLOWED = ("HTTP Method not allowed", 405)
 
 
 def create_app():
-    app = Flask(
-        __name__, static_url_path="", static_folder="vite", template_folder="vite"
-    )
+    app = Flask(__name__, static_folder="vite")
     app.url_map.strict_slashes = False
 
     app.config["SECRET_KEY"] = secrets.token_hex()
@@ -68,7 +66,10 @@ def create_app():
     @app.route("/", defaults={"path": ""})
     @app.route("/<path:path>")
     def serve_frontend(path):
-        return make_response(render_template("index.html", path=path))
+        if path != "" and os.path.exists(app.static_folder + "/" + path):
+            return send_from_directory(app.static_folder, path)
+        else:
+            return send_from_directory(app.static_folder, "index.html")
 
     @app.route("/favicon.ico")
     def favicon():
