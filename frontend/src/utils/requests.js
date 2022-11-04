@@ -428,3 +428,20 @@ export async function deleteEvent (gameId, playerId, eventId) {
     alertError(error)
   }
 }
+
+/**
+ * Check if a game id is valid
+ * @async
+ * @param {string} gameId The game id you are checking
+ * @returns {Promise<boolean>} true if valid false if invalid
+ */
+export async function checkValidGame (gameId) {
+  try {
+    const response = await fetchGame(gameId)
+    console.log(response)
+    return true
+  } catch (error) {
+    alertError(error)
+    return false
+  }
+}
