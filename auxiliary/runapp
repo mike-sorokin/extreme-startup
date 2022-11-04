@@ -7,6 +7,8 @@ rm -rf flaskr/static flaskr/templates
 cd frontend
 npm ci
 npm run build
+rm -rf ../flaskr/vite
+mv dist ../flaskr/vite
 
 # Launch flask server
 cd ..

@@ -1,6 +1,6 @@
 auxiliary/logs
 dontrunme
-
+vite
 # Logs
 logs
 *.log
