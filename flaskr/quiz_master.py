@@ -1,4 +1,4 @@
-import time
+import datetime
 from flaskr.question_factory import QuestionFactory
 from flaskr.rate_controller import RateController
 
@@ -32,7 +32,12 @@ class QuizMaster:
     def administer_question(self, warmup_over):
         if self.is_warmup and warmup_over.is_set():
             self.is_warmup = False
-            self.scoreboard.running_totals = []
+            self.scoreboard.running_totals.append(
+                {
+                    "time": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                    f"{self.player.uuid}": 0,
+                }
+            )
             self.reset_stats_and_rc()
 
         question = self.question_factory.next_question()
