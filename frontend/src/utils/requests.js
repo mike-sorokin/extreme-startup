@@ -445,3 +445,21 @@ export async function checkValidGame (gameId) {
     return false
   }
 }
+
+// Helper functions for authentication
+
+/**
+ * Check if current user is admin
+ * @async
+ * @param {string} gameId The game id
+ * @returns {Promise<boolean>} true if current user is admin
+ */
+export async function isAdmin (gameId) {
+  try {
+    const response = await instance.get(authAPI(gameId))
+    console.log(response)
+    return response
+  } catch (error) {
+    alertError(error)
+  }
+}
