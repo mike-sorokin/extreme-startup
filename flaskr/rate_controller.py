@@ -28,7 +28,7 @@ class RateController:
             self.delay = max(self.delay, MIN_REQUEST_INTERVAL_SECS)
         elif not correct_answer and self.delay <= MAX_REQUEST_INTERVAL_SECS:
             self.delay += REQUEST_DELTA
-            self.delay = min(self.delay, MIN_REQUEST_INTERVAL_SECS)
+            self.delay = min(self.delay, MAX_REQUEST_INTERVAL_SECS)
         else:  # Error case
             print(
                 f"!!!!! unrecognized result '#{question.result}' from #{repr(question)} in Scoreboard#score"
