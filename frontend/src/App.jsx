@@ -13,35 +13,22 @@ import CheckRoute from './utils/CheckRoute'
 
 function App () {
   return (
-  // <Router>
-  //   <Routes>
-  //       <Route path="/" element={<Home />} />
-  //       <Route path="/:gameId" element={<Game />} >
-  //         <Route path="players" element={<Players />} />
-  //         <Route path="players/:id" element={<Player />} />
-  //         <Route path="admin" element={<Admin />} />
-  //         <Route index element={<Leaderboard />} />
-  //       </Route>
-  //       <Route path="*" element={<NotFound />} />
-  //     </Routes>
-  //   </Router>
-
-  <Router >
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route element={<CheckRoute />}>
-        <Route path="/:gameId" element={<Game />} >
-          <Route path="players" element={<Players />} />
-          <Route path="players/:id" element={<Player />} />
-          <Route element={<AdminRoute />} >
-            <Route path="admin" element={<Admin />} />
+    <Router >
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route element={<CheckRoute />}>
+          <Route path="/:gameId" element={<Game />} >
+            <Route path="players" element={<Players />} />
+            <Route path="players/:id" element={<Player />} />
+            <Route element={<AdminRoute />} >
+              <Route path="admin" element={<Admin />} />
+            </Route>
+            <Route index element={<Leaderboard />} />
           </Route>
-          <Route index element={<Leaderboard />} />
         </Route>
-      </Route>
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-  </Router>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Router>
   )
 }
 
