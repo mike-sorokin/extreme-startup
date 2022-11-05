@@ -26,10 +26,11 @@ describe('Home page', () => {
     cy.intercept('POST', '/api').as('create-game')
 
     // Type a password and create a game
-    cy.contains('Create').click()
-    cy.get('[data-cy="password-input"]').clear()
-    cy.get('[data-cy="password-input"]').type('test')
-    cy.get('form > .mantine-Button-root').click()
+    // cy.contains('Create').click()
+    // cy.get('[data-cy="password-input"]').clear()
+    // cy.get('[data-cy="password-input"]').type('test')
+    // cy.get('form > .mantine-Button-root').click()
+    cy.createGame('test')
 
     // Verify request was sent and returned response with status code 200
     cy.wait('@create-game').then(({ request, response }) => {
@@ -63,14 +64,16 @@ describe('Home page', () => {
     cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
 
     // Enter details to join the newly created game
-    cy.contains('Join').click()
-    cy.get('[data-cy="game-id-input"]').clear()
-    cy.get('[data-cy="game-id-input"]').type(this.gameId)
-    cy.get('[data-cy="player-name-input"]').clear()
-    cy.get('[data-cy="player-name-input"]').type('walter ')
-    cy.get('[data-cy="url-input"]').clear()
-    cy.get('[data-cy="url-input"]').type('https://www.google.com')
-    cy.get('form > .mantine-UnstyledButton-root').click()
+    // cy.contains('Join').click()
+    // cy.get('[data-cy="game-id-input"]').clear()
+    // cy.get('[data-cy="game-id-input"]').type(this.gameId)
+    // cy.get('[data-cy="player-name-input"]').clear()
+    // cy.get('[data-cy="player-name-input"]').type('walter ')
+    // cy.get('[data-cy="url-input"]').clear()
+    // cy.get('[data-cy="url-input"]').type('https://www.google.com')
+    // cy.get('form > .mantine-UnstyledButton-root').click()
+
+    cy.joinGameAsPlayer(this.gameId, 'walter ', 'https://www.google.com')
 
     // Assert that player name and url is visible
     cy.contains('walter').should('be.visible')
@@ -99,14 +102,16 @@ describe('Home page', () => {
     cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
 
     // Enter invalid id
-    cy.contains('Join').click()
-    cy.get('[data-cy="game-id-input"]').clear()
-    cy.get('[data-cy="game-id-input"]').type('invalid-id')
-    cy.get('[data-cy="player-name-input"]').clear()
-    cy.get('[data-cy="player-name-input"]').type('walter ')
-    cy.get('[data-cy="url-input"]').clear()
-    cy.get('[data-cy="url-input"]').type('https://www.google.com')
-    cy.get('form > .mantine-UnstyledButton-root').click()
+    // cy.contains('Join').click()
+    // cy.get('[data-cy="game-id-input"]').clear()
+    // cy.get('[data-cy="game-id-input"]').type('invalid-id')
+    // cy.get('[data-cy="player-name-input"]').clear()
+    // cy.get('[data-cy="player-name-input"]').type('walter ')
+    // cy.get('[data-cy="url-input"]').clear()
+    // cy.get('[data-cy="url-input"]').type('https://www.google.com')
+    // cy.get('form > .mantine-UnstyledButton-root').click()
+
+    cy.joinGameAsPlayer('invalid-id', 'walter ', 'https://www.google.com')
 
     // Assert error is shown
     // cy.get('.mantine-Notification-description').invoke('text').should('include', 'Game id does not exist')
@@ -150,28 +155,32 @@ describe('Home page', () => {
     cy.visit('localhost:5173')
 
     // Enter details to join the newly created game
-    cy.contains('Join').click()
-    cy.get('[data-cy="game-id-input"]').clear()
-    cy.get('[data-cy="game-id-input"]').type(this.gameId)
-    cy.get('[data-cy="player-name-input"]').clear()
-    cy.get('[data-cy="player-name-input"]').type('walter')
-    cy.get('[data-cy="url-input"]').clear()
-    cy.get('[data-cy="url-input"]').type('https://www.google.com')
-    cy.get('form > .mantine-UnstyledButton-root').click()
+    // cy.contains('Join').click()
+    // cy.get('[data-cy="game-id-input"]').clear()
+    // cy.get('[data-cy="game-id-input"]').type(this.gameId)
+    // cy.get('[data-cy="player-name-input"]').clear()
+    // cy.get('[data-cy="player-name-input"]').type('walter')
+    // cy.get('[data-cy="url-input"]').clear()
+    // cy.get('[data-cy="url-input"]').type('https://www.google.com')
+    // cy.get('form > .mantine-UnstyledButton-root').click()
+
+    cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
 
     cy.visit('localhost:5173')
 
     cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
 
     // Try and enter game with same name as above
-    cy.contains('Join').click()
-    cy.get('[data-cy="game-id-input"]').clear()
-    cy.get('[data-cy="game-id-input"]').type(this.gameId)
-    cy.get('[data-cy="player-name-input"]').clear()
-    cy.get('[data-cy="player-name-input"]').type('walter')
-    cy.get('[data-cy="url-input"]').clear()
-    cy.get('[data-cy="url-input"]').type('https://www.google.com')
-    cy.get('form > .mantine-UnstyledButton-root').click()
+    // cy.contains('Join').click()
+    // cy.get('[data-cy="game-id-input"]').clear()
+    // cy.get('[data-cy="game-id-input"]').type(this.gameId)
+    // cy.get('[data-cy="player-name-input"]').clear()
+    // cy.get('[data-cy="player-name-input"]').type('walter')
+    // cy.get('[data-cy="url-input"]').clear()
+    // cy.get('[data-cy="url-input"]').type('https://www.google.com')
+    // cy.get('form > .mantine-UnstyledButton-root').click()
+
+    cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
 
     // Assert error is shown
     cy.contains('Your name already exists').should('be.visible')
@@ -200,14 +209,16 @@ describe('Home page', () => {
     cy.intercept('POST', '/api/' + this.gameId + '/auth').as('join-game-as-mod')
 
     // Join game as moderator
-    cy.contains('Join').click()
-    cy.get('.mantine-8jlqcf').click()
-    cy.get('[data-cy="mod-game-id-input"]').clear()
-    cy.get('[data-cy="mod-game-id-input"]').type(this.gameId)
-    cy.get('[data-cy="mod-pwd-input"]').clear()
     // (Game password was given as test in the beforeEach hook)
-    cy.get('[data-cy="mod-pwd-input"]').type('test')
-    cy.get('form > .mantine-Button-root').click()
+    // cy.contains('Join').click()
+    // cy.get('.mantine-8jlqcf').click()
+    // cy.get('[data-cy="mod-game-id-input"]').clear()
+    // cy.get('[data-cy="mod-game-id-input"]').type(this.gameId)
+    // cy.get('[data-cy="mod-pwd-input"]').clear()
+    // cy.get('[data-cy="mod-pwd-input"]').type('test')
+    // cy.get('form > .mantine-Button-root').click()
+
+    cy.joinGameAsModerator(this.gameId, 'test')
 
     // Assert correct request/response was sent/received
     cy.wait('@join-game-as-mod').then(({ request, response }) => {
@@ -219,20 +230,22 @@ describe('Home page', () => {
     cy.url().should('include', this.gameId + '/admin')
   })
 
-  it('join game as moderator with incorrect password', function () {
+  it.only('join game as moderator with incorrect password', function () {
     // Go back to home page
     cy.visit('localhost:5173')
 
     cy.intercept('POST', '/api/' + this.gameId + '/auth').as('join-game-as-mod')
 
     // Join game as moderator
-    cy.contains('Join').click()
-    cy.get('.mantine-8jlqcf').click()
-    cy.get('[data-cy="mod-game-id-input"]').clear()
-    cy.get('[data-cy="mod-game-id-input"]').type(this.gameId)
-    cy.get('[data-cy="mod-pwd-input"]').clear()
-    cy.get('[data-cy="mod-pwd-input"]').type('incorrect-password')
-    cy.get('form > .mantine-Button-root').click()
+    // cy.contains('Join').click()
+    // cy.get('.mantine-8jlqcf').click()
+    // cy.get('[data-cy="mod-game-id-input"]').clear()
+    // cy.get('[data-cy="mod-game-id-input"]').type(this.gameId)
+    // cy.get('[data-cy="mod-pwd-input"]').clear()
+    // cy.get('[data-cy="mod-pwd-input"]').type('incorrect-password')
+    // cy.get('form > .mantine-Button-root').click()
+
+    cy.joinGameAsModerator(this.gameId, 'incorrect-password')
 
     // Assert correct request/response was sent/received
     cy.wait('@join-game-as-mod').then(({ request, response }) => {
