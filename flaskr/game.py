@@ -38,36 +38,64 @@ class Game:
 
             if num_players != 0:
                 # Minimum relative correct streak length needed to be a "player ready to move on"
-                advance_threshold = None
-                if num_players < 2:
-                    advance_threshold = 1
-                elif num_players < 5:
-                    advance_threshold = 0.6
-                else:
-                    advance_threshold = 0.3
+                # advance_threshold = None
+                # if num_players < 2:
+                #     advance_threshold = 1
+                # elif num_players < 5:
+                #     advance_threshold = 0.6
+                # else:
+                #     advance_threshold = 0.3
 
-                # Calculate the relative length of the recent correct streak
-                num_advancable = 0
+                # # Calculate the relative length of the recent correct streak
+                # num_advancable = 0
+                # for pid in self.players:
+                #     # Ignore players that don't have a full length streak
+
+                #     curr_player = players_dict[pid]
+                #     streak = curr_player.streak
+                #     if len(streak) < STREAK_LENGTH:
+                #         continue
+
+                #     # rfind returns -1 if not found
+                #     correct_num_tail = (
+                #         len(streak) - max(streak.rfind("X"), streak.rfind("0")) + 1
+                #     )
+
+                #     # max() is to avoid divZero errors
+                #     if correct_num_tail / max(len(streak), 1) >= advance_threshold:
+                #         num_advancable += 1
+
+                # print(num_advancable)
+
+                # if num_advancable / num_players > ADVANCE_RATIO:
+                #     self.question_factory.advance_round()
+                #     self.round += 1
+                #     self.first_round_event.set()
+
+                ratio_threshold = 0.4
+                advancable_players = 0
+
                 for pid in self.players:
-                    # Ignore players that don't have a full length streak
 
                     curr_player = players_dict[pid]
-                    streak = curr_player.streak
-                    if len(streak) < STREAK_LENGTH:
-                        continue
-
-                    # rfind returns -1 if not found
-                    correct_num_tail = (
-                        len(streak) - max(streak.rfind("X"), streak.rfind("0")) + 1
+                    position, streak = (
+                        scoreboard.leaderboard_position(curr_player),
+                        curr_player.streak,
                     )
 
-                    # max() is to avoid divZero errors
-                    if correct_num_tail / max(len(streak), 1) >= advance_threshold:
-                        num_advancable += 1
+                    correct_num_tail = (
+                        len(streak) - max(streak.rfind("X"), streak.rfind("0")) - 1
+                    )
+                    print(streak, correct_num_tail)
 
-                if num_advancable / num_players > ADVANCE_RATIO:
+                    if correct_num_tail >= 6 and position <= max(
+                        0.6 * len(self.players), 1
+                    ):
+                        advancable_players += 1
+
+                if advancable_players / len(self.players) > ratio_threshold:
                     self.question_factory.advance_round()
                     self.round += 1
                     self.first_round_event.set()
 
-            time.sleep(5)
+            time.sleep(2)
