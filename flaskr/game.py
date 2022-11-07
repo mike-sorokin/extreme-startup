@@ -34,9 +34,10 @@ class Game:
     # In the latter case we would want to increment round. Also in charge of informing game administrators
     def monitor(self, players_dict, scoreboard):
         while not self.paused:
+
             num_players = len(self.players)
 
-            if num_players != 0:
+            if num_players != 0 and self.round != 0:
                 # Minimum relative correct streak length needed to be a "player ready to move on"
                 # advance_threshold = None
                 # if num_players < 2:
