@@ -2,17 +2,13 @@ import React from 'react'
 import { Outlet, useParams, useNavigate } from 'react-router-dom'
 import { Menu, Button, Burger } from '@mantine/core'
 
-import { isAdmin } from '../utils/requests'
+import { checkAdmin } from '../utils/requests'
 
 function Game () {
   const params = useParams()
   const navigate = useNavigate()
 
-  const admin = () => {
-    const isMod = isAdmin(params.gameId)
-    console.log(isMod)
-    return isMod.authorized
-  }
+  const isAdmin = checkAdmin(params.gameId)
 
   const myPlayerUrl = '/admin'
 
@@ -33,7 +29,7 @@ function Game () {
 
         <Menu.Dropdown>
           <Menu.Label>Game Menu</Menu.Label>
-          { admin
+          { isAdmin
             ? <Menu.Item>{navButton('/admin', 'Admin Page', 'grape')}</Menu.Item>
             : <Menu.Item>{navButton(myPlayerUrl, 'My Player Page', 'grape')}</Menu.Item>
           }
