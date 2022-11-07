@@ -63,14 +63,16 @@ function Admin () {
       radius="md"
       size="md"
       style={{ marginLeft: '10%', width: '110px' }}
-      onClick={() => togglePauseRound()}>
+      onClick={() => togglePauseRound()}
+      data-cy='pause-round-button'>
       {text}
     </Button>
   }
 
   function roundBadge (color, text) {
     return <Badge size="xl" color={color} variant="filled"
-      style={{ width: '200px' }}>
+      style={{ width: '200px' }}
+      data-cy='current-round'>
       {text}
     </Badge>
   }
@@ -92,7 +94,7 @@ function Admin () {
         </div>
         <Space h="md" /> <br />
         <h3>Number of Players</h3>
-        <h4 style={{ color: 'grey' }}>{playerNo}</h4>
+        <h4 style={{ color: 'grey' }} data-cy='number-of-players'>{playerNo}</h4>
         <br />
         <h3>Current Round</h3>
         <div style={{ display: 'inline-flex', flexDirection: 'row' }}>
@@ -102,7 +104,8 @@ function Admin () {
             color="indigo"
             radius="md"
             size="md"
-            onClick={() => advanceRound()}>
+            onClick={() => advanceRound()}
+            data-cy='advance-round-button'>
             Advance Round
           </Button>
           {gamePaused

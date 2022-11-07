@@ -150,7 +150,7 @@ describe('Home page', () => {
     cy.url().should('not.include', this.gameId + '/players')
   })
 
-  it.only('joining game with non-unique name or url', function () {
+  it('joining game with non-unique name or url', function () {
     // Go back to home page
     // cy.visit('localhost:5173')
 
