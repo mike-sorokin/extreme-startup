@@ -253,7 +253,10 @@ def create_app():
     # List of players who need help
     @app.get("/api/<game_id>/assist")
     def assist(game_id):
-        pass
+        if game_id not in games:
+            return NOT_ACCEPTABLE
+
+        return games[game_id].assists
 
     # Managing <player_id> player
     @app.route("/api/<game_id>/players/<player_id>", methods=["GET", "PUT", "DELETE"])
