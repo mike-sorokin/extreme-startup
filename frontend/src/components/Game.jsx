@@ -6,14 +6,19 @@ import { checkAdmin } from '../utils/requests'
 
 function Game () {
   const [isAdmin, setIsAdmin] = useState(false)
+  const [playerID, setPlayerID] = useState("")
   const params = useParams()
   const navigate = useNavigate()
 
-  const myPlayerUrl = '/players'
+  const myPlayerUrl = '/players' 
 
   const updateAdmin = async () => {
-    const admin = await checkAdmin(params.gameId)
+    const auth = await checkAuth(params.gameId)
+    const admin = auth.authorized
+    const player = auth.player
+
     setIsAdmin(admin)
+    setPlayerID(player)
   }
 
   updateAdmin()
@@ -37,7 +42,7 @@ function Game () {
           <Menu.Label>Game Menu</Menu.Label>
           { isAdmin
             ? <Menu.Item>{navButton('/admin', 'Admin Page', 'grape')}</Menu.Item>
-            : <Menu.Item>{navButton(myPlayerUrl, 'My Player Page', 'grape')}</Menu.Item>
+            : playerID ? <Menu.Item>{navButton(`/players/${playerID}`, 'My Player Page', 'grape')}</Menu.Item> : <></>
           }
           <Menu.Item>{navButton('', 'Leaderboard', 'indigo')}</Menu.Item>
           <Menu.Item>{navButton('/players', 'Players', 'pink')}</Menu.Item>
