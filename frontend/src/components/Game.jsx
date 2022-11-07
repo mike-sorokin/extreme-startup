@@ -2,26 +2,15 @@ import React, { useState } from 'react'
 import { Outlet, useParams, useNavigate } from 'react-router-dom'
 import { Menu, Button, Burger } from '@mantine/core'
 
-import { checkAdmin } from '../utils/requests'
+import { updateSessionData } from '../utils/utils'
 
 function Game () {
   const [isAdmin, setIsAdmin] = useState(false)
-  const [playerID, setPlayerID] = useState("")
+  const [playerID, setPlayerID] = useState('')
   const params = useParams()
   const navigate = useNavigate()
 
-  const myPlayerUrl = '/players' 
-
-  const updateAdmin = async () => {
-    const auth = await checkAuth(params.gameId)
-    const admin = auth.authorized
-    const player = auth.player
-
-    setIsAdmin(admin)
-    setPlayerID(player)
-  }
-
-  updateAdmin()
+  updateSessionData(params.gameId, setIsAdmin, setPlayerID)
 
   // Separate file for navButton?
   const navButton = (suffix, text, color) => {
@@ -42,7 +31,9 @@ function Game () {
           <Menu.Label>Game Menu</Menu.Label>
           { isAdmin
             ? <Menu.Item>{navButton('/admin', 'Admin Page', 'grape')}</Menu.Item>
-            : playerID ? <Menu.Item>{navButton(`/players/${playerID}`, 'My Player Page', 'grape')}</Menu.Item> : <></>
+            : playerID
+              ? <Menu.Item>{navButton(`/players/${playerID}`, 'My Player Page', 'grape')}</Menu.Item>
+              : <></>
           }
           <Menu.Item>{navButton('', 'Leaderboard', 'indigo')}</Menu.Item>
           <Menu.Item>{navButton('/players', 'Players', 'pink')}</Menu.Item>
