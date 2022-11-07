@@ -2,9 +2,9 @@ import React from 'react'
 import { Outlet, Navigate } from 'react-router-dom'
 
 function AdminRoute () {
-  const auth = { token: false }
+  const valid = true
   return (
-    auth.token ? <Outlet /> : <Navigate to="/" />
+    valid ? <Outlet /> : <Navigate to="/" />
   )
 }
 
