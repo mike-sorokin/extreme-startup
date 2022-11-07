@@ -3,16 +3,24 @@ import { useParams } from 'react-router-dom'
 import { Badge, Button, Card, Container, Space, Title } from '@mantine/core'
 import { useClipboard } from '@mantine/hooks'
 
-import { fetchGame, updateGame } from '../utils/requests'
+import { checkAdmin, fetchGame, updateGame } from '../utils/requests'
 
 function Admin () {
   const [playerNo, setPlayerNo] = useState(0)
   const [round, setRound] = useState(0)
   const [gamePaused, setGamePaused] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   const params = useParams()
-
   const clipboard = useClipboard({ timeout: 500 })
+
+  const updateAdmin = async () => {
+    const admin = await checkAdmin(params.gameId)
+    setIsAdmin(admin)
+    console.log(isAdmin)
+  }
+
+  updateAdmin()
 
   // Fetches game data every 2 seconds (current round and number of players)
   useEffect(() => {
@@ -109,23 +117,6 @@ function Admin () {
             : togglePauseButton('yellow', 'Pause')
           }
         </div>
-        {/* <div style={roundsBarStyle}>
-          <div>
-            <h3>Current Round</h3>
-          </div>
-          <Button variant="outline"
-            color="indigo"
-            radius="md"
-            size="md"
-            onClick={() => advanceRound()}>
-            Advance Round
-          </Button>
-          { gamePaused
-            ? togglePauseButton('green', 'Resume')
-            : togglePauseButton('yellow', 'Pause')
-          }
-        </div>
-        {<h4 style={{ color: 'grey' }}>{gamePaused ? 'PAUSED' : (round > 0 ? round : 'WARMUP')}</h4>} */}
       </Card>
     </Container>
   )

@@ -1,16 +1,22 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Outlet, useParams, useNavigate } from 'react-router-dom'
 import { Menu, Button, Burger } from '@mantine/core'
 
 import { checkAdmin } from '../utils/requests'
 
 function Game () {
+  const [isAdmin, setIsAdmin] = useState(false)
   const params = useParams()
   const navigate = useNavigate()
 
-  const isAdmin = checkAdmin(params.gameId)
+  const myPlayerUrl = '/players'
 
-  const myPlayerUrl = '/admin'
+  const updateAdmin = async () => {
+    const admin = await checkAdmin(params.gameId)
+    setIsAdmin(admin)
+  }
+
+  updateAdmin()
 
   // Separate file for navButton?
   const navButton = (suffix, text, color) => {
