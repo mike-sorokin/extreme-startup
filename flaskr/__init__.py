@@ -118,8 +118,13 @@ def create_app():
         if game_id not in games:
             return NOT_ACCEPTABLE
 
-        if request.method == "GET":
-            return {"authorized": is_admin(game_id, session)}
+        if request.method == "GET": 
+            res = {"authorized": is_admin(game_id, session)}
+            
+            if get_player(session)[0]:
+                res["player_id"] =  get_player(session)[1]
+
+            return res
 
         elif request.method == "POST":
             if "password" not in request.get_json():
@@ -394,5 +399,10 @@ def create_app():
 
     def is_player(player_id, session):
         return ("player" in session) and (player_id in session["player"])
+    
+    def get_player(session):
+        if "player" in session:
+            return True, session["player"]
+        return False, None
 
     return app
