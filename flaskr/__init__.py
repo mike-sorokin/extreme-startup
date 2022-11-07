@@ -177,6 +177,14 @@ def create_app():
                         return ("Race condition wtih lock", 429)
                     return ("GAME_UNPAUSED", 200)
 
+            elif "auto" in r:
+                if r["auto"]:  # turn on auto mode
+                    games[game_id].auto_mode = True
+                    return ("GAME_AUTO_ON", 200)
+                else:  # turn off auto mode
+                    games[game_id].auto_mode = False
+                    return ("GAME_AUTO_OFF", 200)
+
             return NOT_ACCEPTABLE
 
         elif request.method == "DELETE":  # delete game with <game_id>

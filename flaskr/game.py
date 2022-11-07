@@ -26,6 +26,8 @@ class Game:
 
         self.assists = []
 
+        self.auto_mode = False
+
     def new_player(self, player_id):
         self.players.append(player_id)
 
@@ -40,7 +42,7 @@ class Game:
             num_players = len(self.players)
 
             if num_players != 0:
-                if self.round != 0:
+                if self.auto_mode and self.round != 0:
                     self.__auto_increment_round(players_dict, scoreboard)
                 self.__monitor_assists(players_dict)
 
@@ -97,3 +99,6 @@ class Game:
             self.question_factory.advance_round()
             self.round += 1
             self.first_round_event.set()
+
+            for pid in self.players:
+                players_dict[pid].round_index = 0
