@@ -24,6 +24,8 @@ class Game:
 
         self.admin_password = admin_password
 
+        self.assists = []
+
     def new_player(self, player_id):
         self.players.append(player_id)
 
@@ -37,69 +39,61 @@ class Game:
 
             num_players = len(self.players)
 
-            if num_players != 0 and self.round != 0:
-                # Minimum relative correct streak length needed to be a "player ready to move on"
-                # advance_threshold = None
-                # if num_players < 2:
-                #     advance_threshold = 1
-                # elif num_players < 5:
-                #     advance_threshold = 0.6
-                # else:
-                #     advance_threshold = 0.3
-
-                # # Calculate the relative length of the recent correct streak
-                # num_advancable = 0
-                # for pid in self.players:
-                #     # Ignore players that don't have a full length streak
-
-                #     curr_player = players_dict[pid]
-                #     streak = curr_player.streak
-                #     if len(streak) < STREAK_LENGTH:
-                #         continue
-
-                #     # rfind returns -1 if not found
-                #     correct_num_tail = (
-                #         len(streak) - max(streak.rfind("X"), streak.rfind("0")) + 1
-                #     )
-
-                #     # max() is to avoid divZero errors
-                #     if correct_num_tail / max(len(streak), 1) >= advance_threshold:
-                #         num_advancable += 1
-
-                # print(num_advancable)
-
-                # if num_advancable / num_players > ADVANCE_RATIO:
-                #     self.question_factory.advance_round()
-                #     self.round += 1
-                #     self.first_round_event.set()
-
-                ratio_threshold = 0.4
-                advancable_players = 0
-
-                for pid in self.players:
-
-                    curr_player = players_dict[pid]
-                    position, round_streak = (
-                        scoreboard.leaderboard_position(curr_player),
-                        curr_player.streak[curr_player.round_index :],
-                    )
-
-                    print(curr_player.streak, curr_player.round_index)
-                    correct_num_tail = (
-                        len(round_streak)
-                        - max(round_streak.rfind("X"), round_streak.rfind("0"))
-                        - 1
-                    )
-                    print(round_streak, correct_num_tail)
-
-                    if correct_num_tail >= 6 and position <= max(
-                        0.6 * len(self.players), 1
-                    ):
-                        advancable_players += 1
-
-                if advancable_players / len(self.players) > ratio_threshold:
-                    self.question_factory.advance_round()
-                    self.round += 1
-                    self.first_round_event.set()
+            if num_players != 0:
+                if self.round != 0:
+                    self.__auto_increment_round(players_dict, scoreboard)
+                self.__monitor_assists(players_dict)
 
             time.sleep(2)
+
+    def __monitor_assists(self, players_dict):
+        for pid in self.players:
+            curr_player = players_dict[pid]
+            streak = curr_player.streak
+            round_streak = streak[curr_player.round_index :]
+
+            correct_num_tail = (
+                len(round_streak)
+                - max(round_streak.rfind("X"), round_streak.rfind("0"))
+                - 1
+            )
+            wrong_num_tail = (
+                len(round_streak)
+                - max(round_streak.rfind("0"), round_streak.rfind("1"))
+                - 1
+            )
+            no_response_num_tail = (
+                len(streak) - max(streak.rfind("X"), streak.rfind("1")) - 1
+            )
+
+            if correct_num_tail > 0 and pid in self.assists:
+                self.assists.remove(pid)
+            elif (
+                no_response_num_tail > 10 or wrong_num_tail > 15
+            ) and pid not in self.assists:
+                self.assists.append(pid)
+
+    def __auto_increment_round(self, players_dict, scoreboard):
+        ratio_threshold = 0.4
+        advancable_players = 0
+
+        for pid in self.players:
+            curr_player = players_dict[pid]
+            position, round_streak = (
+                scoreboard.leaderboard_position(curr_player),
+                curr_player.streak[curr_player.round_index :],
+            )
+
+            correct_num_tail = (
+                len(round_streak)
+                - max(round_streak.rfind("X"), round_streak.rfind("0"))
+                - 1
+            )
+
+            if correct_num_tail >= 6 and position <= max(0.6 * len(self.players), 1):
+                advancable_players += 1
+
+        if advancable_players / len(self.players) > ratio_threshold:
+            self.question_factory.advance_round()
+            self.round += 1
+            self.first_round_event.set()

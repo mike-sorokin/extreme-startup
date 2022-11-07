@@ -250,6 +250,11 @@ def create_app():
             games[game_id].players.clear()
             return DELETE_SUCCESSFUL
 
+    # List of players who need help
+    @app.get("/api/<game_id>/assist")
+    def assist(game_id):
+        pass
+
     # Managing <player_id> player
     @app.route("/api/<game_id>/players/<player_id>", methods=["GET", "PUT", "DELETE"])
     def player(game_id, player_id):
