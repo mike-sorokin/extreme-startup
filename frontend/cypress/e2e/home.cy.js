@@ -20,7 +20,7 @@
 describe('Home page', () => {
   // Visit 'localhost:5173' and create a game with password before each test
   beforeEach(() => {
-    cy.visit('localhost:5173')
+    // cy.visit('localhost:5173')
 
     // Setup request intercept
     cy.intercept('POST', '/api').as('create-game')
@@ -59,7 +59,7 @@ describe('Home page', () => {
 
   it('joining a game', function () {
     // Go back to home page
-    cy.visit('localhost:5173')
+    // cy.visit('localhost:5173')
 
     cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
 
@@ -97,7 +97,7 @@ describe('Home page', () => {
 
   it('joining game with invalid game id, invalid url or empty name', function () {
     // Go back to home page
-    cy.visit('localhost:5173')
+    // cy.visit('localhost:5173')
 
     cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
 
@@ -150,9 +150,9 @@ describe('Home page', () => {
     cy.url().should('not.include', this.gameId + '/players')
   })
 
-  it('joining game with non-unique name or url', function () {
+  it.only('joining game with non-unique name or url', function () {
     // Go back to home page
-    cy.visit('localhost:5173')
+    // cy.visit('localhost:5173')
 
     // Enter details to join the newly created game
     // cy.contains('Join').click()
@@ -166,7 +166,7 @@ describe('Home page', () => {
 
     cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
 
-    cy.visit('localhost:5173')
+    // cy.visit('localhost:5173')
 
     cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
 
@@ -204,7 +204,7 @@ describe('Home page', () => {
 
   it('join game as moderator', function () {
     // Go back to home page
-    cy.visit('localhost:5173')
+    // cy.visit('localhost:5173')
 
     cy.intercept('POST', '/api/' + this.gameId + '/auth').as('join-game-as-mod')
 
@@ -230,9 +230,9 @@ describe('Home page', () => {
     cy.url().should('include', this.gameId + '/admin')
   })
 
-  it.only('join game as moderator with incorrect password', function () {
+  it('join game as moderator with incorrect password', function () {
     // Go back to home page
-    cy.visit('localhost:5173')
+    // cy.visit('localhost:5173')
 
     cy.intercept('POST', '/api/' + this.gameId + '/auth').as('join-game-as-mod')
 
