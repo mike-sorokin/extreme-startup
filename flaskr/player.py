@@ -12,6 +12,7 @@ class Player:
         self.events = []
         self.active = True
         self.streak = ""
+        self.round_index = 0
 
     def log_event(self, event):
         self.events.append(event)

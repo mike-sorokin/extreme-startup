@@ -78,15 +78,18 @@ class Game:
                 for pid in self.players:
 
                     curr_player = players_dict[pid]
-                    position, streak = (
+                    position, round_streak = (
                         scoreboard.leaderboard_position(curr_player),
-                        curr_player.streak,
+                        curr_player.streak[curr_player.round_index :],
                     )
 
+                    print(curr_player.streak, curr_player.round_index)
                     correct_num_tail = (
-                        len(streak) - max(streak.rfind("X"), streak.rfind("0")) - 1
+                        len(round_streak)
+                        - max(round_streak.rfind("X"), round_streak.rfind("0"))
+                        - 1
                     )
-                    print(streak, correct_num_tail)
+                    print(round_streak, correct_num_tail)
 
                     if correct_num_tail >= 6 and position <= max(
                         0.6 * len(self.players), 1

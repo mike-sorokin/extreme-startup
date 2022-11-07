@@ -57,6 +57,7 @@ class QuizMaster:
 
     def reset_stats_and_rc(self):
         self.player.streak = ""
+        self.player.round_index = 0
         self.scoreboard.reset_player(self.player)
         self.rate_controller.reset()
 

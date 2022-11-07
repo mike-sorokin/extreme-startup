@@ -154,6 +154,9 @@ def create_app():
                 # wake up all sleeping threads in game if going from WARMUP -> ROUND 1
                 games[game_id].first_round_event.set()
 
+                for pid in games[game_id].players:
+                    players[pid].round_index = 0
+
                 return ("ROUND_INCREMENTED", 200)
 
             elif "pause" in r:
