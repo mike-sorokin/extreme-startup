@@ -33,7 +33,7 @@ function Leaderboard () {
   function createBadge (ch) {
     if (ch === '1') {
       return <ColorSwatch color="green"/>
-    } else if (ch === 'X') {
+    } else if (ch === '0') {
       return <ColorSwatch color="red"/>
     } else {
       return <ColorSwatch color="orange"/>
