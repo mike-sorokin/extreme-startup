@@ -3,12 +3,17 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { Button, Container, Table, Title } from '@mantine/core'
 
 import { deleteAllPlayers, deletePlayer, fetchAllPlayers } from '../utils/requests'
+import { updateSessionData } from '../utils/utils'
 
 function Players () {
   const [players, setPlayers] = useState([])
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [playerID, setPlayerID] = useState('')
 
   const params = useParams()
   const navigate = useNavigate()
+
+  updateSessionData(params.gameId, setIsAdmin, setPlayerID)
 
   // Fetches player data every 2 seconds
   useEffect(() => {
@@ -50,11 +55,16 @@ function Players () {
   return (
     <Container size="xl" px="sm">
       <Title order={1} color="white" weight={1000}>Players</Title>
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <Button variant="outline" color="red" radius="md" size="md"
-          onClick={() => withdrawAllPlayers()}>Withdraw All
-        </Button>
-      </div>
+      {
+        isAdmin
+          ? <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button variant="outline" color="red" radius="md" size="md"
+                onClick={() => withdrawAllPlayers()}>Withdraw All
+              </Button>
+            </div>
+          : <></>
+      }
+
       <hr />
 
       <Table hover>
@@ -63,7 +73,7 @@ function Players () {
             <th>ID</th>
             <th>Name</th>
             <th>API</th>
-            <th>ACTION</th>
+            {isAdmin || playerID ? <th>ACTION</th> : <></> }
           </tr>
         </thead>
         <tbody>
@@ -72,12 +82,16 @@ function Players () {
               <td>{player.id}</td>
               <td>{player.name}</td>
               <td>{player.api}</td>
-              <td>
-                <Button variant="outline" color="red" radius="md" size="md"
-                  onClick={() => withdrawPlayer(player.id)}>
-                  Withdraw
-                </Button>
-              </td>
+              {
+                isAdmin || (player.id === playerID)
+                  ? <td>
+                      <Button variant="outline" color="red" radius="md" size="md"
+                        onClick={() => withdrawPlayer(player.id)}>
+                        Withdraw
+                      </Button>
+                    </td>
+                  : <></>
+              }
             </tr>
           ))}
         </tbody>
