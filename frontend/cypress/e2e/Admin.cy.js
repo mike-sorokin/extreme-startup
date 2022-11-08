@@ -7,8 +7,7 @@
 // Game ID, No. of players, current round, advance round button, pause round button should all be visible
 // Check it sends requests to fetch game data and check responses are in the correct format
 // Mock responses and check that it displays the data correctly (data = no. of players, current round, game paused)
-// Check advance round button works
-// Check pause game button works
+// Check advance round and pause game buttons works
 // Maybe check questions stop being sent after pause? or new questions are sent after advance? (not sure how to do this)
 
 describe('Game page', () => {
@@ -39,6 +38,7 @@ describe('Game page', () => {
     cy.url().should('include', this.gameId + '/admin')
     cy.get('[data-cy="current-round"]').should('have.text', 'WARMUP')
 
+    cy.intercept('PUT', '/api/' + this.gameId)
     cy.get('[data-cy="advance-round-button"]').click()
     cy.get('[data-cy="current-round"]').should('have.text', 'Round 1')
 

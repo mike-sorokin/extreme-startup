@@ -56,6 +56,46 @@ describe('Game page', () => {
   })
 
   it('sends requests for leaderboard', function () {
-    // TODO check requests, response and mock response
+    cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
+    // waits up to 4s for player id to be visible before aliasing
+    cy.get('[data-cy="player-id"]').should('be.visible')
+    cy.get('[data-cy="player-id"]').invoke('text').as('playerId')
+
+    cy.joinGameAsPlayer(this.gameId, 'jesse', 'https://www.google.co.uk')
+
+    cy.visit('localhost:5173/' + this.gameId)
+
+    cy.intercept('GET', '/api/' + this.gameId + '/players').as('fetch-players')
+
+    cy.wait('@fetch-players').then(({ request, response }) => {
+      expect(request.body).to.equal('')
+      expect(response.statusCode).to.equal(200)
+      expect(response.body).to.have.property('players')
+      expect(Object.keys(response.body.players)).to.have.length(2)
+      expect(response.body.players[this.playerId]).to.have.property('score')
+    })
+  })
+
+  it('shows correct data on leaderboard', function () {
+    cy.intercept('GET', '/api/' + this.gameId + '/players', { fixture: 'players.json' })
+
+    cy.visit('localhost:5173/' + this.gameId)
+
+    // Assert that leaderboard table is sorted and displays information correctly
+    cy.get('tbody > :nth-child(1) > :nth-child(2)').should('have.text', 'mock_jesse')
+    cy.get('tbody > :nth-child(1) > :nth-child(1)').should('have.text', 'player2')
+    cy.get('tbody > :nth-child(1) > :nth-child(4)').should('have.text', '420')
+    cy.get('tbody > :nth-child(2) > :nth-child(1)').should('have.text', 'player3')
+    cy.get('tbody > :nth-child(2) > :nth-child(4)').should('have.text', '21')
+    cy.get('tbody > :nth-child(3) > :nth-child(1)').should('have.text', 'player1')
+    cy.get('tbody > :nth-child(3) > :nth-child(4)').should('have.text', '-10')
+    // Annoying way to check that the streaks are of the correct colour
+    cy.get('tbody > :nth-child(1) > :nth-child(3) > :nth-child(1) > :nth-child(1) > :nth-child(3)').should('have.css', 'background-color', 'rgb(255, 0, 0)')
+    cy.get('tbody > :nth-child(1) > :nth-child(3) > :nth-child(1) > :nth-child(2) > :nth-child(3)').should('have.css', 'background-color', 'rgb(255, 165, 0)')
+    cy.get('tbody > :nth-child(1) > :nth-child(3) > :nth-child(1) > :nth-child(3) > :nth-child(3)').should('have.css', 'background-color', 'rgb(0, 128, 0)')
+  })
+
+  it('shows correct graph for data', function () {
+    // TODO
   })
 })
