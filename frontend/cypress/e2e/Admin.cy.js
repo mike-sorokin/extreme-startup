@@ -3,7 +3,7 @@
 /* eslint-disable no-undef */
 /// <reference types="cypress" />
 
-// Summary:
+// Summary: (time: 14s)
 // Game ID, No. of players, current round, advance round button, pause round button should all be visible
 // Check it sends requests to fetch game data and check responses are in the correct format
 // Mock responses and check that it displays the data correctly (data = no. of players, current round, game paused)
@@ -38,11 +38,32 @@ describe('Game page', () => {
     cy.url().should('include', this.gameId + '/admin')
     cy.get('[data-cy="current-round"]').should('have.text', 'WARMUP')
 
-    cy.intercept('PUT', '/api/' + this.gameId)
+    cy.intercept('PUT', '/api/' + this.gameId).as('advance-round')
+
+    // Click advance round button
     cy.get('[data-cy="advance-round-button"]').click()
+
+    // Check request and response
+    cy.wait('@advance-round').then(({ request, response }) => {
+      expect(request.body).to.deep.equal({ round: 1 })
+      expect(response.statusCode).to.equal(200)
+      expect(response.body).to.equal('ROUND_INCREMENTED')
+    })
+
+    // Check template
     cy.get('[data-cy="current-round"]').should('have.text', 'Round 1')
 
+    // Click advance round again
     cy.get('[data-cy="advance-round-button"]').click()
+
+    // Check request and response
+    cy.wait('@advance-round').then(({ request, response }) => {
+      expect(request.body).to.deep.equal({ round: 2 })
+      expect(response.statusCode).to.equal(200)
+      expect(response.body).to.equal('ROUND_INCREMENTED')
+    })
+
+    // Check template
     cy.get('[data-cy="current-round"]').should('have.text', 'Round 2')
   })
 
@@ -51,15 +72,33 @@ describe('Game page', () => {
     cy.get('[data-cy="current-round"]').should('have.text', 'WARMUP')
     cy.get('[data-cy="pause-round-button"]').should('have.text', 'Pause')
 
+    cy.intercept('PUT', '/api/' + this.gameId).as('pause-round')
+
     // Click pause button
     cy.get('[data-cy="pause-round-button"]').click()
 
+    // Check request and response
+    cy.wait('@pause-round').then(({ request, response }) => {
+      expect(request.body).to.deep.equal({ pause: 'p' })
+      expect(response.statusCode).to.equal(200)
+      expect(response.body).to.equal('GAME_PAUSED')
+    })
+
+    // Check template
     cy.get('[data-cy="current-round"]').should('have.text', 'PAUSED')
     cy.get('[data-cy="pause-round-button"]').should('have.text', 'Resume')
 
     // Click resume
     cy.get('[data-cy="pause-round-button"]').click()
 
+    // Check request and response
+    cy.wait('@pause-round').then(({ request, response }) => {
+      expect(request.body).to.deep.equal({ pause: '' })
+      expect(response.statusCode).to.equal(200)
+      expect(response.body).to.equal('GAME_UNPAUSED')
+    })
+
+    // Check template
     cy.get('[data-cy="current-round"]').should('have.text', 'WARMUP')
     cy.get('[data-cy="pause-round-button"]').should('have.text', 'Pause')
   })
@@ -80,8 +119,6 @@ describe('Game page', () => {
       expect(JSON.parse(response.body)).to.have.property('players').and.to.deep.equal([])
       expect(JSON.parse(response.body)).to.have.property('paused').and.to.equal(false)
     })
-
-    cy.intercept('GET', '/api/' + this.gameId).as('fetch-game')
 
     cy.wait('@fetch-game').then(({ request, response }) => {
       expect(request.body).to.equal('')

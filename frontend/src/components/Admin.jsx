@@ -39,8 +39,9 @@ function Admin () {
   const advanceRound = async () => {
     try {
       const response = await updateGame(params.gameId, { round: round + 1 })
-      console.log(response)
-      setRound(round + 1)
+      if (response === 'ROUND_INCREMENTED') {
+        setRound(round + 1)
+      }
     } catch (error) {
       // TODO
     }
@@ -50,7 +51,6 @@ function Admin () {
   const togglePauseRound = async () => {
     try {
       const response = await updateGame(params.gameId, { pause: (gamePaused ? '' : 'p') })
-      console.log(response)
       setGamePaused(response === 'GAME_PAUSED')
     } catch (error) {
       // TODO
