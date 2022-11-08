@@ -63,7 +63,7 @@ class Game:
         for pid in self.players:
             curr_player = players_dict[pid]
             streak = curr_player.streak
-            round_streak = streak[curr_player.round_index :]
+            round_streak = streak[-curr_player.round_index :]
 
             c_tail, w_tail, no_res_tail = [__streak_length(round_streak, c) for c in STREAK_CHARS] 
             
@@ -82,7 +82,7 @@ class Game:
 
             position, round_streak = (
                 scoreboard.leaderboard_position(curr_player),
-                curr_player.streak[curr_player.round_index :]
+                curr_player.streak[-curr_player.round_index :]
             )
 
             c_tail = __streak_length(round_streak, "1")

@@ -53,7 +53,7 @@ class Scoreboard:
         player.log_event(event)
 
         player.streak = player.streak[-STREAK_LENGTH:]
-        player.round_index -= 1
+        player.round_index += 1
 
     def record_request_for(self, player):
         self.request_counts[player.uuid] += 1
