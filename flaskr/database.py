@@ -1,4 +1,4 @@
-import pymongo, os, json, subprocess, shutil, time
+import pymongo, os, json, subprocess, shutil
 
 
 def get_mongo_client(local=False):
@@ -10,7 +10,7 @@ def get_mongo_client(local=False):
     config_path = os.path.join(os.path.dirname(__file__), "mongo_config.json")
 
     # Try to update connection_string to json config
-    if os.path.isfile(config_path):
+    if os.path.isfile(config_path) and not local:
         with open(config_path) as f:
             cfg = json.load(f)
             try:
@@ -39,8 +39,3 @@ def destructive_start_localhost_mongo():
     os.mkdir(db_path)
 
     subprocess.Popen(["mongod", "--dbpath", db_path], stdout=subprocess.DEVNULL)
-
-
-destructive_start_localhost_mongo()
-cli = get_mongo_client()
-print(cli.xs.game.insert_one({"test_event": "hello_world"}))
