@@ -4,6 +4,7 @@
 /// <reference types="cypress" />
 
 // Summary:
+// Correct components are displayed on the correct urls
 // You can only navigate to game id's that exist
 // You can only navigate to your own player page
 // You can only navigate to player pages for player id's that exist
@@ -16,7 +17,7 @@ describe('Game page', () => {
     cy.createGame('test')
 
     // save gameId of created game under alias gameId for tests to use later
-    cy.get('.mantine-1mwlxyv').invoke('text').as('gameId')
+    cy.get('[data-cy="game-id"]').invoke('text').as('gameId')
   })
 
   it('can visit a valid game id', function () {

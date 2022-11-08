@@ -16,7 +16,7 @@ describe('Game page', () => {
     cy.createGame('test')
 
     // save gameId of created game under alias gameId for tests to use later
-    cy.get('.mantine-1mwlxyv').invoke('text').as('gameId')
+    cy.get('[data-cy="game-id"]').invoke('text').as('gameId')
 
     // Navigate to game admin page
     cy.get('[data-cy="to-game-page"]').click()

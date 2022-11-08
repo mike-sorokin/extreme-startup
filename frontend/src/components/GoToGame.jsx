@@ -21,7 +21,7 @@ function GoToGame (gameIdGetter) {
       <Space h="xl" />
       <Title order={5} color="white" weight={500}>Your Game ID is:</Title>
       <Space h="md" />
-      <Title order={1} color="white" weight={1000} align="center">{gameId}</Title>
+      <Title order={1} color="white" weight={1000} align="center" data-cy='game-id'>{gameId}</Title>
       <Space h="md" />
       <div style={{ flexDirection: 'row' }}>
         <Button variant="outline"

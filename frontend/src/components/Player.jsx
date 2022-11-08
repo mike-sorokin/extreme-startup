@@ -45,7 +45,7 @@ function Player () {
       <Space h="md" />
       <Card shadow="sm" p="lg" radius="md" withBorder>
         <h3>Player ID</h3>
-        <h4 style={{ color: 'grey' }}>{playerData.id}</h4>
+        <h4 style={{ color: 'grey' }} data-cy='player-id'>{playerData.id}</h4>
         <br />
         <h3>Game ID</h3>
         <div style={{ display: 'inline-flex', flexDirection: 'row' }}>

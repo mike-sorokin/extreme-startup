@@ -4,11 +4,10 @@
 /// <reference types="cypress" />
 
 // Summary:
-// Maybe check auth here instead of Auth.cy (check only players can see their own player page)
 // Check correct requests and response formatting
 // Mock response and check data is displayed correctly
+// Maybe check auth here instead of Auth.cy (check only players can see their own player page)
 // Player withdraw?
-// Update functionality?
 // Check events are correct based on round?
 
 describe('Game page', () => {

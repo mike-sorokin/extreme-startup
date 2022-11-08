@@ -41,7 +41,7 @@ describe('Home page', () => {
     })
 
     // save gameId of created game under alias gameId for tests to use later
-    cy.get('.mantine-1mwlxyv').invoke('text').as('gameId')
+    cy.get('[data-cy="game-id"]').invoke('text').as('gameId')
   })
 
   // must use a function so we can use aliases with this

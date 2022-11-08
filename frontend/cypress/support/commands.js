@@ -38,6 +38,8 @@ Cypress.Commands.add('createGame', (password) => {
   cy.get('[data-cy="password-input"]').clear()
   cy.get('[data-cy="password-input"]').type(password)
   cy.get('form > .mantine-Button-root').click()
+  // Waits up to 4s for the returned game id to be visible so we can grab it and alias it later
+  cy.get('[data-cy="game-id"]').should('be.visible')
 })
 
 // Joins a game as a player from the home page
@@ -63,4 +65,12 @@ Cypress.Commands.add('joinGameAsModerator', (gameId, password) => {
   cy.get('[data-cy="mod-pwd-input"]').clear()
   cy.get('[data-cy="mod-pwd-input"]').type(password)
   cy.get('form > .mantine-Button-root').click()
+})
+
+// Check nav bar buttons are all visible
+Cypress.Commands.add('checkNavMenu', () => {
+  cy.get('[data-cy="nav-menu"]').click()
+  cy.contains('Host Page').should('be.visible')
+  cy.contains('Leaderboard').should('be.visible')
+  cy.contains('Players').should('be.visible')
 })
