@@ -148,15 +148,7 @@ def create_app():
             r = request.get_json()
 
             if "round" in r:  # increment <game_id>'s round by 1
-                games[game_id].question_factory.advance_round()
-                games[game_id].round += 1  # for event logging
-
-                # wake up all sleeping threads in game if going from WARMUP -> ROUND 1
-                games[game_id].first_round_event.set()
-
-                for pid in games[game_id].players:
-                    players[pid].round_index = 0
-
+                games[game_id].advance_round(players)
                 return ("ROUND_INCREMENTED", 200)
 
             elif "pause" in r:
