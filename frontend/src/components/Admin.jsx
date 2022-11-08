@@ -79,7 +79,7 @@ function Admin () {
 
   return (
     <Container size="xl" px="xs">
-      <Title order={1} color="white" weight={1000}>Host Page</Title>
+      <Title order={1} color="white" weight={1000}>Admin Page</Title>
       <Space h="md" />
       <Card shadow="sm" p="lg" radius="md" withBorder>
         <h3>Game ID</h3>

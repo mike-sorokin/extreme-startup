@@ -448,3 +448,54 @@ export async function deleteEvent (gameId, playerId, eventId) {
     alertError(error)
   }
 }
+
+/**
+ * Check if a game id is valid
+ * @async
+ * @param {string} gameId The game id you are checking
+ * @returns {Promise<boolean>} true if valid false if invalid
+ */
+export async function checkValidGame (gameId) {
+  try {
+    const response = await fetchGame(gameId)
+    console.log(response)
+    return true
+  } catch (error) {
+    return false
+  }
+}
+
+/**
+ * Check if a player id is valid
+ * @async
+ * @param {string} gameId The game id you are checking
+ * @param {string} playerId The player id you are checking
+ * @returns {Promise<boolean>} true if valid false if invalid
+ */
+export async function checkValidPlayer (gameId, playerId) {
+  try {
+    const response = await fetchPlayer(gameId, playerId)
+    console.log(response)
+    return true
+  } catch (error) {
+    return false
+  }
+}
+
+// Helper functions for authentication
+
+/**
+ * Check if current user is admin
+ * @async
+ * @param {string} gameId The game id
+ * @returns {Promise<boolean>} true if current user is admin
+ */
+export async function isAdmin (gameId) {
+  try {
+    const response = await instance.get(authAPI(gameId))
+    console.log(response)
+    return response
+  } catch (error) {
+    alertError(error)
+  }
+}

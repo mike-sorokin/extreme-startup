@@ -20,6 +20,7 @@ from flaskr.questions import *
 from datetime import datetime
 import threading
 import secrets
+from random import randint
 
 # PRODUCTION CONSTANT(S)
 QUESTION_TIMEOUT = 10
@@ -147,7 +148,7 @@ def create_app():
 
             if "round" in r:  # increment <game_id>'s round by 1
                 games[game_id].question_factory.advance_round()
-                games[game_id].round += 1 # for event logging
+                games[game_id].round += 1  # for event logging
 
                 # wake up all sleeping threads in game if going from WARMUP -> ROUND 1
                 games[game_id].first_round_event.set()
@@ -160,10 +161,10 @@ def create_app():
                     if not pause_successful:
                         return ("Race condition with lock", 429)
 
-                    games[game_id].paused = True # Kill monitor thread
+                    games[game_id].paused = True  # Kill monitor thread
                     return ("GAME_PAUSED", 200)
 
-                else: # Unpause the game
+                else:  # Unpause the game
                     try:
                         games[game_id].pause_wlock.release()
                         games[game_id].paused = False
@@ -245,7 +246,9 @@ def create_app():
                 games[game_id].pause_rlock,
             )
 
-            player_thread = threading.Thread(target=quiz_master.start, args=(games[game_id].first_round_event,))
+            player_thread = threading.Thread(
+                target=quiz_master.start, args=(games[game_id].first_round_event,)
+            )
             player_thread.daemon = True  # for test termination
             player_thread.start()
 
@@ -362,12 +365,34 @@ def create_app():
     # Get a response
     @app.route("/api/bot/<int:bot_id>", methods=["GET"])
     def _api_response(bot_id):
-        return bot_responses[bot_id][0]
+        if randint(0, max(bot_id - 5, 0)) == 0:
+            return bot_responses[bot_id][0]
+        else:
+            return "Wrong response"
 
-    @app.route("/api/bot/cleanup", methods=["GET"])
-    def _cleanup():
-        bot_responses = {}
-        return "Restored bots"
+    @app.route("/api/bot/ddos/<game_id>", methods=["GET"])
+    def _spam_with_bots(game_id):
+        for i in range(20):
+            player = Player(
+                game_id, f"Bot{i}", api=f"http://localhost:5000/api/bot/{i}"
+            )
+
+            games[game_id].new_player(player.uuid)
+            scoreboards[game_id].new_player(player)
+            players[player.uuid] = player
+
+            quiz_master = QuizMaster(
+                player,
+                games[game_id].question_factory,
+                scoreboards[game_id],
+                games[game_id].pause_rlock,
+            )
+
+            player_thread = threading.Thread(
+                target=quiz_master.start, args=(games[game_id].first_round_event,)
+            )
+            player_thread.daemon = True  # for test termination
+            player_thread.start()
 
     @app.route("/api/bot/", methods=["GET"])
     def _main_view():
@@ -386,7 +411,9 @@ def create_app():
             del games[curr_gid]
 
     def spawn_game_monitor(game):
-        game_monitor_thread = threading.Thread(target=game.monitor, args=[players, scoreboards[game.id]])
+        game_monitor_thread = threading.Thread(
+            target=game.monitor, args=[players, scoreboards[game.id]]
+        )
         game_monitor_thread.daemon = True  # for test termination
         game_monitor_thread.start()
 
