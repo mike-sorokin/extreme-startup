@@ -55,7 +55,7 @@ describe('Game page', () => {
     cy.get('h1').should('have.text', 'Players')
   })
 
-  it('sends requests for leaderboard', function () {
+  it('check requests for leaderboard', function () {
     cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
     // waits up to 4s for player id to be visible before aliasing
     cy.get('[data-cy="player-id"]').should('be.visible')

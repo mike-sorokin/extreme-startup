@@ -103,7 +103,7 @@ describe('Game page', () => {
     cy.get('[data-cy="pause-round-button"]').should('have.text', 'Pause')
   })
 
-  it('check requests are being sent', function () {
+  it('check requests for admin', function () {
     cy.url().should('include', this.gameId + '/admin')
 
     // Setup request intercept
