@@ -83,12 +83,17 @@ describe('Game page', () => {
 
     // Assert that leaderboard table is sorted and displays information correctly
     cy.get('tbody > :nth-child(1) > :nth-child(2)').should('have.text', 'mock_jesse')
+
     cy.get('tbody > :nth-child(1) > :nth-child(1)').should('have.text', 'player2')
     cy.get('tbody > :nth-child(1) > :nth-child(4)').should('have.text', '420')
     cy.get('tbody > :nth-child(2) > :nth-child(1)').should('have.text', 'player3')
     cy.get('tbody > :nth-child(2) > :nth-child(4)').should('have.text', '21')
     cy.get('tbody > :nth-child(3) > :nth-child(1)').should('have.text', 'player1')
     cy.get('tbody > :nth-child(3) > :nth-child(4)').should('have.text', '-10')
+
+    cy.get('tbody > :nth-child(2) > :nth-child(5)').should('have.text', ' ON FIRE! ')
+    cy.get('tbody > :nth-child(1) > :nth-child(5)').should('have.text', '')
+
     // Annoying way to check that the streaks are of the correct colour
     cy.get('tbody > :nth-child(1) > :nth-child(3) > :nth-child(1) > :nth-child(1) > :nth-child(3)').should('have.css', 'background-color', 'rgb(255, 0, 0)')
     cy.get('tbody > :nth-child(1) > :nth-child(3) > :nth-child(1) > :nth-child(2) > :nth-child(3)').should('have.css', 'background-color', 'rgb(255, 165, 0)')
