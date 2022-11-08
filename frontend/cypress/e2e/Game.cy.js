@@ -74,9 +74,17 @@ describe('Game page', () => {
       expect(Object.keys(response.body.players)).to.have.length(2)
       expect(response.body.players[this.playerId]).to.have.property('score')
     })
+
+    cy.wait('@fetch-players').then(({ request, response }) => {
+      expect(request.body).to.equal('')
+      expect(response.statusCode).to.equal(200)
+      expect(response.body).to.have.property('players')
+      expect(Object.keys(response.body.players)).to.have.length(2)
+      expect(response.body.players[this.playerId]).to.have.property('score')
+    })
   })
 
-  it('shows correct data on leaderboard', function () {
+  it('shows correct data on leaderboard for mock response data', function () {
     cy.intercept('GET', '/api/' + this.gameId + '/players', { fixture: 'players.json' })
 
     cy.visit('localhost:5173/' + this.gameId)
@@ -100,7 +108,7 @@ describe('Game page', () => {
     cy.get('tbody > :nth-child(1) > :nth-child(3) > :nth-child(1) > :nth-child(3) > :nth-child(3)').should('have.css', 'background-color', 'rgb(0, 128, 0)')
   })
 
-  it('shows correct graph for data', function () {
+  it('shows correct graph for mock response data', function () {
     // TODO
   })
 })

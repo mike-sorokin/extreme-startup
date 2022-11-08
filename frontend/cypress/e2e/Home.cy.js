@@ -95,7 +95,7 @@ describe('Home page', () => {
     cy.url().should('include', this.gameId + '/players')
   })
 
-  it('joining game with invalid game id, invalid url or empty name', function () {
+  it('joining game with invalid game id', function () {
     // Go back to home page
     // cy.visit('localhost:5173')
 
@@ -117,29 +117,16 @@ describe('Home page', () => {
     // cy.get('.mantine-Notification-description').invoke('text').should('include', 'Game id does not exist')
     cy.contains('Game id does not exist').should('be.visible')
 
-    // wait for mantine notification to go away
-    cy.wait(3000)
+    // Assert join-game request was not sent
+    cy.get('@join-game').should('equal', null)
 
-    // This time enter an empty name
-    cy.get('[data-cy="game-id-input"]').clear()
-    cy.get('[data-cy="game-id-input"]').type(this.gameId)
-    cy.get('[data-cy="player-name-input"]').clear()
-    cy.get('[data-cy="player-name-input"]').type(' ')
-    cy.get('form > .mantine-UnstyledButton-root').click()
+    cy.url().should('not.include', this.gameId + '/players')
+  })
 
-    // Assert error is shown
-    // cy.get('.mantine-Notification-description').invoke('text').should('include', 'Your name cannot be empty')
-    cy.contains('Your name cannot be empty').should('be.visible')
+  it('joining game with invalid url', function () {
+    cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
 
-    // wait for mantine notification to go away
-    cy.wait(3000)
-
-    // This time enter an invalid url
-    cy.get('[data-cy="player-name-input"]').clear()
-    cy.get('[data-cy="player-name-input"]').type('walter')
-    cy.get('[data-cy="url-input"]').clear()
-    cy.get('[data-cy="url-input"]').type('www.google.com')
-    cy.get('form > .mantine-UnstyledButton-root').click()
+    cy.joinGameAsPlayer(this.gameId, 'walter', 'www.google.com')
 
     // Assert error is shown
     cy.contains('invalid URL').should('be.visible')
@@ -150,7 +137,21 @@ describe('Home page', () => {
     cy.url().should('not.include', this.gameId + '/players')
   })
 
-  it('joining game with non-unique name or url', function () {
+  it('joining game with empty name', function () {
+    cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
+
+    cy.joinGameAsPlayer(this.gameId, ' ', 'https://www.google.com')
+
+    // Assert error is shown
+    cy.contains('Your name cannot be empty').should('be.visible')
+
+    // Assert join-game request was not sent
+    cy.get('@join-game').should('equal', null)
+
+    cy.url().should('not.include', this.gameId + '/players')
+  })
+
+  it('joining game with non-unique name', function () {
     // Go back to home page
     // cy.visit('localhost:5173')
 
@@ -185,13 +186,18 @@ describe('Home page', () => {
     // Assert error is shown
     cy.contains('Your name already exists').should('be.visible')
 
-    // wait for mantine notification to go away
-    cy.wait(3000)
+    // Assert join-game request was not sent
+    cy.get('@join-game').should('equal', null)
 
-    // This time try and enter game with already existing url
-    cy.get('[data-cy="player-name-input"]').clear()
-    cy.get('[data-cy="player-name-input"]').type('jesse')
-    cy.get('form > .mantine-UnstyledButton-root').click()
+    cy.url().should('not.include', this.gameId + '/players')
+  })
+
+  it('joining game with non-unique url', function () {
+    cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
+
+    cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
+
+    cy.joinGameAsPlayer(this.gameId, 'jesse', 'https://www.google.com')
 
     // Assert mantine error is shown
     cy.contains('Your url already exists').should('be.visible')
