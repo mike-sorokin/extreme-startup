@@ -40,9 +40,9 @@ describe('Game page', () => {
     cy.visit('localhost:5173/' + this.gameId)
 
     cy.get('[data-cy="nav-menu"]').click()
-    cy.contains('Host Page').click()
+    cy.contains('Admin Page').click()
     cy.url().should('include', this.gameId + '/admin')
-    cy.get('h1').should('have.text', 'Host Page')
+    cy.get('h1').should('have.text', 'Admin Page')
 
     cy.get('[data-cy="nav-menu"]').click()
     cy.contains('Leaderboard').click()

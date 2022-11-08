@@ -67,23 +67,43 @@ describe('Game page', () => {
     })
   })
 
-  it.only('player withdraw button works', function () {
+  it('player withdraw button works', function () {
     cy.visit('localhost:5173/' + this.gameId + '/players')
 
-    cy.intercept('DELETE', '/api/' + this.game_id + '/players/' + this.player_id).as('withdraw-player')
+    cy.intercept('DELETE', '/api/' + this.gameId + '/players/' + this.playerId).as('withdraw-player')
 
     // Click withdraw button
     cy.get('tbody > :nth-child(1) > :nth-child(4) > .mantine-UnstyledButton-root').click()
 
+    // Check request and response
+    cy.wait('@withdraw-player').then(({ request, response }) => {
+      console.log({ request, response })
+      expect(request.body).to.equal('')
+      expect(response.statusCode).to.equal(200)
+      expect(response.body).to.deep.equal({ deleted: this.playerId })
+    })
+
+    // Check template
+    cy.get('h1').should('have.text', 'Leaderboard')
+  })
+
+  it('withdraw all button works', function () {
+    // cy.visit('localhost:5173/' + this.gameId + '/players')
+
+    // cy.intercept('DELETE', '/api/' + this.gameId + '/players/' + this.playerId).as('withdraw-player')
+
+    // // Click withdraw button
+    // cy.get('tbody > :nth-child(1) > :nth-child(4) > .mantine-UnstyledButton-root').click()
+
     // // Check request and response
     // cy.wait('@withdraw-player').then(({ request, response }) => {
     //   console.log({ request, response })
-    //   // expect(request.body).to.deep.equal({ round: 1 })
-    //   // expect(response.statusCode).to.equal(200)
-    //   // expect(response.body).to.equal('ROUND_INCREMENTED')
+    //   expect(request.body).to.equal('')
+    //   expect(response.statusCode).to.equal(200)
+    //   expect(response.body).to.deep.equal({ deleted: this.playerId })
     // })
 
     // // Check template
-    // // cy.get('[data-cy="current-round"]').should('have.text', 'Round 1')
+    // cy.get('h1').should('have.text', 'Leaderboard')
   })
 })

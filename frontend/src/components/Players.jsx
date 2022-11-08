@@ -32,6 +32,7 @@ function Players () {
   const withdrawPlayer = async playerId => {
     try {
       const response = await deletePlayer(params.gameId, playerId)
+      navigate('/' + params.gameId)
       console.log(response)
     } catch (error) {
       // TODO

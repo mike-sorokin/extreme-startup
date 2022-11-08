@@ -70,7 +70,7 @@ Cypress.Commands.add('joinGameAsModerator', (gameId, password) => {
 // Check nav bar buttons are all visible
 Cypress.Commands.add('checkNavMenu', () => {
   cy.get('[data-cy="nav-menu"]').click()
-  cy.contains('Host Page').should('be.visible')
+  cy.contains('Admin Page').should('be.visible')
   cy.contains('Leaderboard').should('be.visible')
   cy.contains('Players').should('be.visible')
 })

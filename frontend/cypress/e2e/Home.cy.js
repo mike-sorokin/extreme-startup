@@ -3,7 +3,7 @@
 /* eslint-disable no-undef */
 /// <reference types="cypress" />
 
-// Summary:
+// Summary: (time: 33s)
 // Create game
 //  - Creating a game with password should always work
 //  - Should send a POST req to "/api" which should return new game object with id property
