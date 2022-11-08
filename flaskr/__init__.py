@@ -256,7 +256,7 @@ def create_app():
         if game_id not in games:
             return NOT_ACCEPTABLE
 
-        return games[game_id].assists
+        return games[game_id].players_to_assist
 
     # Managing <player_id> player
     @app.route("/api/<game_id>/players/<player_id>", methods=["GET", "PUT", "DELETE"])

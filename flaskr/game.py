@@ -8,8 +8,8 @@ ADVANCE_RATIO = 0.2
 
 # 1 -> Correct 
 # X -> Wrong/Incorrect
-# 0 -> No server respones
-STREAK_CHARS = {'1', 'X', '0'}
+# 0 -> No server response
+STREAK_CHARS = ['1', 'X', '0']
 
 # Most fundamental object in application -- stores information of players, scoreboard, questions gen., etc.
 class Game:
@@ -27,7 +27,7 @@ class Game:
 
         self.admin_password = admin_password
 
-        self.assists = []
+        self.players_to_assist = []
 
         self.auto_mode = False
 
@@ -47,7 +47,7 @@ class Game:
             if num_players != 0:
                 if self.auto_mode and self.round != 0:
                     self.__auto_increment_round(players_dict, scoreboard)
-                self.__monitor_assists(players_dict)
+                self.__update_players_to_assist(players_dict)
 
             time.sleep(2)
         
@@ -59,19 +59,20 @@ class Game:
         for pid in self.players:
             players_dict[pid].round_index = 0
 
-    def __monitor_assists(self, players_dict):
+    def __update_players_to_assist(self, players_dict):
         for pid in self.players:
             curr_player = players_dict[pid]
-            streak = curr_player.streak
-            round_streak = streak[-curr_player.round_index :]
+            streak, round_index = curr_player.streak, curr_player.round_index
+            round_streak = streak[-round_index:] if round_index != 0 else ""
 
-            c_tail, w_tail, no_res_tail = [__streak_length(round_streak, c) for c in STREAK_CHARS] 
+            # corect and incorrect tail(s)
+            c_tail, ic_tail = streak_length(round_streak, STREAK_CHARS[0]), streak_length(round_streak, "".join(STREAK_CHARS[1:]))
             
-            if c_tail > 0 and pid in self.assists:
-                self.assists.remove(pid)
+            if c_tail > 0 and pid in self.players_to_assist:
+                self.players_to_assist.remove(pid)
 
-            elif (no_res_tail > 10 or w_tail > 15) and pid not in self.assists:
-                self.assists.append(pid)
+            elif ic_tail > 15 and pid not in self.players_to_assist:
+                self.players_to_assist.append(pid)
 
     def __auto_increment_round(self, players_dict, scoreboard):
         ratio_threshold = 0.4
@@ -79,13 +80,13 @@ class Game:
 
         for pid in self.players:
             curr_player = players_dict[pid]
-
+            round_index = curr_player.round_index 
             position, round_streak = (
                 scoreboard.leaderboard_position(curr_player),
-                curr_player.streak[-curr_player.round_index :]
+                curr_player.streak[-round_index:] if round_index != 0 else ""
             )
 
-            c_tail = __streak_length(round_streak, "1")
+            c_tail = streak_length(round_streak, "1")
 
             if c_tail >= 6 and position <= max(0.6 * len(self.players), 1):
                 advancable_players += 1
@@ -93,5 +94,5 @@ class Game:
         if advancable_players / len(self.players) > ratio_threshold:
             self.advance_round(players_dict)
 
-def __streak_length(response_history, streak_char):
+def streak_length(response_history, streak_char):
     return len(response_history) - len(response_history.rstrip(streak_char))
