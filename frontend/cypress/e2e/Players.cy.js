@@ -88,22 +88,25 @@ describe('Game page', () => {
   })
 
   it('withdraw all button works', function () {
-    // cy.visit('localhost:5173/' + this.gameId + '/players')
+    cy.visit('localhost:5173/' + this.gameId + '/players')
 
-    // cy.intercept('DELETE', '/api/' + this.gameId + '/players/' + this.playerId).as('withdraw-player')
+    cy.intercept('DELETE', '/api/' + this.gameId + '/players').as('withdraw-all-players')
 
-    // // Click withdraw button
-    // cy.get('tbody > :nth-child(1) > :nth-child(4) > .mantine-UnstyledButton-root').click()
+    // Check that player shows in template
+    cy.contains('walter').should('exist')
 
-    // // Check request and response
-    // cy.wait('@withdraw-player').then(({ request, response }) => {
-    //   console.log({ request, response })
-    //   expect(request.body).to.equal('')
-    //   expect(response.statusCode).to.equal(200)
-    //   expect(response.body).to.deep.equal({ deleted: this.playerId })
-    // })
+    // Click withdraw all button
+    cy.get('[data-cy="withdraw-all"]').click()
 
-    // // Check template
-    // cy.get('h1').should('have.text', 'Leaderboard')
+    // Check request and response
+    cy.wait('@withdraw-all-players').then(({ request, response }) => {
+      console.log({ request, response })
+      expect(request.body).to.equal('')
+      expect(response.statusCode).to.equal(204)
+      expect(response.body).to.deep.equal('')
+    })
+
+    // Check that player is not shown in template
+    cy.contains('walter').should('not.exist')
   })
 })

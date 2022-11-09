@@ -53,7 +53,8 @@ function Players () {
       <Title order={1} color="white" weight={1000}>Players</Title>
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Button variant="outline" color="red" radius="md" size="md"
-          onClick={() => withdrawAllPlayers()}>Withdraw All
+          onClick={() => withdrawAllPlayers()}
+          data-cy="withdraw-all">Withdraw All
         </Button>
       </div>
       <hr />
