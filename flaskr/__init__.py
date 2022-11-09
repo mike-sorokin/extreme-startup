@@ -42,9 +42,7 @@ METHOD_NOT_ALLOWED = ("HTTP Method not allowed", 405)
 
 
 def create_app():
-    app = Flask(
-        __name__, static_url_path="", static_folder="vite", template_folder="vite"
-    )
+    app = Flask(__name__, static_folder="vite")
     app.url_map.strict_slashes = False
 
     app.config["SECRET_KEY"] = secrets.token_hex()
@@ -68,7 +66,10 @@ def create_app():
     @app.route("/", defaults={"path": ""})
     @app.route("/<path:path>")
     def serve_frontend(path):
-        return make_response(render_template("index.html", path=path))
+        if path != "" and os.path.exists(app.static_folder + "/" + path):
+            return send_from_directory(app.static_folder, path)
+        else:
+            return send_from_directory(app.static_folder, "index.html")
 
     @app.route("/favicon.ico")
     def favicon():
@@ -117,8 +118,13 @@ def create_app():
         if game_id not in games:
             return NOT_ACCEPTABLE
 
-        if request.method == "GET":
-            return {"authorized": is_admin(game_id, session)}
+        if request.method == "GET": 
+            res = {"authorized": is_admin(game_id, session), "player" : ""}
+            
+            if get_player(session)[0]:
+                res["player"] =  get_player(session)[1]
+
+            return res
 
         elif request.method == "POST":
             if "password" not in request.get_json():
@@ -190,29 +196,7 @@ def create_app():
         if game_id not in games:
             return NOT_ACCEPTABLE
 
-        player_ids = games[game_id].players
-        all_events = [e for pid in player_ids for e in players[pid].events]
-        all_events.sort(key=lambda e: e.timestamp)
-
-        # [{time: <time>, p1: s1, p2:s2.. }]
-        if not all_events:
-            return make_response(encoder.encode([]))
-        cumulative_sums = [{pid: 0 for pid in player_ids}]
-        cumulative_sums[0]["time"] = all_events[0].timestamp
-
-        current_scores = {pid: 0 for pid in player_ids}
-        for event in all_events:
-            next = {}
-            next["time"] = event.timestamp
-
-            old_score = current_scores[event.player_id]
-            new_score = old_score + event.points_gained
-
-            current_scores[event.player_id] = new_score
-            next[event.player_id] = new_score
-
-            cumulative_sums.append(next)
-
+        cumulative_sums = scoreboards[game_id].running_totals
         r = make_response(encoder.encode(cumulative_sums))
         r.mimetype = "application/json"
         return r
@@ -339,19 +323,6 @@ def create_app():
             players[player_id].events.remove(event)
             return DELETE_SUCCESSFUL
 
-    @app.get("/api/<game_id>/leaderboard")
-    def leaderboard(game_id):
-        if game_id not in scoreboards:
-            return NOT_ACCEPTABLE
-
-        score_dict = scoreboards[game_id].leaderboard()
-        res = []
-
-        for k, s in score_dict.items():
-            res.append({"name": players[k].name, "id": k, "score": s})
-
-        return encoder.encode(res)
-
     # FORGIVE ME
     bot_responses = {n: [f"Bot{n}", 0] for n in range(100)}
 
@@ -428,5 +399,10 @@ def create_app():
 
     def is_player(player_id, session):
         return ("player" in session) and (player_id in session["player"])
+    
+    def get_player(session):
+        if "player" in session:
+            return True, session["player"]
+        return False, None
 
     return app

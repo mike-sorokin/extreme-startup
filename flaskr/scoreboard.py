@@ -1,4 +1,5 @@
 from flaskr.event import Event
+from datetime import datetime
 
 PROBLEM_DECREMENT = 50
 STREAK_LENGTH = 30
@@ -10,6 +11,9 @@ class Scoreboard:
 
         # scores: { player_id -> player score }
         self.scores = {}
+
+        # running_totals: [ {"time": timestamp, "pid": score} ]
+        self.running_totals = []
 
         self.correct_tally = {}
         self.incorrect_tally = {}
@@ -42,7 +46,10 @@ class Scoreboard:
             increment,
             question.result if question.problem == "" else question.problem,
         )
-
+        # Append this to cache, used for drawing graph on frontend
+        self.running_totals.append(
+            {"time": event.timestamp, f"{player.uuid}": player.score}
+        )
         player.log_event(event)
 
         player.streak = player.streak[-STREAK_LENGTH:]
@@ -65,13 +72,13 @@ class Scoreboard:
 
     def current_score(self, player):
         return self.scores[player.uuid]
-    
+
     def reset_player(self, player):
-        self.scores[player.uuid] = 0 
+        self.scores[player.uuid] = 0
         self.incorrect_tally[player.uuid] = 0
         self.correct_tally[player.uuid] = 0
-        player.score = 0 
-        # NO request_count reset   
+        player.score = 0
+        # NO request_count reset
 
     def current_total_correct(self, player):
         return self.correct_tally[player.uuid]

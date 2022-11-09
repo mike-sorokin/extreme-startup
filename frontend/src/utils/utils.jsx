@@ -2,6 +2,8 @@ import { showNotification } from '@mantine/notifications'
 import { IconCheck, IconX, IconAlertTriangle } from '@tabler/icons'
 import { React } from 'react'
 
+import { checkAuth } from '../utils/requests'
+
 export function str (obj) {
   return JSON.stringify(obj)
 }
@@ -44,4 +46,13 @@ export function playersAsArray (playersDict) {
     arr.push(playersDict[playerId])
   }
   return arr
+}
+
+export async function updateSessionData (gameId, setIsAdmin, setPlayerID) {
+  const auth = await checkAuth(gameId)
+  const admin = auth.authorized
+  const player = auth.player
+
+  setIsAdmin(admin)
+  setPlayerID(player)
 }

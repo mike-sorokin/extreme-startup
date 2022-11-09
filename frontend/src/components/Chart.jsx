@@ -21,6 +21,7 @@ function Chart ({ gameId }) {
 
         response.forEach((pt) => {
           pt.time -= startTime
+          pt.time /= 1000
         })
         setChartData(response)
       } catch (error) {

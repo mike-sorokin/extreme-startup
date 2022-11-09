@@ -9,10 +9,18 @@ function Admin () {
   const [playerNo, setPlayerNo] = useState(0)
   const [round, setRound] = useState(0)
   const [gamePaused, setGamePaused] = useState(false)
+  // const [isAdmin, setIsAdmin] = useState(false)
 
   const params = useParams()
-
   const clipboard = useClipboard({ timeout: 500 })
+
+  // const updateSessionData = async () => {
+  //   const admin = await checkAuth(params.gameId)
+  //   setIsAdmin(admin)
+  //   console.log(isAdmin)
+  // }
+
+  // updateSessionData()
 
   // Fetches game data every 2 seconds (current round and number of players)
   useEffect(() => {
