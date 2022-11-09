@@ -23,8 +23,6 @@ describe('Game page', () => {
     // save gameId of created game under alias gameId for tests to use later
     cy.get('[data-cy="game-id"]').invoke('text').as('gameId').then(() => {
       cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
-      // waits up to 4s for player id to be visible before aliasing
-      cy.get('[data-cy="player-id"]').should('be.visible')
       cy.get('[data-cy="player-id"]').invoke('text').as('playerId')
     })
   })

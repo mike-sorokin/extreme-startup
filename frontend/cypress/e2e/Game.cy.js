@@ -40,8 +40,6 @@ describe('Game page', () => {
 
     // Create a plaer so we can check that nav menu is showing on player page
     cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
-    // waits up to 4s for player id to be visible before aliasing
-    cy.get('[data-cy="player-id"]').should('be.visible')
     cy.get('[data-cy="player-id"]').invoke('text').as('playerId').then(() => {
       cy.visit('localhost:5173/' + this.gameId + '/players/' + this.playerId)
       cy.checkNavMenu()
@@ -73,8 +71,6 @@ describe('Game page', () => {
   it('fetchAllPlayers requests are being made and check responses', function () {
     // Create 2 players for the game
     cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
-    // waits up to 4s for player id to be visible before aliasing
-    cy.get('[data-cy="player-id"]').should('be.visible')
     cy.get('[data-cy="player-id"]').invoke('text').as('playerId').then(() => {
       cy.joinGameAsPlayer(this.gameId, 'jesse', 'https://www.google.co.uk')
     })

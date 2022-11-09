@@ -24,8 +24,6 @@ describe('Game page', () => {
 
   it('shows correct components on correct urls', function () {
     cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
-    // waits up to 4s for player id to be visible before aliasing
-    cy.get('[data-cy="player-id"]').should('be.visible')
     cy.get('[data-cy="player-id"]').invoke('text').as('playerId').then(() => {
       // Home component
       cy.visit('localhost:5173/')

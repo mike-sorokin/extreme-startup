@@ -6,7 +6,7 @@
       "name": "mock_walter",
       "score": -10,
       "api": "https://www.savewalterwhite.com",
-      "streak": "X01X01"
+      "streak": "0X10X1"
     },
     "player2": {
       "id": "player2",
@@ -14,7 +14,7 @@
       "name": "mock_jesse",
       "score": 420,
       "api": "https://www.savewalterwhite.com",
-      "streak": "X01X01"
+      "streak": "0X10X1"
     },
     "player3": {
       "id": "player3",

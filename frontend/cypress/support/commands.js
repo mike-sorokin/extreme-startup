@@ -53,6 +53,8 @@ Cypress.Commands.add('joinGameAsPlayer', (gameId, name, url) => {
   cy.get('[data-cy="url-input"]').clear()
   cy.get('[data-cy="url-input"]').type(url)
   cy.get('form > .mantine-UnstyledButton-root').click()
+  // waits up to 4s for player id to be visible before aliasing
+  cy.get('[data-cy="player-id"]').should('be.visible')
 })
 
 // Joins a game as a moderator from the home page
