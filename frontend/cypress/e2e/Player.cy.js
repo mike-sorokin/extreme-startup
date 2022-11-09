@@ -8,9 +8,9 @@
 // Test 1:
 //  - Check all information is displayed correctly on initial render
 // Test 2:
-//  - Check fetchPlayer requests are being sent and response format
+//  - Check fetchPlayer requests are being sent and check response format
 // Test 3:
-//  - check all information (including events table) is displayed correctly with a mock response
+//  - Check all information (including events table) is displayed correctly from a mock response
 //
 // TODO: Check that only the player can see this page
 // Player withdraw?
@@ -29,13 +29,13 @@ describe('Game page', () => {
     })
   })
 
-  it('check all information is displayed correctly on initial render', function () {
+  it('all information is displayed correctly on initial render', function () {
     cy.get('[data-cy="game-id"]').should('have.text', this.gameId)
     cy.get('[data-cy="api"]').should('have.text', 'https://www.google.com')
     cy.get('[data-cy="score"]').should('be.visible')
   })
 
-  it('check fetchPlayer requests are being sent and response format', function () {
+  it('fetchPlayer requests are being sent and response has correct format', function () {
     cy.intercept('GET', '/api/' + this.gameId + '/players/' + this.playerId).as('fetch-player')
 
     cy.wait('@fetch-player').then(({ request, response }) => {
@@ -64,7 +64,7 @@ describe('Game page', () => {
     cy.wait('@fetch-player')
   })
 
-  it('check all information is displayed correctly with a mock response', function () {
+  it('all information is displayed correctly from a mock response', function () {
     cy.intercept('GET', '/api/' + this.gameId + '/players/' + this.playerId, { fixture: 'player.json' }).as('fetch-player')
     cy.wait('@fetch-player')
 

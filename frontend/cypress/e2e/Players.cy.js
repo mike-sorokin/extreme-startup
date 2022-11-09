@@ -4,10 +4,17 @@
 /// <reference types="cypress" />
 
 // Summary:
-// Check correct requests are sent and response correctly formatted
-// Check list of players is displayed correctly
-// Check that withdrawing player/ all players works and they are removed from the table
-// Maybe check auth here instead of Auth.cy
+// approx time: 34s
+// Test 1:
+//  - Check all information is displayed correctly on initial render
+// Test 2:
+//  - Check fetchAllPlayers requests are being sent and check response format
+// Test 3:
+//  - Player withdraw button works and player is removed from table
+// Test 4:
+//  - Withdraw all button works and players a removed from table
+//
+// TODO: Make sure players can only see their own withdraw button and cannot see the withdraw all button
 
 describe('Game page', () => {
   beforeEach(function () {
@@ -19,18 +26,23 @@ describe('Game page', () => {
       // waits up to 4s for player id to be visible before aliasing
       cy.get('[data-cy="player-id"]').should('be.visible')
       cy.get('[data-cy="player-id"]').invoke('text').as('playerId')
+    }).then(() => {
+      cy.joinGameAsPlayer(this.gameId, 'jesse', 'https://www.google.co.uk')
     })
   })
 
-  it('check template', function () {
+  it('all information is displayed correctly on initial render', function () {
     cy.visit('localhost:5173/' + this.gameId + '/players')
 
     // Check correct text is displayed
     cy.get('tbody > :nth-child(1) > :nth-child(2)').should('have.text', 'walter')
     cy.get('tbody > :nth-child(1) > :nth-child(3)').should('have.text', 'https://www.google.com')
+    cy.get('tbody > :nth-child(2) > :nth-child(2)').should('have.text', 'jesse')
+    cy.get('tbody > :nth-child(2) > :nth-child(3)').should('have.text', 'https://www.google.co.uk')
 
     // Check withdraw buttons are visible
     cy.get('tbody > :nth-child(1) > :nth-child(4)').should('have.text', 'Withdraw')
+    cy.get('tbody > :nth-child(2) > :nth-child(4)').should('have.text', 'Withdraw')
     cy.contains('Withdraw All').should('be.visible')
 
     // Check that clicking on a player row takes you to that player page
@@ -39,9 +51,7 @@ describe('Game page', () => {
     cy.get('h1').should('contain', 'walter')
   })
 
-  it('check requests for players', function () {
-    cy.joinGameAsPlayer(this.gameId, 'jesse', 'https://www.google.co.uk')
-
+  it('fetchAllPlayers requests are being sent and response has correct format', function () {
     cy.visit('localhost:5173/' + this.gameId + '/players')
 
     cy.intercept('GET', '/api/' + this.gameId + '/players').as('fetch-players')
@@ -65,6 +75,8 @@ describe('Game page', () => {
       expect(response.body.players[this.playerId]).to.have.property('name')
       expect(response.body.players[this.playerId]).to.have.property('api')
     })
+
+    cy.wait('@fetch-players')
   })
 
   it('player withdraw button works', function () {
@@ -85,6 +97,10 @@ describe('Game page', () => {
 
     // Check template
     cy.get('h1').should('have.text', 'Leaderboard')
+
+    // Navigate back to players page and check player is removed
+    cy.visit('localhost:5173/' + this.gameId + '/players')
+    cy.contains('walter').should('not.exist')
   })
 
   it('withdraw all button works', function () {

@@ -29,7 +29,7 @@ describe('Game page', () => {
     })
   })
 
-  it('check all info is displayed on the page', function () {
+  it('all info is displayed on the page on initial render', function () {
     // Check game id is visible
     cy.contains(this.gameId).should('be.visible')
     // Check number of players is zero initially
@@ -110,7 +110,7 @@ describe('Game page', () => {
     cy.get('[data-cy="pause-game-button"]').should('have.text', 'Pause')
   })
 
-  it('check fetchGame requests are being sent and correct responses are received', function () {
+  it('fetchGame requests are being sent and correct responses are received', function () {
     // Setup request intercept
     cy.intercept('GET', '/api/' + this.gameId).as('fetch-game')
 
@@ -138,7 +138,7 @@ describe('Game page', () => {
     cy.wait('@fetch-game')
   })
 
-  it('check correct data is displayed on the page from a mock response', function () {
+  it('correct data is displayed on the page from a mock response', function () {
     // Setup request intercept with mock response
     cy.intercept('GET', '/api/' + this.gameId, { fixture: 'new-game.json' }).as('fetch-game')
     cy.wait('@fetch-game')

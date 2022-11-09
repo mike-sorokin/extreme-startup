@@ -70,7 +70,7 @@ describe('Game page', () => {
     cy.get('h1').should('have.text', 'Players')
   })
 
-  it('Check fetchAllPlayers requests are being made and check responses', function () {
+  it('fetchAllPlayers requests are being made and check responses', function () {
     // Create 2 players for the game
     cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
     // waits up to 4s for player id to be visible before aliasing
