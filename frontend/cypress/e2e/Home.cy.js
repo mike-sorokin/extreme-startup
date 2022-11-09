@@ -3,7 +3,8 @@
 /* eslint-disable no-undef */
 /// <reference types="cypress" />
 
-// Summary: (time: 33s)
+// Summary:
+// approx time: 35s
 // Create game
 //  - Creating a game with password should always work
 //  - Should send a POST req to "/api" which should return new game object with id property
@@ -16,6 +17,8 @@
 //  - Joining a game as moderator should only work with valid game id and correct password
 //  - Should send a POST req to "/api/(gameId)/auth" which should return {valid: True} if pwd correct and {valid: False} if not
 //  - Should be navigated to admin page
+//
+// TODO: check cookies coming from server response
 
 describe('Home page', () => {
   // Visit 'localhost:5173' and create a game with password before each test
@@ -47,9 +50,10 @@ describe('Home page', () => {
   // must use a function so we can use aliases with this
   it('creating game displays game id, success notification and navigates to correct url', function () {
     // Assert that a game id is visible
-    cy.get('.mantine-1mwlxyv').should('be.visible')
+    cy.get('[data-cy="game-id"]').should('be.visible')
 
-    cy.contains('Created Game').should('be.visible')
+    // Assert success notification is shown
+    cy.contains('Successfully Created Game').should('be.visible')
 
     // Click to go to game page
     cy.get('[data-cy="to-game-page"]').click()
@@ -79,7 +83,7 @@ describe('Home page', () => {
     cy.contains('walter').should('be.visible')
     cy.contains('https://www.google.com').should('be.visible')
 
-    cy.contains('Created Player').should('be.visible')
+    cy.contains('Successfully Created Player').should('be.visible')
 
     // Assert that response contains all info we need
     cy.wait('@join-game').then(({ request, response }) => {
@@ -165,6 +169,7 @@ describe('Home page', () => {
     // cy.get('[data-cy="url-input"]').type('https://www.google.com')
     // cy.get('form > .mantine-UnstyledButton-root').click()
 
+    // Join game with name 'walter'
     cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
 
     // cy.visit('localhost:5173')
@@ -181,6 +186,7 @@ describe('Home page', () => {
     // cy.get('[data-cy="url-input"]').type('https://www.google.com')
     // cy.get('form > .mantine-UnstyledButton-root').click()
 
+    // Try and join with same name
     cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
 
     // Assert error is shown
@@ -193,13 +199,15 @@ describe('Home page', () => {
   })
 
   it('joining game with non-unique url', function () {
+    // Join game with a url
     cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
 
     cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
 
+    // Try and join with the same url
     cy.joinGameAsPlayer(this.gameId, 'jesse', 'https://www.google.com')
 
-    // Assert mantine error is shown
+    // Assert error is shown
     cy.contains('Your url already exists').should('be.visible')
 
     // Assert join-game request was not sent
