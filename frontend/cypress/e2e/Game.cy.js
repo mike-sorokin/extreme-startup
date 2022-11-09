@@ -4,10 +4,21 @@
 /// <reference types="cypress" />
 
 // Summary:
-// Nav bar should be visible on all urls
-// Nav bar buttons should navigate correctly
-// Correct child components should be visible on their corresponding urls
-// Check leaderboard and graph functionality here (requests, response, mock response, streaks, on fire, visible to everyone)
+// approx time: 20s
+// Test 1:
+//  - Nav menu and buttons should be visible on all urls
+// Test 2:
+//  - Nav menu buttons should navigate correctly
+//  - Correct child components should be visible on their corresponding urls
+//  - TODO: Update this to make sure players can't see the admin page button, check isAdmin requests are being made
+// Test 3:
+//  - Check fetchAllPlayers requests are being made and check responses format
+// Test 4:
+//  - Check that correct data is displayed on the leaderboard for a mock response
+//  - Check streaks are displayed correctly and the on fire badge
+//
+// TODO: Check graph
+// TODO: Check that the page is visible to everyone
 
 describe('Game page', () => {
   beforeEach(() => {
@@ -17,7 +28,7 @@ describe('Game page', () => {
     cy.get('[data-cy="game-id"]').invoke('text').as('gameId')
   })
 
-  it('nav bar is visible on all game urls', function () {
+  it('nav menu is visible on all game urls', function () {
     cy.visit('localhost:5173/' + this.gameId)
     cy.checkNavMenu()
 
@@ -27,6 +38,7 @@ describe('Game page', () => {
     cy.visit('localhost:5173/' + this.gameId + '/admin')
     cy.checkNavMenu()
 
+    // Create a plaer so we can check that nav menu is showing on player page
     cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
     // waits up to 4s for player id to be visible before aliasing
     cy.get('[data-cy="player-id"]').should('be.visible')
@@ -36,38 +48,41 @@ describe('Game page', () => {
     })
   })
 
-  it('nav menu buttons should all work', function () {
+  it('nav menu buttons should all work and correct component is displayed at each url', function () {
     cy.visit('localhost:5173/' + this.gameId)
 
+    // Click on Admin page button
     cy.get('[data-cy="nav-menu"]').click()
     cy.contains('Admin Page').click()
     cy.url().should('include', this.gameId + '/admin')
     cy.get('h1').should('have.text', 'Admin Page')
 
+    // Click on Leaderboard button
     cy.get('[data-cy="nav-menu"]').click()
     cy.contains('Leaderboard').click()
     cy.url().should('include', this.gameId)
     cy.get('h1').should('have.text', 'Leaderboard')
 
+    // Click on Players button
     cy.get('[data-cy="nav-menu"]').click()
     cy.contains('Players').click()
     cy.url().should('include', this.gameId + '/players')
     cy.get('h1').should('have.text', 'Players')
   })
 
-  it('check requests for leaderboard', function () {
+  it('Check fetchAllPlayers requests are being made and check responses', function () {
+    // Create 2 players for the game
     cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
     // waits up to 4s for player id to be visible before aliasing
     cy.get('[data-cy="player-id"]').should('be.visible')
-    cy.get('[data-cy="player-id"]').invoke('text').as('playerId')
-
-    cy.joinGameAsPlayer(this.gameId, 'jesse', 'https://www.google.co.uk')
+    cy.get('[data-cy="player-id"]').invoke('text').as('playerId').then(() => {
+      cy.joinGameAsPlayer(this.gameId, 'jesse', 'https://www.google.co.uk')
+    })
 
     cy.visit('localhost:5173/' + this.gameId)
+    cy.intercept('GET', '/api/' + this.gameId + '/players').as('fetch-all-players')
 
-    cy.intercept('GET', '/api/' + this.gameId + '/players').as('fetch-players')
-
-    cy.wait('@fetch-players').then(({ request, response }) => {
+    cy.wait('@fetch-all-players').then(({ request, response }) => {
       expect(request.body).to.equal('')
       expect(response.statusCode).to.equal(200)
       expect(response.body).to.have.property('players')
@@ -75,13 +90,15 @@ describe('Game page', () => {
       expect(response.body.players[this.playerId]).to.have.property('score')
     })
 
-    cy.wait('@fetch-players').then(({ request, response }) => {
+    cy.wait('@fetch-all-players').then(({ request, response }) => {
       expect(request.body).to.equal('')
       expect(response.statusCode).to.equal(200)
       expect(response.body).to.have.property('players')
       expect(Object.keys(response.body.players)).to.have.length(2)
       expect(response.body.players[this.playerId]).to.have.property('score')
     })
+
+    cy.wait('@fetch-all-players')
   })
 
   it('shows correct data on leaderboard for mock response data', function () {
