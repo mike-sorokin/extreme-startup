@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import { homeAPI, gameAPI, authAPI, playersAPI, playerAPI, playerEventsAPI, eventAPI, scoresAPI } from './urls'
-import { alertError, showFailureNotification, playersAsArray } from './utils'
+import { alertError, showFailureNotification, playersAsArray, HTTPError } from './utils'
 
 const instance = axios.create({
   headers: { 'Content-Type': 'application/json' }
@@ -29,7 +29,7 @@ const instance = axios.create({
  * @property {string} query
  * @property {number} difficulty - "0" for warmup, 1 for round 1, etc.
  * @property {number} points_gained - +ve / -ve point difference
- * @property {NO_RESPONSE/WRONG/CORRECT} response_type
+ * @property {string} response_type "NO_SERVER_RESPONSE"/"WRONG"/"CORRECT"
  * @property {RFC3339} timestamp
  */
 
@@ -48,7 +48,7 @@ const instance = axios.create({
  * (GET, "/api")
  * Fetches all games
  * @async
- * @return {Promise<{gameId: Game, ...}>} Object containing all Game objects
+ * @return {Promise<{gameId: Game, gameId2: Game, ... , gameIdN: Game}>} Object containing all Game objects
  */
 export async function fetchAllGames () {
   try {
@@ -79,7 +79,7 @@ export async function createNewGame (data) {
  * (DELETE, "/api")
  * Drops all games, ids, events
  * @async
- * @return unsure
+ * @return {Promise<string>} "Successfully deleted", (status code 204)
  */
 export async function deleteAllGames () {
   try {
@@ -117,7 +117,7 @@ export async function fetchGame (gameId) {
  * @async
  * @param  {string} gameId
  * @param  {{"round": number, "pause": boolean}} data Object containing either the round or whether to pause/unpause
- * @return {Promise<string>} unsure
+ * @return {Promise<string>} "ROUND_INCREMENTED" or "GAME_PAUSED" or "GAME_UNPAUSED"
  */
 export async function updateGame (gameId, data) {
   try {
@@ -157,12 +157,10 @@ export async function deleteGame (gameId) {
 export async function createModerator (gameId, data) {
   // Check gameId exists
   try {
-    const response = await fetchGame(gameId)
-    console.log(response)
+    await fetchGame(gameId)
   } catch (error) {
     showFailureNotification('Error creating moderator', 'Game id does not exist!')
-    console.error('Invalid data submitted')
-    throw new Error('Invalid data submitted')
+    alertError(new HTTPError('Game id does not exist', 404))
   }
 
   try {
@@ -220,14 +218,13 @@ export async function fetchAllPlayers (gameId) {
  * @param  {string} gameId
  * @param  {string} name   Name submitted by user
  * @param  {string} api    URL submitted by user
- * @return {Promise<Player>}        Player JSON object for newly created player (returns false if invalid)
+ * @return {Promise<Player>} Player JSON object for newly created player (returns false if invalid)
  */
 export async function createPlayer (gameId, name, api) {
   const valid = await validateData(gameId, { name, api })
 
   if (!valid) {
-    console.error('Invalid data submitted')
-    throw new Error('Invalid data submitted')
+    alertError(new HTTPError('Invalid data submitted', 404))
   }
 
   const playerData = {
@@ -253,8 +250,7 @@ export async function createPlayer (gameId, name, api) {
 async function validateData (gameId, data) {
   // Check gameId exists
   try {
-    const response = await fetchGame(gameId)
-    console.log(response)
+    await fetchGame(gameId)
   } catch (error) {
     showFailureNotification('Error creating player', 'Game id does not exist!')
     return false
@@ -303,7 +299,7 @@ async function validateData (gameId, data) {
  * (DELETE, "/api/(game_id)/players")
  * Deletes all players in a game
  * @param  {string} gameId
- * @return unsure
+ * @return {Promise<string>} "Successfully deleted", (status code 204)
  */
 export async function deleteAllPlayers (gameId) {
   try {
@@ -340,14 +336,13 @@ export async function fetchPlayer (gameId, playerId) {
  * @param  {string} gameId
  * @param  {string} playerId
  * @param  {{name: string, api: string}} data Object containing new name and/or new api
- * @return {Promise<Player>} Updated player JSON object (returns false if data is invalid)
+ * @return {Promise<Player>} Updated player JSON object
  */
 export async function updatePlayer (gameId, playerId, data) {
   const valid = await validateData(gameId, data)
 
   if (!valid) {
-    console.error('Invalid data submitted')
-    return false
+    alertError(new HTTPError('Invalid data submitted', 404))
   }
 
   try {
@@ -400,7 +395,7 @@ export async function fetchAllEvents (gameId, playerId) {
  * @async
  * @param  {string} gameId
  * @param  {string} playerId
- * @return unsure
+ * @return {Promise<string>} "Successfully deleted", (status code 204)
  */
 export async function deleteAllEvents (gameId, playerId) {
   try {
@@ -457,8 +452,7 @@ export async function deleteEvent (gameId, playerId, eventId) {
  */
 export async function checkValidGame (gameId) {
   try {
-    const response = await fetchGame(gameId)
-    console.log(response)
+    await fetchGame(gameId)
     return true
   } catch (error) {
     return false
@@ -474,8 +468,7 @@ export async function checkValidGame (gameId) {
  */
 export async function checkValidPlayer (gameId, playerId) {
   try {
-    const response = await fetchPlayer(gameId, playerId)
-    console.log(response)
+    await fetchPlayer(gameId, playerId)
     return true
   } catch (error) {
     return false
@@ -493,7 +486,6 @@ export async function checkValidPlayer (gameId, playerId) {
 export async function checkAuth (gameId) {
   try {
     const response = await instance.get(authAPI(gameId))
-    console.log(response)
     return response.data
   } catch (error) {
     alertError(error)

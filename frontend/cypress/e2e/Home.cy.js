@@ -4,7 +4,7 @@
 /// <reference types="cypress" />
 
 // Summary:
-// approx time: 35s
+// approx time: 38s
 // Create game
 //  - Creating a game with password should always work
 //  - Should send a POST req to "/api" which should return new game object with id property
@@ -79,7 +79,7 @@ describe('Home page', () => {
     cy.url().should('include', this.gameId + '/players')
   })
 
-  it('joining game with invalid game id', function () {
+  it('joining a game with invalid game id', function () {
     cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
 
     cy.joinGameAsPlayer('invalid-id', 'walter ', 'https://www.google.com')
@@ -93,7 +93,7 @@ describe('Home page', () => {
     cy.url().should('not.include', this.gameId + '/players')
   })
 
-  it('joining game with invalid url', function () {
+  it('joining a game with invalid url', function () {
     cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
 
     cy.joinGameAsPlayer(this.gameId, 'walter', 'www.google.com')
@@ -107,7 +107,7 @@ describe('Home page', () => {
     cy.url().should('not.include', this.gameId + '/players')
   })
 
-  it('joining game with empty name', function () {
+  it('joining a game with empty name', function () {
     cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
 
     cy.joinGameAsPlayer(this.gameId, ' ', 'https://www.google.com')
@@ -121,7 +121,7 @@ describe('Home page', () => {
     cy.url().should('not.include', this.gameId + '/players')
   })
 
-  it('joining game with non-unique name', function () {
+  it('joining a game with non-unique name', function () {
     // Join game with name 'walter'
     cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
 
@@ -139,7 +139,7 @@ describe('Home page', () => {
     cy.url().should('not.include', this.gameId + '/players')
   })
 
-  it('joining game with non-unique url', function () {
+  it('joining a game with non-unique url', function () {
     // Join game with a url
     cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
 
@@ -157,7 +157,7 @@ describe('Home page', () => {
     cy.url().should('not.include', this.gameId + '/players')
   })
 
-  it('join game as moderator', function () {
+  it('joining a game as moderator', function () {
     cy.intercept('POST', '/api/' + this.gameId + '/auth').as('join-game-as-mod')
 
     cy.joinGameAsModerator(this.gameId, 'test')
@@ -172,7 +172,21 @@ describe('Home page', () => {
     cy.url().should('include', this.gameId + '/admin')
   })
 
-  it('join game as moderator with incorrect password', function () {
+  it('joining a game as moderator with invalid game id', function () {
+    cy.intercept('POST', '/api/' + this.gameId + '/auth').as('join-game-as-mod')
+
+    cy.joinGameAsModerator('invalid-id', 'test')
+
+    // Assert error is shown
+    cy.contains('Game id does not exist').should('be.visible')
+
+    // Assert join-game request was not sent
+    cy.get('@join-game-as-mod').should('equal', null)
+
+    cy.url().should('not.include', this.gameId + '/admin')
+  })
+
+  it('joining a game as moderator with incorrect password', function () {
     cy.intercept('POST', '/api/' + this.gameId + '/auth').as('join-game-as-mod')
 
     cy.joinGameAsModerator(this.gameId, 'incorrect-password')
