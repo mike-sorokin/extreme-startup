@@ -4,9 +4,15 @@
 /// <reference types="cypress" />
 
 // Summary:
-// Check correct requests and response formatting
-// Mock response and check data is displayed correctly
-// Maybe check auth here instead of Auth.cy (check only players can see their own player page)
+// approx time: 20s
+// Test 1:
+//  - Check all information is displayed correctly on initial render
+// Test 2:
+//  - Check fetchPlayer requests are being sent and response format
+// Test 3:
+//  - check all information (including events table) is displayed correctly with a mock response
+//
+// TODO: Check that only the player can see this page
 // Player withdraw?
 // Check events are correct based on round?
 
@@ -23,13 +29,13 @@ describe('Game page', () => {
     })
   })
 
-  it('initial template', function () {
+  it('check all information is displayed correctly on initial render', function () {
     cy.get('[data-cy="game-id"]').should('have.text', this.gameId)
     cy.get('[data-cy="api"]').should('have.text', 'https://www.google.com')
     cy.get('[data-cy="score"]').should('be.visible')
   })
 
-  it('check requests', function () {
+  it('check fetchPlayer requests are being sent and response format', function () {
     cy.intercept('GET', '/api/' + this.gameId + '/players/' + this.playerId).as('fetch-player')
 
     cy.wait('@fetch-player').then(({ request, response }) => {
@@ -54,9 +60,11 @@ describe('Game page', () => {
       expect(JSON.parse(response.body)).to.have.property('score')
       expect(JSON.parse(response.body)).to.have.property('events').and.to.be.an('array')
     })
+
+    cy.wait('@fetch-player')
   })
 
-  it.only('mock response', function () {
+  it('check all information is displayed correctly with a mock response', function () {
     cy.intercept('GET', '/api/' + this.gameId + '/players/' + this.playerId, { fixture: 'player.json' }).as('fetch-player')
     cy.wait('@fetch-player')
 
@@ -66,6 +74,7 @@ describe('Game page', () => {
     cy.get('[data-cy="api"]').should('have.text', 'https://www.savewalterwhite.com')
     cy.get('[data-cy="score"]').should('have.text', '-420')
 
+    // Check events table displays info correctly
     cy.get('tbody > :nth-child(1) > :nth-child(1)').should('have.text', 'mock_event_id_3')
     cy.get('tbody > :nth-child(1) > :nth-child(2)').should('have.text', 'What\'s up dog?')
     cy.get('tbody > :nth-child(1) > :nth-child(3)').should('have.text', '-1')
