@@ -4,13 +4,15 @@
 /// <reference types="cypress" />
 
 // Summary:
-// Correct components are displayed on the correct urls
-// You can only navigate to game id's that exist
-// You can only navigate to your own player page
-// You can only navigate to player pages for player id's that exist
-// You can only see the link to the admin page if you are an admin
-// You can only see the withdraw options for all players if you are an admin
-// You can only see your individual withdraw option if your are a player (maybe it doesn't show at all and only shows on your player page)
+// approx time: 13s
+// Test 1:
+//  - Correct components are displayed on the correct urls
+// Test 2:
+//  - You can only navigate to game id's that exist
+// Test 3:
+//  - You can only navigate to player pages for player id's that exist
+//
+// TODO: You can only navigate to your own player page
 
 describe('Game page', () => {
   beforeEach(() => {
@@ -20,28 +22,49 @@ describe('Game page', () => {
     cy.get('[data-cy="game-id"]').invoke('text').as('gameId')
   })
 
-  it('can visit a valid game id', function () {
-    cy.visit('localhost:5173/' + this.gameId)
-    cy.contains('Leaderboard').should('be.visible')
-    // cy.contains('Not Found').should('not.exist')
+  it('shows correct components on correct urls', function () {
+    cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
+    // waits up to 4s for player id to be visible before aliasing
+    cy.get('[data-cy="player-id"]').should('be.visible')
+    cy.get('[data-cy="player-id"]').invoke('text').as('playerId').then(() => {
+      // Home component
+      cy.visit('localhost:5173/')
+      cy.contains('Extreme Startup').should('be.visible')
+
+      // Game + Leaderboard component
+      cy.visit('localhost:5173/' + this.gameId)
+      cy.get('[data-cy="nav-menu"]').should('be.visible')
+      cy.contains('Leaderboard').should('be.visible')
+
+      // Players component
+      cy.visit('localhost:5173/' + this.gameId + '/players')
+      cy.contains('Players').should('be.visible')
+
+      // Player component
+      cy.visit('localhost:5173/' + this.gameId + '/players/' + this.playerId)
+      cy.contains('Player:').should('be.visible')
+
+      // Admin component
+      cy.visit('localhost:5173/' + this.gameId + '/admin')
+      cy.contains('Admin Page').should('be.visible')
+
+      // Not Found component
+      cy.visit('localhost:5173/' + this.gameId + '/invalidurl')
+      cy.contains('not found').should('be.visible')
+    })
   })
 
   it('shows not found page when trying to visit a url with invalid game id', function () {
     cy.visit('localhost:5173/420')
-    cy.contains('Not Found').should('be.visible')
-  })
-
-  it('only allows you to see your own player page', function () {
-    // TODO (need to be able to check authentication of cookie with backend)
+    cy.contains('not found').should('be.visible')
   })
 
   it('shows not found page when trying to visit a url with invalid player id', function () {
     cy.visit('localhost:5173/' + this.gameId + '/players/420')
-    cy.contains('Not Found').should('be.visible')
+    cy.contains('not found').should('be.visible')
   })
 
-  it('shows not found page when visiting a url that does not exist', function () {
-    cy.visit('localhost:5173/' + this.gameId + '/invalidurl')
-    cy.contains('Not Found').should('be.visible')
+  it('only allows you to see your own player page', function () {
+    // TODO (need to be able to check authentication of cookie with backend)
   })
 })
