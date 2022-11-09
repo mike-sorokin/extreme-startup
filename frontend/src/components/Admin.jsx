@@ -64,7 +64,7 @@ function Admin () {
       size="md"
       style={{ marginLeft: '10%', width: '110px' }}
       onClick={() => togglePauseRound()}
-      data-cy='pause-round-button'>
+      data-cy='pause-game-button'>
       {text}
     </Button>
   }
