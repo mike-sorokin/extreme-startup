@@ -20,11 +20,11 @@ function Players () {
     const getPlayers = async () => {
       try {
         const players = await fetchAllPlayers(params.gameId)
-        console.log("players");
-        console.log(players);
+        // console.log("players");
+        // console.log(players);
         const ordered = withCurrentPlayerLiftedIfPresent(playerID, players)
-        console.log("ordered");
-        console.log(ordered);
+        // console.log(ordered);
+        // console.log("ordered");
         setPlayers(ordered)
       } catch (error) {
         // Nothing to be done

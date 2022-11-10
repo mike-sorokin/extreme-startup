@@ -52,9 +52,6 @@ export async function updateSessionData (gameId, setIsAdmin, setPlayerID) {
   const auth = await checkAuth(gameId)
   const admin = auth.authorized
   const player = auth.player
-  console.log("aba 2")
-  console.log(admin);
-  console.log(player);
   setIsAdmin(admin)
   setPlayerID(player)
 }
@@ -66,14 +63,13 @@ export async function updateSessionData (gameId, setIsAdmin, setPlayerID) {
  * inital order, but the current player in a session is on top of a list
  */
 export function withCurrentPlayerLiftedIfPresent (playerID, players) {
+  console.log("playerID")
+  console.log(playerID);
   if (playerID === '') {
     console.log("playerID is empty ");
     return players
   }
-  const ordered = [...(players.sort((p1, p2) => p1.id == playerID ? -1 : p2.id == playerID ? 1 : 0))]
-  console.log("ordered")
-  console.log(ordered)
-  return ordered
+  return players.sort((p1, p2) => p1.id == playerID ? -1 : p2.id == playerID ? 1 : 0)
 }
 
 export class HTTPError extends Error {
