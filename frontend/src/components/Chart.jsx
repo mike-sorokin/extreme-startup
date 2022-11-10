@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Line, LineChart, CartesianGrid, XAxis, YAxis, Legend } from 'recharts'
+import { Line, LineChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import { MD5 } from 'crypto-js'
 
 import { fetchAllPlayers, fetchGameScores } from '../utils/requests'
@@ -61,7 +61,6 @@ function Chart ({ gameId }) {
           yAxisId={1}
           dot={false}/>
         })}
-        <Legend/>
       </LineChart>
     </div>
   )

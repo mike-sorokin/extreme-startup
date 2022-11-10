@@ -175,10 +175,10 @@ def create_app():
                     return ("GAME_UNPAUSED", 200)
 
             elif "stop" in r:
-                    # Set the flag to kill all quiz_master threads
-                    games[game_id].end_game_event.set()
-                    print("Game ended")
-                    return ("GAME_ENDED", 200)
+                # Set the flag to kill all quiz_master threads
+                games[game_id].end_game_event.set()
+                print("Game ended")
+                return ("GAME_ENDED", 200)
 
             return NOT_ACCEPTABLE
 
