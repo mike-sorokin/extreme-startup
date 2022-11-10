@@ -25,10 +25,10 @@ function Home () {
       setOpenedChoosePwd(false)
       setOpenedCreateGame(true)
     } catch (error) {
-      if (error.response.status === 406) {
+      if (error.response && error.response.status === 406) {
         console.error('password not sent in request')
       }
-      if (error.response.status === 400) {
+      if (error.response && error.response.status === 400) {
         console.error('password cannot be empty')
       }
     }

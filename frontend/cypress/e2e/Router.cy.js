@@ -69,8 +69,10 @@ describe('Game page', () => {
 
     cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.savewalterwhite.com')
 
+    // Try to visit admin page
     cy.visit('localhost:5173/' + this.gameId + '/admin')
 
+    // Assert that you are redirected back to the game page
     cy.get('h1').should('have.text', 'Leaderboard')
     cy.get('h1').should('not.have.text', 'Admin Page')
     cy.url().should('not.include', '/admin')

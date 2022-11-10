@@ -13,8 +13,8 @@
 //  - Player withdraw button works and player is removed from table
 // Test 4:
 //  - Withdraw all button works and players a removed from table
-//
-// TODO: Make sure players can only see their own withdraw button and cannot see the withdraw all button
+// Test 5:
+//  - Make sure players can only see their own withdraw button and cannot see the withdraw all button
 
 describe('Game page', () => {
   beforeEach(function () {
@@ -122,5 +122,21 @@ describe('Game page', () => {
 
     // Check that player is not shown in template
     cy.contains('walter').should('not.exist')
+  })
+
+  it.only('players can only see their own withdraw button or the withdraw all button', function () {
+    cy.clearCookies()
+
+    cy.joinGameAsPlayer(this.gameId, 'jimmy', 'https://www.savewalterwhite.com')
+
+    cy.visit('localhost:5173/' + this.gameId + '/players')
+
+    // Assert withdraw all button does not exist
+    cy.get('[data-cy="withdraw-all"]').should('not.exist')
+
+    // Assert player can only see their own withdraw button
+    cy.get('tbody > :nth-child(1) > :nth-child(4)').should('not.exist')
+    cy.get('tbody > :nth-child(2) > :nth-child(4)').should('not.exist')
+    cy.get('tbody > :nth-child(3) > :nth-child(4)').should('have.text', 'Withdraw')
   })
 })

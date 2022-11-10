@@ -42,7 +42,7 @@ function AddPlayer () {
         showFailureNotification('Error creating moderator', 'Game password incorrect!')
       }
     } catch (error) {
-      if (error.response.status === 406) {
+      if (error.response && error.response.status === 406) {
         console.error('password not sent in request')
       }
     }

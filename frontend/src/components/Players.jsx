@@ -39,7 +39,7 @@ function Players () {
       await deletePlayer(params.gameId, playerId)
       navigate('/' + params.gameId)
     } catch (error) {
-      if (error.response.status === 401) {
+      if (error.response && error.response.status === 401) {
         alert('401 - Unauthenticated request')
       }
     }
@@ -49,7 +49,7 @@ function Players () {
     try {
       await deleteAllPlayers(params.gameId)
     } catch (error) {
-      if (error.response.status === 401) {
+      if (error.response && error.response.status === 401) {
         alert('401 - Unauthenticated request')
       }
     }
