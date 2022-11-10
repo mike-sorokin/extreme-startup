@@ -25,6 +25,7 @@ function Home () {
       setOpenedChoosePwd(false)
       setOpenedCreateGame(true)
     } catch (error) {
+      console.error(error)
       if (error.response && error.response.status === 406) {
         console.error('password not sent in request')
       }

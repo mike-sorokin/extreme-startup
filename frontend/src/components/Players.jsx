@@ -22,7 +22,7 @@ function Players () {
         const players = await fetchAllPlayers(params.gameId)
         setPlayers(players)
       } catch (error) {
-        // Nothing to be done
+        console.error(error)
       }
     }
 
@@ -39,6 +39,7 @@ function Players () {
       await deletePlayer(params.gameId, playerId)
       navigate('/' + params.gameId)
     } catch (error) {
+      console.error(error)
       if (error.response && error.response.status === 401) {
         alert('401 - Unauthenticated request')
       }
@@ -49,6 +50,7 @@ function Players () {
     try {
       await deleteAllPlayers(params.gameId)
     } catch (error) {
+      console.error(error)
       if (error.response && error.response.status === 401) {
         alert('401 - Unauthenticated request')
       }

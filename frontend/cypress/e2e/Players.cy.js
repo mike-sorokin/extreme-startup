@@ -124,7 +124,7 @@ describe('Game page', () => {
     cy.contains('walter').should('not.exist')
   })
 
-  it.only('players can only see their own withdraw button or the withdraw all button', function () {
+  it('players can only see their own withdraw button or the withdraw all button', function () {
     cy.clearCookies()
 
     cy.joinGameAsPlayer(this.gameId, 'jimmy', 'https://www.savewalterwhite.com')
