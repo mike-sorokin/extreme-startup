@@ -163,7 +163,6 @@ export async function checkAuth (gameId) {
     const response = await instance.get(authAPI(gameId))
     return response.data
   } catch (error) {
-    console.log(response)
     alertError(error)
   }
 }
