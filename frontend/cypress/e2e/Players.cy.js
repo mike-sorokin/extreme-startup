@@ -33,10 +33,10 @@ describe('Game page', () => {
     cy.visit('localhost:5173/' + this.gameId + '/players')
 
     // Check correct text is displayed
-    cy.get('tbody > :nth-child(1) > :nth-child(2)').should('have.text', 'walter')
-    cy.get('tbody > :nth-child(1) > :nth-child(3)').should('have.text', 'https://www.google.com')
-    cy.get('tbody > :nth-child(2) > :nth-child(2)').should('have.text', 'jesse')
-    cy.get('tbody > :nth-child(2) > :nth-child(3)').should('have.text', 'https://www.google.co.uk')
+    cy.get('tbody > :nth-child(1) > :nth-child(2)').should('have.text', 'jesse')
+    cy.get('tbody > :nth-child(1) > :nth-child(3)').should('have.text', 'https://www.google.co.uk')
+    cy.get('tbody > :nth-child(2) > :nth-child(2)').should('have.text', 'walter')
+    cy.get('tbody > :nth-child(2) > :nth-child(3)').should('have.text', 'https://www.google.com')
 
     // Check withdraw buttons are visible
     cy.get('tbody > :nth-child(1) > :nth-child(4)').should('have.text', 'Withdraw')
@@ -44,7 +44,7 @@ describe('Game page', () => {
     cy.contains('Withdraw All').should('be.visible')
 
     // Check that clicking on a player row takes you to that player page
-    cy.get('tbody > :nth-child(1) > :nth-child(1)').click()
+    cy.get('tbody > :nth-child(2) > :nth-child(1)').click()
     cy.url().should('include', this.gameId + '/players/' + this.playerId)
     cy.get('h1').should('contain', 'walter')
   })
@@ -124,19 +124,22 @@ describe('Game page', () => {
     cy.contains('walter').should('not.exist')
   })
 
-  it('players can only see their own withdraw button or the withdraw all button', function () {
+  it.only('players can only see their own withdraw button or the withdraw all button', function () {
     cy.clearCookies()
 
     cy.joinGameAsPlayer(this.gameId, 'jimmy', 'https://www.savewalterwhite.com')
 
     cy.visit('localhost:5173/' + this.gameId + '/players')
 
+    // Wait for the players to load
+    cy.contains('jimmy').should('be.visible')
+
     // Assert withdraw all button does not exist
     cy.get('[data-cy="withdraw-all"]').should('not.exist')
 
-    // Assert player can only see their own withdraw button
-    cy.get('tbody > :nth-child(1) > :nth-child(4)').should('not.exist')
+    // Assert player can only see their own withdraw button (player is at the top)
+    cy.get('tbody > :nth-child(1) > :nth-child(4)').should('have.text', 'Withdraw')
     cy.get('tbody > :nth-child(2) > :nth-child(4)').should('not.exist')
-    cy.get('tbody > :nth-child(3) > :nth-child(4)').should('have.text', 'Withdraw')
+    cy.get('tbody > :nth-child(3) > :nth-child(4)').should('not.exist')
   })
 })
