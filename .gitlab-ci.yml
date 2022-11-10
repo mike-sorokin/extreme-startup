@@ -30,6 +30,12 @@ bot-entry-test:
     - *preamble
     - pytest test/bots/test_bot_entry.py
 
+database-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_database.py
+
 flaskr-test:
   stage: test
   script:

@@ -14,6 +14,8 @@ node_modules
 dist
 dist-ssr
 *.local
+_db
+mongo_config.json
 
 # Editor directories and files
 .vscode/*

@@ -6,7 +6,7 @@ import time
 
 ADVANCE_RATIO = 0.2
 
-# 1 -> Correct 
+# 1 -> Correct
 # X -> Wrong/Incorrect
 # 0 -> No server response
 STREAK_CHARS = ['1', 'X', '0']
@@ -20,6 +20,7 @@ class Game:
 
         self.question_factory = QuestionFactory(round)
         self.first_round_event = threading.Event()
+        self.end_game_event = threading.Event()
 
         self.paused = False
         pauser = rwlock.RWLockWrite()
@@ -40,24 +41,27 @@ class Game:
     #   (2) balance catching-up after a drought of points vs. escaping with the lead.
     # In the latter case we would want to increment round. Also in charge of informing game administrators
     def monitor(self, players_dict, scoreboard):
-        while not self.paused:
+        while True:
+            if self.end_game_event.is_set():
+                exit()
 
-            num_players = len(self.players)
+            if not self.paused:
+                num_players = len(self.players)
 
             if num_players != 0:
                 if self.auto_mode and self.round != 0:
                     self.__auto_increment_round(players_dict, scoreboard)
                 self.__update_players_to_assist(players_dict)
 
-            time.sleep(2)
-        
+                time.sleep(2)
+
     def advance_round(self, players_dict):
         self.question_factory.advance_round()
-        self.round += 1
+            self.round += 1
         self.first_round_event.set()
 
-        for pid in self.players:
-            players_dict[pid].round_index = 0
+            for pid in self.players:
+                players_dict[pid].round_index = 0
 
     def __update_players_to_assist(self, players_dict):
         for pid in self.players:
@@ -67,7 +71,7 @@ class Game:
 
             # corect and incorrect tail(s)
             c_tail, ic_tail = streak_length(round_streak, STREAK_CHARS[0]), streak_length(round_streak, "".join(STREAK_CHARS[1:]))
-            
+
             if c_tail > 0 and pid in self.players_to_assist:
                 self.players_to_assist.remove(pid)
 
@@ -80,7 +84,7 @@ class Game:
 
         for pid in self.players:
             curr_player = players_dict[pid]
-            round_index = curr_player.round_index 
+            round_index = curr_player.round_index
             position, round_streak = (
                 scoreboard.leaderboard_position(curr_player),
                 curr_player.streak[-round_index:] if round_index != 0 else ""

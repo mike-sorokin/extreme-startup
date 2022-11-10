@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Line, LineChart, CartesianGrid, XAxis, YAxis, Legend } from 'recharts'
+import { Line, LineChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import { MD5 } from 'crypto-js'
 
 import { fetchAllPlayers, fetchGameScores } from '../utils/requests'
@@ -54,21 +54,19 @@ function Chart ({ gameId }) {
           key={p.id}
           connectNulls
           type="monotone"
-          animationDuration={300}
+          isAnimationActive={false}
           name={p.name}
           dataKey={p.id}
           stroke={stringToColour(p.name)}
           yAxisId={1}
           dot={false}/>
         })}
-        <Legend/>
       </LineChart>
     </div>
   )
 }
 
 export default Chart
-
 // TEMPORARY
 // <LineChart width={750} height={450} data={speeddata}>
 //   <XAxis dataKey="time" type="number"/>

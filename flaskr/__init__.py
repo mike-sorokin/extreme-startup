@@ -17,6 +17,7 @@ from flaskr.scoreboard import Scoreboard
 from flaskr.quiz_master import QuizMaster
 from flaskr.json_encoder import JSONEncoder
 from flaskr.questions import *
+from flaskr.database import get_mongo_client
 from datetime import datetime
 import threading
 import secrets
@@ -52,9 +53,6 @@ def create_app():
 
     # players: player_id -> Player
     players = {}
-
-    # Scoreboard lock
-    lock = threading.Lock()
 
     # scoreboards: game_id -> Scoreboard
     scoreboards = {}
@@ -177,6 +175,17 @@ def create_app():
                     games[game_id].auto_mode = False
                     return ("GAME_AUTO_OFF", 200)
 
+            elif "stop" in r:
+                cli = get_mongo_client()
+                data = (encoder.default(players[pid]) for pid in games[game_id].players)
+                cli.xs[game_id].insert_many(data)
+
+                # Set the flag to kill all quiz_master threads
+                games[game_id].end_game_event.set()
+                remove_players(*games[game_id].players)
+                remove_games(game_id)
+                return ("GAME_ENDED", 200)
+
             return NOT_ACCEPTABLE
 
         elif request.method == "DELETE":  # delete game with <game_id>
@@ -229,7 +238,8 @@ def create_app():
             )
 
             player_thread = threading.Thread(
-                target=quiz_master.start, args=(games[game_id].first_round_event,)
+                target=quiz_master.start,
+                args=(games[game_id].first_round_event, games[game_id].end_game_event),
             )
             player_thread.daemon = True  # for test termination
             player_thread.start()
@@ -366,7 +376,8 @@ def create_app():
             )
 
             player_thread = threading.Thread(
-                target=quiz_master.start, args=(games[game_id].first_round_event,)
+                target=quiz_master.start,
+                args=(games[game_id].first_round_event, games[game_id].end_game_event),
             )
             player_thread.daemon = True  # for test termination
             player_thread.start()
