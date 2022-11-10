@@ -28,20 +28,20 @@ describe('Game page', () => {
     cy.get('[data-cy="game-id"]').invoke('text').as('gameId')
   })
 
-  it('nav menu is visible on all game urls', function () {
-    cy.visit('localhost:5173/' + this.gameId)
+  it.only('nav menu is visible on all game urls', function () {
+    cy.visit(Cypress.env('baseUrl') + this.gameId)
     cy.checkAdminNavMenu()
 
-    cy.visit('localhost:5173/' + this.gameId + '/players')
+    cy.visit(Cypress.env('baseUrl') + this.gameId + '/players')
     cy.checkAdminNavMenu()
 
-    cy.visit('localhost:5173/' + this.gameId + '/admin')
+    cy.visit(Cypress.env('baseUrl') + this.gameId + '/admin')
     cy.checkAdminNavMenu()
 
     // Create a player so we can check that nav menu is showing on player page
     cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
     cy.get('[data-cy="player-id"]').invoke('text').as('playerId').then(() => {
-      cy.visit('localhost:5173/' + this.gameId + '/players/' + this.playerId)
+      cy.visit(Cypress.env('baseUrl') + this.gameId + '/players/' + this.playerId)
       cy.checkAdminNavMenu()
     })
   })
@@ -52,36 +52,36 @@ describe('Game page', () => {
     // Create a player, then check nav menu on all pages
     cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
     cy.get('[data-cy="player-id"]').invoke('text').as('playerId').then(() => {
-      cy.visit('localhost:5173/' + this.gameId)
+      cy.visit(Cypress.env('baseUrl') + this.gameId)
       cy.checkPlayerNavMenu()
 
-      cy.visit('localhost:5173/' + this.gameId + '/players')
+      cy.visit(Cypress.env('baseUrl') + this.gameId + '/players')
       cy.checkPlayerNavMenu()
 
-      cy.visit('localhost:5173/' + this.gameId + '/players/' + this.playerId)
+      cy.visit(Cypress.env('baseUrl') + this.gameId + '/players/' + this.playerId)
       cy.checkPlayerNavMenu()
     })
   })
 
   it('nav menu buttons should all work and correct component is displayed at each url', function () {
-    cy.visit('localhost:5173/' + this.gameId)
+    cy.visit(Cypress.env('baseUrl') + this.gameId)
 
     // Click on Admin page button
     cy.get('[data-cy="nav-menu"]').click()
     cy.contains('Admin Page').click()
-    cy.url().should('include', this.gameId + '/admin')
+    cy.url().should('equal', Cypress.env('baseUrl') + this.gameId + '/admin')
     cy.get('h1').should('have.text', 'Admin Page')
 
     // Click on Leaderboard button
     cy.get('[data-cy="nav-menu"]').click()
     cy.contains('Leaderboard').click()
-    cy.url().should('include', this.gameId)
+    cy.url().should('equal', Cypress.env('baseUrl') + this.gameId)
     cy.get('h1').should('have.text', 'Leaderboard')
 
     // Click on Players button
     cy.get('[data-cy="nav-menu"]').click()
     cy.contains('Players').click()
-    cy.url().should('include', this.gameId + '/players')
+    cy.url().should('equal', Cypress.env('baseUrl') + this.gameId + '/players')
     cy.get('h1').should('have.text', 'Players')
   })
 
@@ -91,24 +91,24 @@ describe('Game page', () => {
     // Create a player, then check nav menu buttons
     cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
     cy.get('[data-cy="player-id"]').invoke('text').as('playerId').then(() => {
-      cy.visit('localhost:5173/' + this.gameId)
+      cy.visit(Cypress.env('baseUrl') + this.gameId)
 
       // Click on Player page button
       cy.get('[data-cy="nav-menu"]').click()
       cy.contains('My Player Page').click()
-      cy.url().should('include', this.gameId + '/players/' + this.playerId)
+      cy.url().should('equal', Cypress.env('baseUrl') + this.gameId + '/players/' + this.playerId)
       cy.get('h1').should('contain.text', 'walter')
 
       // Click on Leaderboard button
       cy.get('[data-cy="nav-menu"]').click()
       cy.contains('Leaderboard').click()
-      cy.url().should('include', this.gameId)
+      cy.url().should('equal', Cypress.env('baseUrl') + this.gameId)
       cy.get('h1').should('have.text', 'Leaderboard')
 
       // Click on Players button
       cy.get('[data-cy="nav-menu"]').click()
       cy.contains('Players').click()
-      cy.url().should('include', this.gameId + '/players')
+      cy.url().should('equal', Cypress.env('baseUrl') + this.gameId + '/players')
       cy.get('h1').should('have.text', 'Players')
     })
   })
@@ -120,7 +120,7 @@ describe('Game page', () => {
       cy.joinGameAsPlayer(this.gameId, 'jesse', 'https://www.google.co.uk')
     })
 
-    cy.visit('localhost:5173/' + this.gameId)
+    cy.visit(Cypress.env('baseUrl') + this.gameId)
     cy.intercept('GET', '/api/' + this.gameId + '/players').as('fetch-all-players')
 
     cy.wait('@fetch-all-players').then(({ request, response }) => {
@@ -145,7 +145,7 @@ describe('Game page', () => {
   it('shows correct data on leaderboard for mock response data', function () {
     cy.intercept('GET', '/api/' + this.gameId + '/players', { fixture: 'players.json' })
 
-    cy.visit('localhost:5173/' + this.gameId)
+    cy.visit(Cypress.env('baseUrl') + this.gameId)
 
     // Assert that leaderboard table is sorted and displays information correctly
     cy.get('tbody > :nth-child(1) > :nth-child(2)').should('have.text', 'mock_jesse')

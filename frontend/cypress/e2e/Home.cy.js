@@ -51,7 +51,7 @@ describe('Home page', () => {
     // Click to go to game page
     cy.get('[data-cy="to-game-page"]').click()
 
-    cy.url().should('include', this.gameId + '/admin')
+    cy.url().should('equal', Cypress.env('baseUrl') + this.gameId + '/admin')
   })
 
   it('does not allow you to give an empty password', function () {
@@ -59,7 +59,7 @@ describe('Home page', () => {
     cy.intercept('POST', '/api').as('create-game-empty-pwd')
 
     // Try to create a game with empty password
-    cy.visit('localhost:5173')
+    cy.visit(Cypress.env('baseUrl'))
     cy.contains('Create').click()
     cy.get('[data-cy="password-input"]').clear()
     cy.get('[data-cy="password-input"]').type(' ')
@@ -71,32 +71,33 @@ describe('Home page', () => {
     // Assert create-game request was not sent
     cy.get('@create-game-empty-pwd').should('equal', null)
 
-    cy.url().should('equal', 'http://localhost:5173/')
+    cy.url().should('equal', Cypress.env('baseUrl'))
   })
 
   it('joining a game', function () {
     cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
 
     cy.joinGameAsPlayer(this.gameId, 'walter ', 'https://www.google.com')
+    cy.get('[data-cy="player-id"]').invoke('text').as('playerId').then(() => {
+      // Assert that player name and url is visible
+      cy.contains('walter').should('be.visible')
+      cy.contains('https://www.google.com').should('be.visible')
 
-    // Assert that player name and url is visible
-    cy.contains('walter').should('be.visible')
-    cy.contains('https://www.google.com').should('be.visible')
+      cy.contains('Successfully Created Player').should('be.visible')
 
-    cy.contains('Successfully Created Player').should('be.visible')
+      // Assert that response contains all info we need
+      cy.wait('@join-game').then(({ request, response }) => {
+        expect(request.body).to.deep.equal({ name: 'walter', api: 'https://www.google.com' })
+        expect(response.statusCode).to.equal(200)
+        expect(response.body).to.have.property('id')
+        expect(response.body).to.have.property('score')
+        expect(response.body.api).to.equal('https://www.google.com')
+        expect(response.body.name).to.equal('walter')
+        expect(response.body.game_id).to.equal(this.gameId)
+      })
 
-    // Assert that response contains all info we need
-    cy.wait('@join-game').then(({ request, response }) => {
-      expect(request.body).to.deep.equal({ name: 'walter', api: 'https://www.google.com' })
-      expect(response.statusCode).to.equal(200)
-      expect(response.body).to.have.property('id')
-      expect(response.body).to.have.property('score')
-      expect(response.body.api).to.equal('https://www.google.com')
-      expect(response.body.name).to.equal('walter')
-      expect(response.body.game_id).to.equal(this.gameId)
+      cy.url().should('equal', Cypress.env('baseUrl') + this.gameId + '/players/' + this.playerId)
     })
-
-    cy.url().should('include', this.gameId + '/players')
   })
 
   it('joining a game with invalid game id', function () {
@@ -110,7 +111,7 @@ describe('Home page', () => {
     // Assert join-game request was not sent
     cy.get('@join-game').should('equal', null)
 
-    cy.url().should('not.include', this.gameId + '/players')
+    cy.url().should('equal', Cypress.env('baseUrl'))
   })
 
   it('joining a game with invalid url', function () {
@@ -124,7 +125,7 @@ describe('Home page', () => {
     // Assert join-game request was not sent
     cy.get('@join-game').should('equal', null)
 
-    cy.url().should('not.include', this.gameId + '/players')
+    cy.url().should('equal', Cypress.env('baseUrl'))
   })
 
   it('joining a game with empty name', function () {
@@ -138,7 +139,7 @@ describe('Home page', () => {
     // Assert join-game request was not sent
     cy.get('@join-game').should('equal', null)
 
-    cy.url().should('not.include', this.gameId + '/players')
+    cy.url().should('equal', Cypress.env('baseUrl'))
   })
 
   it('joining a game with non-unique name', function () {
@@ -156,7 +157,7 @@ describe('Home page', () => {
     // Assert join-game request was not sent
     cy.get('@join-game').should('equal', null)
 
-    cy.url().should('not.include', this.gameId + '/players')
+    cy.url().should('equal', Cypress.env('baseUrl'))
   })
 
   it('joining a game with non-unique url', function () {
@@ -174,7 +175,7 @@ describe('Home page', () => {
     // Assert join-game request was not sent
     cy.get('@join-game').should('equal', null)
 
-    cy.url().should('not.include', this.gameId + '/players')
+    cy.url().should('equal', Cypress.env('baseUrl'))
   })
 
   it('joining a game as moderator', function () {
@@ -189,7 +190,7 @@ describe('Home page', () => {
       expect(response.body).to.deep.equal({ valid: true })
     })
 
-    cy.url().should('include', this.gameId + '/admin')
+    cy.url().should('equal', Cypress.env('baseUrl') + this.gameId + '/admin')
   })
 
   it('joining a game as moderator with invalid game id', function () {
@@ -203,7 +204,7 @@ describe('Home page', () => {
     // Assert join-game request was not sent
     cy.get('@join-game-as-mod').should('equal', null)
 
-    cy.url().should('not.include', this.gameId + '/admin')
+    cy.url().should('equal', Cypress.env('baseUrl'))
   })
 
   it('joining a game as moderator with incorrect password', function () {
@@ -217,6 +218,6 @@ describe('Home page', () => {
       expect(response.body).to.deep.equal({ valid: false })
     })
 
-    cy.url().should('not.include', this.gameId + '/admin')
+    cy.url().should('equal', Cypress.env('baseUrl'))
   })
 })

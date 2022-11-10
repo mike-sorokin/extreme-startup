@@ -28,28 +28,28 @@ describe('Game page', () => {
     cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
     cy.get('[data-cy="player-id"]').invoke('text').as('playerId').then(() => {
       // Home component
-      cy.visit('localhost:5173/')
+      cy.visit(Cypress.env('baseUrl'))
       cy.contains('Extreme Startup').should('be.visible')
 
       // Game + Leaderboard component
-      cy.visit('localhost:5173/' + this.gameId)
+      cy.visit(Cypress.env('baseUrl') + this.gameId)
       cy.get('[data-cy="nav-menu"]').should('be.visible')
       cy.contains('Leaderboard').should('be.visible')
 
       // Players component
-      cy.visit('localhost:5173/' + this.gameId + '/players')
+      cy.visit(Cypress.env('baseUrl') + this.gameId + '/players')
       cy.contains('Players').should('be.visible')
 
       // Player component
-      cy.visit('localhost:5173/' + this.gameId + '/players/' + this.playerId)
+      cy.visit(Cypress.env('baseUrl') + this.gameId + '/players/' + this.playerId)
       cy.contains('Player:').should('be.visible')
 
       // Admin component
-      cy.visit('localhost:5173/' + this.gameId + '/admin')
+      cy.visit(Cypress.env('baseUrl') + this.gameId + '/admin')
       cy.contains('Admin Page').should('be.visible')
 
       // Not Found component
-      cy.visit('localhost:5173/' + this.gameId + '/invalidurl')
+      cy.visit(Cypress.env('baseUrl') + this.gameId + '/invalidurl')
       cy.contains('not found').should('be.visible')
     })
   })
@@ -60,7 +60,7 @@ describe('Game page', () => {
   })
 
   it('shows not found page when trying to visit a url with invalid player id', function () {
-    cy.visit('localhost:5173/' + this.gameId + '/players/420')
+    cy.visit(Cypress.env('baseUrl') + this.gameId + '/players/420')
     cy.contains('not found').should('be.visible')
   })
 
@@ -70,12 +70,11 @@ describe('Game page', () => {
     cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.savewalterwhite.com')
 
     // Try to visit admin page
-    cy.visit('localhost:5173/' + this.gameId + '/admin')
+    cy.visit(Cypress.env('baseUrl') + this.gameId + '/admin')
 
     // Assert that you are redirected back to the game page
     cy.get('h1').should('have.text', 'Leaderboard')
-    cy.get('h1').should('not.have.text', 'Admin Page')
-    cy.url().should('not.include', '/admin')
+    cy.url().should('equal', Cypress.env('baseUrl') + this.gameId)
   })
 
   it('only allows you to see your own player page', function () {

@@ -29,11 +29,9 @@ import { mount } from 'cypress/react18'
 
 Cypress.Commands.add('mount', mount)
 
-const homePage = 'localhost:5173'
-
 // Creates a game from the home page
 Cypress.Commands.add('createGame', (password) => {
-  cy.visit(homePage)
+  cy.visit(Cypress.env('baseUrl'))
   cy.contains('Create').click()
   cy.get('[data-cy="password-input"]').clear()
   cy.get('[data-cy="password-input"]').type(password)
@@ -44,7 +42,7 @@ Cypress.Commands.add('createGame', (password) => {
 
 // Joins a game as a player from the home page
 Cypress.Commands.add('joinGameAsPlayer', (gameId, name, url, valid = true) => {
-  cy.visit(homePage)
+  cy.visit(Cypress.env('baseUrl'))
   cy.contains('Join').click()
   cy.get('[data-cy="game-id-input"]').clear()
   cy.get('[data-cy="game-id-input"]').type(gameId)
@@ -61,7 +59,7 @@ Cypress.Commands.add('joinGameAsPlayer', (gameId, name, url, valid = true) => {
 
 // Joins a game as a moderator from the home page
 Cypress.Commands.add('joinGameAsModerator', (gameId, password) => {
-  cy.visit(homePage)
+  cy.visit(Cypress.env('baseUrl'))
   cy.contains('Join').click()
   cy.get('.mantine-8jlqcf').click()
   cy.get('[data-cy="mod-game-id-input"]').clear()

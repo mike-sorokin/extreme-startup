@@ -25,7 +25,7 @@ describe('Game page', () => {
     cy.get('[data-cy="game-id"]').invoke('text').as('gameId').then(() => {
       // Navigate to game admin page and check we are on the correct url
       cy.get('[data-cy="to-game-page"]').click()
-      cy.url().should('include', this.gameId + '/admin')
+      cy.url().should('equal', Cypress.env('baseUrl') + this.gameId + '/admin')
     })
   })
 
