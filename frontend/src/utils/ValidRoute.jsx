@@ -27,10 +27,12 @@ function ValidRoute () {
     validateUrl()
   }, [])
 
+  // Show loader whilst waiting for params check
   if (loading) {
     return <Loader />
   }
 
+  // If valid is true, show any child component through Outlet, else show NotFound component
   return (
     valid ? <Outlet /> : <NotFound />
   )

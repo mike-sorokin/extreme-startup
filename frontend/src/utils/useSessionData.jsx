@@ -6,6 +6,8 @@ function useSessionData (gameId) {
   const [isAdmin, setIsAdmin] = useState(false)
   const [playerID, setPlayerID] = useState('')
 
+  // Checks session cookie and returns if a player is an admin, and their player id (if they have one)
+  // playerID should equal an empty string if the player is a spectator (or if they are an admin)
   useEffect(() => {
     const checkCookie = async () => {
       try {
