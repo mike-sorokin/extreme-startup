@@ -70,7 +70,7 @@ function Players () {
 
       <hr />
 
-      <Table hover>
+      <Table highlightOnHover>
         <thead>
           <tr>
             <th>ID</th>
