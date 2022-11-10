@@ -28,7 +28,7 @@ describe('Game page', () => {
     cy.get('[data-cy="game-id"]').invoke('text').as('gameId')
   })
 
-  it.only('nav menu is visible on all game urls', function () {
+  it('nav menu is visible on all game urls', function () {
     cy.visit(Cypress.env('baseUrl') + this.gameId)
     cy.checkAdminNavMenu()
 
