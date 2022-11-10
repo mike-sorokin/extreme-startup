@@ -25,7 +25,9 @@ function Home () {
       showSuccessNotification('Successfully Created Game!')
       setNewGameId(response.id)
     } catch (error) {
-      // TODO
+      if (error.response.status === 406) {
+        console.error('password not sent in request')
+      }
     }
   }
 

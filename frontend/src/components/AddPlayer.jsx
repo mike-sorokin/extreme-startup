@@ -21,11 +21,10 @@ function AddPlayer () {
 
     try {
       const response = await createPlayer(gameId, name, url)
-      console.log(response)
       showSuccessNotification('Successfully Created Player!')
       navigate(playerUrl(response.game_id, response.id))
     } catch (error) {
-      // TODO
+      // Notification has already been shown, currently all errors have already been handled
     }
   }
 
@@ -35,7 +34,6 @@ function AddPlayer () {
 
     try {
       const response = await createModerator(gameId, { password: pwd })
-      console.log(response)
 
       if (response.valid) {
         showSuccessNotification('Successfully Joined as Moderator!')
@@ -44,7 +42,9 @@ function AddPlayer () {
         showFailureNotification('Error creating moderator', 'Game password incorrect!')
       }
     } catch (error) {
-      // TODO
+      if (error.response.status === 406) {
+        console.error('password not sent in request')
+      }
     }
   }
 

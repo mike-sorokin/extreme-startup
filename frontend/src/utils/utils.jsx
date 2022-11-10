@@ -9,7 +9,7 @@ export function str (obj) {
 }
 
 export function alertError (error) {
-  console.log(error.toJSON())
+  console.error(error)
   throw error
 }
 

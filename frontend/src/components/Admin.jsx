@@ -31,7 +31,7 @@ function Admin () {
         setGamePaused(response.paused)
         setPlayerNo(response.players.length)
       } catch (error) {
-        // TODO
+        // Nothing to be done
       }
     }
 
@@ -51,7 +51,9 @@ function Admin () {
         setRound(round + 1)
       }
     } catch (error) {
-      // TODO
+      if (error.response.status === 401) {
+        alert('401 - Unauthenticated request')
+      }
     }
   }
 
@@ -61,7 +63,9 @@ function Admin () {
       const response = await updateGame(params.gameId, { pause: (gamePaused ? '' : 'p') })
       setGamePaused(response === 'GAME_PAUSED')
     } catch (error) {
-      // TODO
+      if (error.response.status === 401) {
+        alert('401 - Unauthenticated request')
+      }
     }
   }
 
