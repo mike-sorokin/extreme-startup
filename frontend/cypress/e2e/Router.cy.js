@@ -4,13 +4,15 @@
 /// <reference types="cypress" />
 
 // Summary:
-// approx time: 13s
+// approx time: 17s
 // Test 1:
 //  - Correct components are displayed on the correct urls
 // Test 2:
 //  - You can only navigate to game id's that exist
 // Test 3:
 //  - You can only navigate to player pages for player id's that exist
+// Test 4:
+//  - only admins can access the admin page
 //
 // TODO: You can only navigate to your own player page
 
@@ -60,6 +62,18 @@ describe('Game page', () => {
   it('shows not found page when trying to visit a url with invalid player id', function () {
     cy.visit('localhost:5173/' + this.gameId + '/players/420')
     cy.contains('not found').should('be.visible')
+  })
+
+  it('only allows admins to see the admin page', function () {
+    cy.clearCookies()
+
+    cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.savewalterwhite.com')
+
+    cy.visit('localhost:5173/' + this.gameId + '/admin')
+
+    cy.get('h1').should('have.text', 'Leaderboard')
+    cy.get('h1').should('not.have.text', 'Admin Page')
+    cy.url().should('not.include', '/admin')
   })
 
   it('only allows you to see your own player page', function () {

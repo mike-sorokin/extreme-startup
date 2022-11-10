@@ -14,7 +14,7 @@
 // Test 5:
 //  - Mock responses and check that it displays the data correctly (data = no. of players, current round)
 //
-// TODO: Check that this page is only visible to admins
+// This page can only be accessed by admins (see Router.cy.js)
 // Maybe check questions stop being sent after pause? or new questions are sent after advance? (not sure how to do this)
 
 describe('Game page', () => {
