@@ -56,23 +56,23 @@ function AddPlayer () {
         color="teal"
         checked={mod} onChange={(e) => setMod(e.currentTarget.checked)}
       />
-      <Space h="md"></Space>
+      <Space h="md" />
       {
         mod
           ? <form onSubmit={submitModerator}>
           <TextInput value={gameId} onChange={(e) => setGameId(e.target.value)} placeholder="Game id (e.g. abcd1234)" label="Enter game id:" required />
-          <Space h="md"></Space>
+          <Space h="md" />
           <PasswordInput value={pwd} onChange={(e) => setPwd(e.target.value)} placeholder="Game password" label="Enter game password:" required />
-          <Space h="md"></Space>
+          <Space h="md" />
           <Button variant="outline" color="grape" type="submit">Join as Moderator!</Button>
         </form>
           : <form onSubmit={submitPlayer}>
           <TextInput value={gameId} onChange={(e) => setGameId(e.target.value)} placeholder="Game id (e.g. abcd1234)" label="Enter game id:" required />
-          <Space h="md"></Space>
+          <Space h="md" />
           <TextInput value={name} onChange={(e) => setName(e.target.value)} placeholder="Your player name" label="Enter player name:" required />
-          <Space h="md"></Space>
+          <Space h="md" />
           <TextInput value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Your URL (http://...)" label="Enter URL:" required />
-          <Space h="md"></Space>
+          <Space h="md" />
           <Button variant="outline" color="green" type="submit">Join!</Button>
         </form>
       }

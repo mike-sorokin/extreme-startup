@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button, Modal, Card, Stack, Space, Title, PasswordInput } from '@mantine/core'
+import { Button, Modal, Card, Stack, Space, Text, Title, PasswordInput } from '@mantine/core'
 
 import { createNewGame } from '../utils/requests'
 import { showSuccessNotification } from '../utils/utils'
@@ -11,6 +11,7 @@ function Home () {
   const [openedChoosePwd, setOpenedChoosePwd] = useState(false)
   const [openedCreateGame, setOpenedCreateGame] = useState(false)
   const [openedAddPlayer, setOpenedAddPlayer] = useState(false)
+  const [openedInfo, setOpenedInfo] = useState(false)
   const [newGameId, setNewGameId] = useState('')
   const [pwd, setPwd] = useState('')
 
@@ -40,7 +41,7 @@ function Home () {
           <form onSubmit={handleCreateGame}>
             <PasswordInput value={pwd} onChange={(e) => setPwd(e.target.value)}
               placeholder="Game password" label="Enter game password:" required />
-              <Space h="md"></Space>
+              <Space h="md" />
             <Button variant="outline" color="green" type="submit">Create Game!</Button>
           </form>
         </div>
@@ -57,6 +58,14 @@ function Home () {
         title="Join a Game!">
         <AddPlayer setOpened={setOpenedAddPlayer} />
       </Modal>
+      <Modal centered
+        opened={openedInfo}
+        onClose={() => setOpenedInfo(false)}
+        withCloseButton={false}>
+        <Text>
+          Text
+        </Text>
+      </Modal>
 
       <Card shadow="sm" p="lg" radius="md" withBorder
         style={{
@@ -69,8 +78,11 @@ function Home () {
         }}>
         <Stack align="center" spacing="xl">
           <Title order={1} color="white" weight={1000}>🔥 Extreme Startup 🔥</Title>
-          <Button variant="outline" color="green" radius="md" size="lg" onClick={() => setOpenedChoosePwd(true) }>Create a Game!</Button>
-          <Button variant="outline" color="orange" radius="md" size="lg" onClick={() => { setOpenedAddPlayer(true) }}>Join a Game!</Button>
+          <Button variant="outline" color="green" radius="md" size="lg" onClick={() => setOpenedChoosePwd(true)}>Create a Game!</Button>
+          <Button variant="outline" color="orange" radius="md" size="lg" onClick={() => setOpenedAddPlayer(true)}>Join a Game!</Button>
+          <Button variant="outline" color="pink" radius="xl" onClick={() => setOpenedInfo(true)}>
+            About Extreme Startup
+          </Button>
         </Stack>
       </Card>
     </div>
