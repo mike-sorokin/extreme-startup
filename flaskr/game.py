@@ -41,19 +41,17 @@ class Game:
     #   (2) balance catching-up after a drought of points vs. escaping with the lead.
     # In the latter case we would want to increment round. Also in charge of informing game administrators
     def monitor(self, players_dict, scoreboard):
-        while True:
+        while not self.paused:
             if self.end_game_event.is_set():
                 exit()
 
-            if not self.paused:
-                num_players = len(self.players)
-
+            num_players = len(self.players)
             if num_players != 0:
                 if self.auto_mode and self.round != 0:
                     self.__auto_increment_round(players_dict, scoreboard)
                 self.__update_players_to_assist(players_dict)
 
-                time.sleep(2)
+            time.sleep(2)
 
     def advance_round(self, players_dict):
         self.question_factory.advance_round()
