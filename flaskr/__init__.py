@@ -53,9 +53,6 @@ def create_app():
     # players: player_id -> Player
     players = {}
 
-    # Scoreboard lock
-    lock = threading.Lock()
-
     # scoreboards: game_id -> Scoreboard
     scoreboards = {}
 
@@ -175,9 +172,12 @@ def create_app():
                     return ("GAME_UNPAUSED", 200)
 
             elif "stop" in r:
+                print("Game ended")  # TODO: dump to db
+
                 # Set the flag to kill all quiz_master threads
                 games[game_id].end_game_event.set()
-                print("Game ended")
+                remove_players(*games[game_id].players)
+                remove_games(game_id)
                 return ("GAME_ENDED", 200)
 
             return NOT_ACCEPTABLE
