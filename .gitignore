@@ -1,6 +1,11 @@
 auxiliary/logs
 dontrunme
 vite
+
+# cypress
+frontend/cypress/screenshots
+frontend/cypress/videos
+
 # Logs
 logs
 *.log
