@@ -33,7 +33,8 @@ function Players () {
     }
   }, [params.gameId, playerID])
 
-  const withdrawPlayer = async playerId => {
+  const withdrawPlayer = async (event, playerId) => {
+    event.stopPropagation()
     try {
       await deletePlayer(params.gameId, playerId)
       navigate('/' + params.gameId)
@@ -91,7 +92,7 @@ function Players () {
                 isAdmin || (player.id === playerID)
                   ? <td>
                       <Button variant="outline" color="red" radius="md" size="md"
-                        onClick={() => withdrawPlayer(player.id)}>
+                        onClick={(event) => withdrawPlayer(event, player.id)}>
                         Withdraw
                       </Button>
                     </td>
