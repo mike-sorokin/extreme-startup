@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import { homeAPI, gameAPI, authAPI, playersAPI, playerAPI, playerEventsAPI, eventAPI, scoresAPI } from './urls'
-import { alertError, showFailureNotification, playersAsArray, HTTPError } from './utils'
+import { alertError, showFailureNotification, showErrorNotification, playersAsArray, HTTPError } from './utils'
 
 const instance = axios.create({
   headers: { 'Content-Type': 'application/json' }
@@ -67,6 +67,11 @@ export async function fetchAllGames () {
  * @return {Promise<Game>} Game object of newly created game
  */
 export async function createNewGame (data) {
+  if (data.password.trim() === '') {
+    showErrorNotification('Error creating game', 'Game password cannot be empty!')
+    alertError(new HTTPError('Game password cannot be empty', 400))
+  }
+
   try {
     const response = await instance.post(homeAPI(), data)
     return response.data
@@ -280,7 +285,7 @@ async function validateData (gameId, data) {
 
     // Check player name is not empty
     if (name === '') {
-      showFailureNotification('Error creating player', 'Your name cannot be empty!')
+      showErrorNotification('Error creating player', 'Your name cannot be empty!')
       return false
     }
 
@@ -296,7 +301,7 @@ async function validateData (gameId, data) {
   if (data.api) {
     // Check valid URL
     if (data.api.substring(0, 7) !== 'http://' && data.api.substring(0, 8) !== 'https://') {
-      showFailureNotification('Error creating player', 'You entered an invalid URL!')
+      showErrorNotification('Error creating player', 'You entered an invalid URL!')
       return false
     }
 

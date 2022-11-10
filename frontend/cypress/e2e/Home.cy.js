@@ -6,7 +6,7 @@
 // Summary:
 // approx time: 38s
 // Create game
-//  - Creating a game with password should always work
+//  - Creating a game with password should always work unless you enter an empty password
 //  - Should send a POST req to "/api" which should return new game object with id property
 //  - Should be navigated to game admin page after clicking button
 // Join game
@@ -52,6 +52,26 @@ describe('Home page', () => {
     cy.get('[data-cy="to-game-page"]').click()
 
     cy.url().should('include', this.gameId + '/admin')
+  })
+
+  it.only('does not allow you to give an empty password', function () {
+    // Setup request intercept
+    cy.intercept('POST', '/api').as('create-game-empty-pwd')
+
+    // Try to create a game with empty password
+    cy.visit('localhost:5173')
+    cy.contains('Create').click()
+    cy.get('[data-cy="password-input"]').clear()
+    cy.get('[data-cy="password-input"]').type(' ')
+    cy.get('form > .mantine-Button-root').click()
+
+    // Assert error is shown
+    cy.contains('password cannot be empty').should('be.visible')
+
+    // Assert create-game request was not sent
+    cy.get('@create-game-empty-pwd').should('equal', null)
+
+    cy.url().should('equal', 'http://localhost:5173/')
   })
 
   it('joining a game', function () {

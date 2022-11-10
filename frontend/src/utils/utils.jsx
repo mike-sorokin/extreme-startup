@@ -60,10 +60,12 @@ export async function updateSessionData (gameId, setIsAdmin, setPlayerID) {
 export class HTTPError extends Error {
   constructor (message, status) {
     super(message)
-    this.status = status
+    this.response = {
+      status
+    }
   }
 
   toJSON () {
-    return { message: this.message, status: this.status }
+    return { message: this.message, response: { status: this.response.status } }
   }
 }

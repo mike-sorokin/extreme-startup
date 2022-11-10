@@ -17,16 +17,19 @@ function Home () {
   // Creates a new game
   const handleCreateGame = async (event) => {
     event.preventDefault()
-    setOpenedChoosePwd(false)
-    setOpenedCreateGame(true)
 
     try {
       const response = await createNewGame({ password: pwd })
       showSuccessNotification('Successfully Created Game!')
       setNewGameId(response.id)
+      setOpenedChoosePwd(false)
+      setOpenedCreateGame(true)
     } catch (error) {
       if (error.response.status === 406) {
         console.error('password not sent in request')
+      }
+      if (error.response.status === 400) {
+        console.error('password cannot be empty')
       }
     }
   }
