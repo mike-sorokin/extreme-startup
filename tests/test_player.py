@@ -30,7 +30,7 @@ def test_player_can_log_event():
 
     assert len(player.events) == 0
     assert event not in player.events
-    
+
     player.log_event(event)
 
     assert len(player.events) == 1

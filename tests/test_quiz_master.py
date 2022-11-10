@@ -51,7 +51,7 @@ def test_reset_player_changes_streak_to_empty_str_and_resets_score_and_rc(
 ):
     quiz_master, player, rc, _, scoreboard, _, _ = basic_quiz_master
     player.streak = "X"
-    player.round_index = 1 # any non-zero value
+    player.round_index = 1  # any non-zero value
 
     quiz_master.reset_stats_and_rc()
 

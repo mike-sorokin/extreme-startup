@@ -9,7 +9,7 @@ ADVANCE_RATIO = 0.2
 # 1 -> Correct
 # X -> Wrong/Incorrect
 # 0 -> No server response
-STREAK_CHARS = ['1', 'X', '0']
+STREAK_CHARS = ["1", "X", "0"]
 
 # Most fundamental object in application -- stores information of players, scoreboard, questions gen., etc.
 class Game:
@@ -57,11 +57,11 @@ class Game:
 
     def advance_round(self, players_dict):
         self.question_factory.advance_round()
-            self.round += 1
+        self.round += 1
         self.first_round_event.set()
 
-            for pid in self.players:
-                players_dict[pid].round_index = 0
+        for pid in self.players:
+            players_dict[pid].round_index = 0
 
     def __update_players_to_assist(self, players_dict):
         for pid in self.players:
@@ -70,7 +70,10 @@ class Game:
             round_streak = streak[-round_index:] if round_index != 0 else ""
 
             # corect and incorrect tail(s)
-            c_tail, ic_tail = streak_length(round_streak, STREAK_CHARS[0]), streak_length(round_streak, "".join(STREAK_CHARS[1:]))
+            c_tail, ic_tail = (
+                streak_length(round_streak, STREAK_CHARS[0]),
+                streak_length(round_streak, "".join(STREAK_CHARS[1:])),
+            )
 
             if c_tail > 0 and pid in self.players_to_assist:
                 self.players_to_assist.remove(pid)
@@ -87,7 +90,7 @@ class Game:
             round_index = curr_player.round_index
             position, round_streak = (
                 scoreboard.leaderboard_position(curr_player),
-                curr_player.streak[-round_index:] if round_index != 0 else ""
+                curr_player.streak[-round_index:] if round_index != 0 else "",
             )
 
             c_tail = streak_length(round_streak, "1")
@@ -97,6 +100,7 @@ class Game:
 
         if advancable_players / len(self.players) > ratio_threshold:
             self.advance_round(players_dict)
+
 
 def streak_length(response_history, streak_char):
     return len(response_history) - len(response_history.rstrip(streak_char))

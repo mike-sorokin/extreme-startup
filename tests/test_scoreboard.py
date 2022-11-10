@@ -72,19 +72,20 @@ def test_scoreboard_can_have_multiple_players(game_setup):
     assert len(scoreboard.correct_tally) == num_players
     assert len(scoreboard.incorrect_tally) == num_players
 
+
 def test_scoring_increases_round_index(full_game_setup):
     scoreboard, player, question = full_game_setup
     question.result, question.points = "CORRECT", DEFAULT_POINT_SCORE
 
     player.round_index = 0
     scoreboard.increment_score_for(player, question)
-    assert player.round_index == 1 
+    assert player.round_index == 1
 
 
 def test_can_increment_score_for_player_with_correct_result(full_game_setup):
     scoreboard, player, question = full_game_setup
     question.result, question.points = "CORRECT", DEFAULT_POINT_SCORE
-    
+
     scoreboard.increment_score_for(player, question)
 
     assert scoreboard.scores[player.uuid] == DEFAULT_POINT_SCORE
@@ -164,7 +165,11 @@ def test_reseting_player_sets_score_and_tally_to_zero_but_retain_request_count(
 ):
     scoreboard, player, question = full_game_setup
     scoreboard.new_player(player)
-    question.result, question.problem, question.points = "CORRECT", "", DEFAULT_POINT_SCORE
+    question.result, question.problem, question.points = (
+        "CORRECT",
+        "",
+        DEFAULT_POINT_SCORE,
+    )
 
     scoreboard.increment_score_for(player, question)
     assert scoreboard.scores[player.uuid] == 10

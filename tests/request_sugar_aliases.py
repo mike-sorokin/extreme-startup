@@ -10,7 +10,6 @@ def create_game(cli):
 def create_player(cli, game_id, player_name="noname", player_url="nourl"):
     return response_as_dict_if_sucecssful(
         cli.post(
-            f"/api/{game_id}/players/",
-            json={"name": player_name, "api": player_url},
+            f"/api/{game_id}/players/", json={"name": player_name, "api": player_url}
         )
     )
