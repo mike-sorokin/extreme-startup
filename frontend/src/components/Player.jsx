@@ -23,7 +23,7 @@ function Player () {
         setPlayerData(response)
         setEvents(response.events.reverse())
       } catch (error) {
-        // Nothing to be done
+        console.error(error)
       }
     }
 

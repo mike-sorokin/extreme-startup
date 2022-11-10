@@ -6,7 +6,7 @@
 // Summary:
 // approx time: 38s
 // Create game
-//  - Creating a game with password should always work
+//  - Creating a game with password should always work unless you enter an empty password
 //  - Should send a POST req to "/api" which should return new game object with id property
 //  - Should be navigated to game admin page after clicking button
 // Join game
@@ -54,6 +54,26 @@ describe('Home page', () => {
     cy.url().should('include', this.gameId + '/admin')
   })
 
+  it('does not allow you to give an empty password', function () {
+    // Setup request intercept
+    cy.intercept('POST', '/api').as('create-game-empty-pwd')
+
+    // Try to create a game with empty password
+    cy.visit('localhost:5173')
+    cy.contains('Create').click()
+    cy.get('[data-cy="password-input"]').clear()
+    cy.get('[data-cy="password-input"]').type(' ')
+    cy.get('form > .mantine-Button-root').click()
+
+    // Assert error is shown
+    cy.contains('password cannot be empty').should('be.visible')
+
+    // Assert create-game request was not sent
+    cy.get('@create-game-empty-pwd').should('equal', null)
+
+    cy.url().should('equal', 'http://localhost:5173/')
+  })
+
   it('joining a game', function () {
     cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
 
@@ -82,7 +102,7 @@ describe('Home page', () => {
   it('joining a game with invalid game id', function () {
     cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
 
-    cy.joinGameAsPlayer('invalid-id', 'walter ', 'https://www.google.com')
+    cy.joinGameAsPlayer('invalid-id', 'walter ', 'https://www.google.com', false)
 
     // Assert error is shown
     cy.contains('Game id does not exist').should('be.visible')
@@ -96,7 +116,7 @@ describe('Home page', () => {
   it('joining a game with invalid url', function () {
     cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
 
-    cy.joinGameAsPlayer(this.gameId, 'walter', 'www.google.com')
+    cy.joinGameAsPlayer(this.gameId, 'walter', 'www.google.com', false)
 
     // Assert error is shown
     cy.contains('invalid URL').should('be.visible')
@@ -110,7 +130,7 @@ describe('Home page', () => {
   it('joining a game with empty name', function () {
     cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
 
-    cy.joinGameAsPlayer(this.gameId, ' ', 'https://www.google.com')
+    cy.joinGameAsPlayer(this.gameId, ' ', 'https://www.google.com', false)
 
     // Assert error is shown
     cy.contains('Your name cannot be empty').should('be.visible')
@@ -128,7 +148,7 @@ describe('Home page', () => {
     cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
 
     // Try and join with same name
-    cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
+    cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com', false)
 
     // Assert error is shown
     cy.contains('Your name already exists').should('be.visible')
@@ -146,7 +166,7 @@ describe('Home page', () => {
     cy.intercept('POST', '/api/' + this.gameId + '/players').as('join-game')
 
     // Try and join with the same url
-    cy.joinGameAsPlayer(this.gameId, 'jesse', 'https://www.google.com')
+    cy.joinGameAsPlayer(this.gameId, 'jesse', 'https://www.google.com', false)
 
     // Assert error is shown
     cy.contains('Your url already exists').should('be.visible')

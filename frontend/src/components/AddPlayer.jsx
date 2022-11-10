@@ -24,7 +24,7 @@ function AddPlayer () {
       showSuccessNotification('Successfully Created Player!')
       navigate(playerUrl(response.game_id, response.id))
     } catch (error) {
-      // Notification has already been shown, currently all errors have already been handled
+      console.error(error)
     }
   }
 
@@ -42,7 +42,8 @@ function AddPlayer () {
         showFailureNotification('Error creating moderator', 'Game password incorrect!')
       }
     } catch (error) {
-      if (error.response.status === 406) {
+      console.error(error)
+      if (error.response && error.response.status === 406) {
         console.error('password not sent in request')
       }
     }

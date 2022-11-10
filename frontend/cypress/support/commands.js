@@ -43,7 +43,7 @@ Cypress.Commands.add('createGame', (password) => {
 })
 
 // Joins a game as a player from the home page
-Cypress.Commands.add('joinGameAsPlayer', (gameId, name, url) => {
+Cypress.Commands.add('joinGameAsPlayer', (gameId, name, url, valid = true) => {
   cy.visit(homePage)
   cy.contains('Join').click()
   cy.get('[data-cy="game-id-input"]').clear()
@@ -53,8 +53,10 @@ Cypress.Commands.add('joinGameAsPlayer', (gameId, name, url) => {
   cy.get('[data-cy="url-input"]').clear()
   cy.get('[data-cy="url-input"]').type(url)
   cy.get('form > .mantine-UnstyledButton-root').click()
-  // waits up to 4s for player id to be visible before aliasing
-  cy.get('[data-cy="player-id"]').should('be.visible')
+  if (valid) {
+    // waits up to 4s for player id to be visible before aliasing
+    cy.get('[data-cy="player-id"]').should('be.visible')
+  }
 })
 
 // Joins a game as a moderator from the home page
@@ -69,10 +71,18 @@ Cypress.Commands.add('joinGameAsModerator', (gameId, password) => {
   cy.get('form > .mantine-Button-root').click()
 })
 
-// Check nav bar buttons are all visible
-Cypress.Commands.add('checkNavMenu', () => {
+// Check nav bar buttons for admins are all visible
+Cypress.Commands.add('checkAdminNavMenu', () => {
   cy.get('[data-cy="nav-menu"]').click()
   cy.contains('Admin Page').should('be.visible')
+  cy.contains('Leaderboard').should('be.visible')
+  cy.contains('Players').should('be.visible')
+})
+
+// Check nav bar buttons for players are all visible
+Cypress.Commands.add('checkPlayerNavMenu', () => {
+  cy.get('[data-cy="nav-menu"]').click()
+  cy.contains('My Player Page').should('be.visible')
   cy.contains('Leaderboard').should('be.visible')
   cy.contains('Players').should('be.visible')
 })

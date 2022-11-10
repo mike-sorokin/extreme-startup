@@ -1,16 +1,14 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Outlet, useParams, useNavigate } from 'react-router-dom'
 import { Menu, Button, Burger } from '@mantine/core'
 
-import { updateSessionData } from '../utils/utils'
+import useSessionData from '../utils/useSessionData'
 
 function Game () {
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [playerID, setPlayerID] = useState('')
   const params = useParams()
   const navigate = useNavigate()
 
-  updateSessionData(params.gameId, setIsAdmin, setPlayerID)
+  const [isAdmin, playerID] = useSessionData(params.gameId)
 
   // Separate file for navButton?
   const navButton = (suffix, text, color) => {

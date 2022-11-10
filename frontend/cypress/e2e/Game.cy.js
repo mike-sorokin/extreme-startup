@@ -4,21 +4,21 @@
 /// <reference types="cypress" />
 
 // Summary:
-// approx time: 20s
-// Test 1:
-//  - Nav menu and buttons should be visible on all urls
-// Test 2:
-//  - Nav menu buttons should navigate correctly
+// approx time: 38s
+// Test 1 and 2:
+//  - Nav menu and buttons should be visible on all urls (for admin and player)
+//  - Make sure player cannot see admin page button
+// Test 3 and 4:
+//  - Nav menu buttons should navigate correctly (for admin and player)
 //  - Correct child components should be visible on their corresponding urls
-//  - TODO: Update this to make sure players can't see the admin page button, check isAdmin requests are being made
-// Test 3:
+//  - TODO: maybe check isAdmin requests are being made and that they give the correct response?
+// Test 5:
 //  - Check fetchAllPlayers requests are being made and check responses format
-// Test 4:
+// Test 6:
 //  - Check that correct data is displayed on the leaderboard for a mock response
 //  - Check streaks are displayed correctly and the on fire badge
 //
 // TODO: Check graph
-// TODO: Check that the page is visible to everyone
 
 describe('Game page', () => {
   beforeEach(() => {
@@ -30,19 +30,36 @@ describe('Game page', () => {
 
   it('nav menu is visible on all game urls', function () {
     cy.visit('localhost:5173/' + this.gameId)
-    cy.checkNavMenu()
+    cy.checkAdminNavMenu()
 
     cy.visit('localhost:5173/' + this.gameId + '/players')
-    cy.checkNavMenu()
+    cy.checkAdminNavMenu()
 
     cy.visit('localhost:5173/' + this.gameId + '/admin')
-    cy.checkNavMenu()
+    cy.checkAdminNavMenu()
 
-    // Create a plaer so we can check that nav menu is showing on player page
+    // Create a player so we can check that nav menu is showing on player page
     cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
     cy.get('[data-cy="player-id"]').invoke('text').as('playerId').then(() => {
       cy.visit('localhost:5173/' + this.gameId + '/players/' + this.playerId)
-      cy.checkNavMenu()
+      cy.checkAdminNavMenu()
+    })
+  })
+
+  it('for players, nav menu shows player page button instead of admin button', function () {
+    cy.clearCookies()
+
+    // Create a player, then check nav menu on all pages
+    cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
+    cy.get('[data-cy="player-id"]').invoke('text').as('playerId').then(() => {
+      cy.visit('localhost:5173/' + this.gameId)
+      cy.checkPlayerNavMenu()
+
+      cy.visit('localhost:5173/' + this.gameId + '/players')
+      cy.checkPlayerNavMenu()
+
+      cy.visit('localhost:5173/' + this.gameId + '/players/' + this.playerId)
+      cy.checkPlayerNavMenu()
     })
   })
 
@@ -66,6 +83,34 @@ describe('Game page', () => {
     cy.contains('Players').click()
     cy.url().should('include', this.gameId + '/players')
     cy.get('h1').should('have.text', 'Players')
+  })
+
+  it('for players, nav menu buttons should all work', function () {
+    cy.clearCookies()
+
+    // Create a player, then check nav menu buttons
+    cy.joinGameAsPlayer(this.gameId, 'walter', 'https://www.google.com')
+    cy.get('[data-cy="player-id"]').invoke('text').as('playerId').then(() => {
+      cy.visit('localhost:5173/' + this.gameId)
+
+      // Click on Player page button
+      cy.get('[data-cy="nav-menu"]').click()
+      cy.contains('My Player Page').click()
+      cy.url().should('include', this.gameId + '/players/' + this.playerId)
+      cy.get('h1').should('contain.text', 'walter')
+
+      // Click on Leaderboard button
+      cy.get('[data-cy="nav-menu"]').click()
+      cy.contains('Leaderboard').click()
+      cy.url().should('include', this.gameId)
+      cy.get('h1').should('have.text', 'Leaderboard')
+
+      // Click on Players button
+      cy.get('[data-cy="nav-menu"]').click()
+      cy.contains('Players').click()
+      cy.url().should('include', this.gameId + '/players')
+      cy.get('h1').should('have.text', 'Players')
+    })
   })
 
   it('fetchAllPlayers requests are being made and check responses', function () {

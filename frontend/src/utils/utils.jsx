@@ -2,8 +2,6 @@ import { showNotification } from '@mantine/notifications'
 import { IconCheck, IconX, IconAlertTriangle } from '@tabler/icons'
 import { React } from 'react'
 
-import { checkAuth } from '../utils/requests'
-
 export function str (obj) {
   return JSON.stringify(obj)
 }
@@ -48,6 +46,7 @@ export function playersAsArray (playersDict) {
   return arr
 }
 
+<<<<<<< HEAD
 export async function updateSessionData (gameId, setIsAdmin, setPlayerID) {
   const auth = await checkAuth(gameId)
   const admin = auth.authorized
@@ -72,13 +71,17 @@ export function withCurrentPlayerLiftedIfPresent (playerID, players) {
   return players.sort((p1, p2) => p1.id == playerID ? -1 : p2.id == playerID ? 1 : 0)
 }
 
+=======
+>>>>>>> auth-routing
 export class HTTPError extends Error {
   constructor (message, status) {
     super(message)
-    this.status = status
+    this.response = {
+      status
+    }
   }
 
   toJSON () {
-    return { message: this.message, status: this.status }
+    return { message: this.message, response: { status: this.response.status } }
   }
 }
