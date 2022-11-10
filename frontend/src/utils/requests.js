@@ -156,9 +156,9 @@ export async function deleteGame (gameId) {
 export async function checkAuth (gameId) {
   try {
     const response = await instance.get(authAPI(gameId))
-    console.log(response)
     return response.data
   } catch (error) {
+    console.log(response)
     alertError(error)
   }
 }

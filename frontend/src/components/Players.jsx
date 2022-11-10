@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { Button, Container, Table, Title } from '@mantine/core'
 
 import { deleteAllPlayers, deletePlayer, fetchAllPlayers } from '../utils/requests'
-import { updateSessionData } from '../utils/utils'
+import { updateSessionData, withCurrentPlayerLiftedIfPresent } from '../utils/utils'
 
 function Players () {
   const [players, setPlayers] = useState([])
@@ -20,7 +20,12 @@ function Players () {
     const getPlayers = async () => {
       try {
         const players = await fetchAllPlayers(params.gameId)
-        setPlayers(players)
+        console.log("players");
+        console.log(players);
+        const ordered = withCurrentPlayerLiftedIfPresent(playerID, players)
+        console.log("ordered");
+        console.log(ordered);
+        setPlayers(ordered)
       } catch (error) {
         // Nothing to be done
       }
