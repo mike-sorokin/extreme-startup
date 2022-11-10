@@ -147,6 +147,23 @@ export async function deleteGame (gameId) {
 // Requests to "/api/(gameId)/auth"
 
 /**
+ * (GET, "/api/(gameId)/auth")
+ * Check current user authentication. If current user is admin, returns boolean. If player, returns boolean and player_id
+ * @async
+ * @param {string} gameId The game id
+ * @returns {Promise<{"authorized": boolean, "player": string}} json authentication data
+ */
+export async function checkAuth (gameId) {
+  try {
+    const response = await instance.get(authAPI(gameId))
+    console.log(response)
+    return response.data
+  } catch (error) {
+    alertError(error)
+  }
+}
+
+/**
  * (POST, "/api/(gameId)/auth")
  * Adds a moderator to game
  * @async
@@ -370,7 +387,7 @@ export async function deletePlayer (gameId, playerId) {
   }
 }
 
-// "/api/(game_id)/players/(player_id)/events"
+// Requests to "/api/(game_id)/players/(player_id)/events"
 
 /**
  * (GET, "/api/(game_id)/players/(player_id)/events")
@@ -406,7 +423,7 @@ export async function deleteAllEvents (gameId, playerId) {
   }
 }
 
-// "/api/(game_id)/players/(player_id)/events/(event_id)"
+// Requests to "/api/(game_id)/players/(player_id)/events/(event_id)"
 
 /**
  * (GET, "/api/(game_id)/players/(player_id)/events/(event_id)")
@@ -444,6 +461,8 @@ export async function deleteEvent (gameId, playerId, eventId) {
   }
 }
 
+// Helper functions
+
 /**
  * Check if a game id is valid
  * @async
@@ -472,22 +491,5 @@ export async function checkValidPlayer (gameId, playerId) {
     return true
   } catch (error) {
     return false
-  }
-}
-
-// Helper functions for authentication
-
-/**
- * Check current user authentication. If current user is admin, returns boolean. If player, returns boolean and player_id
- * @async
- * @param {string} gameId The game id
- * @returns {Promise<{"authorized": boolean, "player": string}} json authentication data
- */
-export async function checkAuth (gameId) {
-  try {
-    const response = await instance.get(authAPI(gameId))
-    return response.data
-  } catch (error) {
-    alertError(error)
   }
 }
