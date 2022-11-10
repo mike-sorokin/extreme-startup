@@ -46,7 +46,6 @@ export function playersAsArray (playersDict) {
   return arr
 }
 
-<<<<<<< HEAD
 export async function updateSessionData (gameId, setIsAdmin, setPlayerID) {
   const auth = await checkAuth(gameId)
   const admin = auth.authorized
@@ -71,8 +70,6 @@ export function withCurrentPlayerLiftedIfPresent (playerID, players) {
   return players.sort((p1, p2) => p1.id == playerID ? -1 : p2.id == playerID ? 1 : 0)
 }
 
-=======
->>>>>>> auth-routing
 export class HTTPError extends Error {
   constructor (message, status) {
     super(message)

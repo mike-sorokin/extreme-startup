@@ -18,11 +18,7 @@ function Players () {
     const getPlayers = async () => {
       try {
         const players = await fetchAllPlayers(params.gameId)
-        // console.log("players");
-        // console.log(players);
         const ordered = withCurrentPlayerLiftedIfPresent(playerID, players)
-        // console.log(ordered);
-        // console.log("ordered");
         setPlayers(ordered)
       } catch (error) {
         console.error(error)
@@ -35,7 +31,7 @@ function Players () {
     return () => {
       clearInterval(timer)
     }
-  }, [params.gameId])
+  }, [params.gameId, playerID])
 
   const withdrawPlayer = async playerId => {
     try {
