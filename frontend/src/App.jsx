@@ -9,14 +9,14 @@ import Leaderboard from './components/Leaderboard'
 import NotFound from './components/NotFound'
 
 import AdminRoute from './utils/AdminRoute'
-import CheckRoute from './utils/CheckRoute'
+import ValidRoute from './utils/ValidRoute'
 
 function App () {
   return (
     <Router >
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route element={<CheckRoute />}>
+        <Route element={<ValidRoute />}>
           <Route path="/:gameId" element={<Game />} >
             <Route path="players" element={<Players />} />
             <Route path="players/:id" element={<Player />} />

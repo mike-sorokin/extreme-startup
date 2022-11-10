@@ -5,7 +5,7 @@ import { Loader } from '@mantine/core'
 import { checkValidGame, checkValidPlayer } from './requests'
 import NotFound from '../components/NotFound'
 
-function CheckRoute () {
+function ValidRoute () {
   const [loading, setLoading] = useState(true)
   const [valid, setValid] = useState(null)
 
@@ -36,4 +36,4 @@ function CheckRoute () {
   )
 }
 
-export default CheckRoute
+export default ValidRoute
