@@ -14,7 +14,7 @@ class JSONEncoder(json.JSONEncoder):
                 name=obj.name,
                 score=obj.score,
                 api=obj.api,
-                events=obj.events,
+                events=[self.default(e) for e in obj.events],
                 streak=obj.streak,
             )
         elif isinstance(obj, Event):

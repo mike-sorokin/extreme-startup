@@ -17,6 +17,7 @@ from flaskr.scoreboard import Scoreboard
 from flaskr.quiz_master import QuizMaster
 from flaskr.json_encoder import JSONEncoder
 from flaskr.questions import *
+from flaskr.database import get_mongo_client
 from datetime import datetime
 import threading
 import secrets
@@ -172,7 +173,9 @@ def create_app():
                     return ("GAME_UNPAUSED", 200)
 
             elif "stop" in r:
-                print("Game ended")  # TODO: dump to db
+                cli = get_mongo_client()
+                data = [encoder.default(players[pid]) for pid in games[game_id].players]
+                cli.xs[game_id].insert_many(data)
 
                 # Set the flag to kill all quiz_master threads
                 games[game_id].end_game_event.set()
