@@ -72,7 +72,7 @@ class Question:
 
     # Check the player answered correctly
     def answered_correctly(self):
-        return self.answer == self.correct_answer()
+        return self.answer == str(self.correct_answer())
 
     # abstract function to be overwritten
     def correct_answer(self):

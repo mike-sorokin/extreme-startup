@@ -22,10 +22,16 @@ def test_player_initialises_correctly(dummy_player):
     assert dummy_player.game_id == GAME_ID
     assert dummy_player.score == 0
     assert dummy_player.active == True
+    assert dummy_player.round_index == 0
 
 
 def test_player_can_log_event():
     player, event = Player(GAME_ID, PLAYER_NAME, API), Mock()
+
     assert len(player.events) == 0
+    assert event not in player.events
+    
     player.log_event(event)
+
     assert len(player.events) == 1
+    assert event in player.events

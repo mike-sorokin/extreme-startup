@@ -148,12 +148,7 @@ def create_app():
             r = request.get_json()
 
             if "round" in r:  # increment <game_id>'s round by 1
-                games[game_id].question_factory.advance_round()
-                games[game_id].round += 1  # for event logging
-
-                # wake up all sleeping threads in game if going from WARMUP -> ROUND 1
-                games[game_id].first_round_event.set()
-
+                games[game_id].advance_round(players)
                 return ("ROUND_INCREMENTED", 200)
 
             elif "pause" in r:
@@ -173,6 +168,14 @@ def create_app():
                     except RuntimeError:
                         return ("Race condition wtih lock", 429)
                     return ("GAME_UNPAUSED", 200)
+
+            elif "auto" in r:
+                if r["auto"]:  # turn on auto mode
+                    games[game_id].auto_mode = True
+                    return ("GAME_AUTO_ON", 200)
+                else:  # turn off auto mode
+                    games[game_id].auto_mode = False
+                    return ("GAME_AUTO_OFF", 200)
 
             return NOT_ACCEPTABLE
 
@@ -246,6 +249,14 @@ def create_app():
             remove_players(*games[game_id].players)
             games[game_id].players.clear()
             return DELETE_SUCCESSFUL
+
+    # List of players who need help
+    @app.get("/api/<game_id>/assist")
+    def assist(game_id):
+        if game_id not in games:
+            return NOT_ACCEPTABLE
+
+        return games[game_id].players_to_assist
 
     # Managing <player_id> player
     @app.route("/api/<game_id>/players/<player_id>", methods=["GET", "PUT", "DELETE"])
