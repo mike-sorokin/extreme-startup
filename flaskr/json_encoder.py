@@ -1,3 +1,4 @@
+import datetime
 import json
 from flaskr.player import Player
 from flaskr.event import Event
@@ -30,5 +31,7 @@ class JSONEncoder(json.JSONEncoder):
             return dict(
                 id=obj.id, round=obj.round, players=obj.players, paused=obj.paused
             )
+        elif isinstance(obj, datetime.datetime):
+            return obj.isoformat()
 
         return super().default(obj)

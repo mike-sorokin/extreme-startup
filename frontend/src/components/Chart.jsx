@@ -54,7 +54,7 @@ function Chart ({ gameId }) {
           key={p.id}
           connectNulls
           type="monotone"
-          animationDuration={300}
+          isAnimationActive={false}
           name={p.name}
           dataKey={p.id}
           stroke={stringToColour(p.name)}
@@ -67,7 +67,6 @@ function Chart ({ gameId }) {
 }
 
 export default Chart
-
 // TEMPORARY
 // <LineChart width={750} height={450} data={speeddata}>
 //   <XAxis dataKey="time" type="number"/>
