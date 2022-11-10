@@ -3,17 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { Button, Container, Table, Title } from '@mantine/core'
 
 import { deleteAllPlayers, deletePlayer, fetchAllPlayers } from '../utils/requests'
-import { updateSessionData } from '../utils/utils'
+import useSessionData from '../utils/useSessionData'
 
 function Players () {
-  const [players, setPlayers] = useState([])
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [playerID, setPlayerID] = useState('')
-
   const params = useParams()
   const navigate = useNavigate()
 
-  updateSessionData(params.gameId, setIsAdmin, setPlayerID)
+  const [players, setPlayers] = useState([])
+  const [isAdmin, playerID] = useSessionData(params.gameId)
 
   // Fetches player data every 2 seconds
   useEffect(() => {
