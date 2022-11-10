@@ -46,14 +46,6 @@ export function playersAsArray (playersDict) {
   return arr
 }
 
-export async function updateSessionData (gameId, setIsAdmin, setPlayerID) {
-  const auth = await checkAuth(gameId)
-  const admin = auth.authorized
-  const player = auth.player
-  setIsAdmin(admin)
-  setPlayerID(player)
-}
-
 /**
  * Creates array where the current player is lifted on top.
  * Note that the sort is not inplace. The array is copied and returned new.
@@ -61,13 +53,13 @@ export async function updateSessionData (gameId, setIsAdmin, setPlayerID) {
  * inital order, but the current player in a session is on top of a list
  */
 export function withCurrentPlayerLiftedIfPresent (playerID, players) {
-  console.log("playerID")
-  console.log(playerID);
+  console.log('playerID')
+  console.log(playerID)
   if (playerID === '') {
-    console.log("playerID is empty ");
+    console.log('playerID is empty ')
     return players
   }
-  return players.sort((p1, p2) => p1.id == playerID ? -1 : p2.id == playerID ? 1 : 0)
+  return players.sort((p1, p2) => p1.id === playerID ? -1 : p2.id === playerID ? 1 : 0)
 }
 
 export class HTTPError extends Error {
