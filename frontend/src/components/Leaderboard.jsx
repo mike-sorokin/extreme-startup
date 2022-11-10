@@ -70,7 +70,7 @@ function Leaderboard () {
                   </Group>
                   </td>
 
-                  <td>{player.score}</td>
+                  <td>{Math.round(player.score)}</td>
                   <td>{player.streak.slice(-6) === '111111' && (<Badge variant="gradient" gradient={{ from: 'orange', to: 'red' }}> ON FIRE! </Badge>)}</td>
                 </tr>
               ))
