@@ -21,9 +21,12 @@ class QuizMaster:
         self.is_warmup = self.question_factory.round == 0
 
     # Continuous loop, administering questions to self.player at a rate specified by RateController
-    def start(self, e):
+    # Every question, check if game is over. If yes, then exit the thread.
+    def start(self, warmup_over, game_over):
         while self.player.active:
-            self.administer_question(e)
+            if game_over.is_set():
+                exit()
+            self.administer_question(warmup_over)
 
     # Administer question involving:
     # (1) acquiring r_lock,

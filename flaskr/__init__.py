@@ -174,6 +174,12 @@ def create_app():
                         return ("Race condition wtih lock", 429)
                     return ("GAME_UNPAUSED", 200)
 
+            elif "stop" in r:
+                    # Set the flag to kill all quiz_master threads
+                    games[game_id].end_game_event.set()
+                    print("Game ended")
+                    return ("GAME_ENDED", 200)
+
             return NOT_ACCEPTABLE
 
         elif request.method == "DELETE":  # delete game with <game_id>
@@ -226,7 +232,8 @@ def create_app():
             )
 
             player_thread = threading.Thread(
-                target=quiz_master.start, args=(games[game_id].first_round_event,)
+                target=quiz_master.start,
+                args=(games[game_id].first_round_event, games[game_id].end_game_event),
             )
             player_thread.daemon = True  # for test termination
             player_thread.start()
@@ -355,7 +362,8 @@ def create_app():
             )
 
             player_thread = threading.Thread(
-                target=quiz_master.start, args=(games[game_id].first_round_event,)
+                target=quiz_master.start,
+                args=(games[game_id].first_round_event, games[game_id].end_game_event),
             )
             player_thread.daemon = True  # for test termination
             player_thread.start()
