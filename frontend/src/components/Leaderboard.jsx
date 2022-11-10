@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { Badge, ColorSwatch, Container, Group, Space, Table, Title } from '@mantine/core'
 
 import { fetchAllPlayers } from '../utils/requests'
+import { MD5 } from 'crypto-js'
 
 import Chart from './Chart'
 
@@ -34,10 +35,15 @@ function Leaderboard () {
     if (ch === '1') {
       return <ColorSwatch color="green"/>
     } else if (ch === '0') {
-      return <ColorSwatch color="red"/>
-    } else {
       return <ColorSwatch color="orange"/>
+    } else {
+      return <ColorSwatch color="red"/>
     }
+  }
+  const stringToColour = (str) => {
+    const colour = '#'
+    const hash = MD5(str).toString().substring(0, 6)
+    return colour.concat(hash)
   }
 
   return (
@@ -62,7 +68,7 @@ function Leaderboard () {
               leaderboard.map((player) => (
                 <tr key={player.id}>
                   <td>{player.id}</td>
-                  <td>{player.name}</td>
+                  <td style={{ color: stringToColour(player.name) }}>{player.name}</td>
 
                   <td style={{ width: '300px' }}>
                   <Group position="left" spacing="xs" >
@@ -70,7 +76,7 @@ function Leaderboard () {
                   </Group>
                   </td>
 
-                  <td>{player.score}</td>
+                  <td>{Math.round(player.score)}</td>
                   <td>{player.streak.slice(-6) === '111111' && (<Badge variant="gradient" gradient={{ from: 'orange', to: 'red' }}> ON FIRE! </Badge>)}</td>
                 </tr>
               ))

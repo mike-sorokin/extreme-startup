@@ -7,6 +7,7 @@ from unittest.mock import Mock, MagicMock
 import pytest
 
 PROBLEM_DECREMENT = 50
+DEFAULT_POINT_SCORE = 10
 
 
 @pytest.fixture()
@@ -72,24 +73,33 @@ def test_scoreboard_can_have_multiple_players(game_setup):
     assert len(scoreboard.incorrect_tally) == num_players
 
 
+def test_scoring_increases_round_index(full_game_setup):
+    scoreboard, player, question = full_game_setup
+    question.result, question.points = "CORRECT", DEFAULT_POINT_SCORE
+
+    player.round_index = 0
+    scoreboard.increment_score_for(player, question)
+    assert player.round_index == 1
+
+
 def test_can_increment_score_for_player_with_correct_result(full_game_setup):
     scoreboard, player, question = full_game_setup
-    points = 10
-    question.result, question.points = "CORRECT", points
+    question.result, question.points = "CORRECT", DEFAULT_POINT_SCORE
+
     scoreboard.increment_score_for(player, question)
 
-    assert scoreboard.scores[player.uuid] == points
+    assert scoreboard.scores[player.uuid] == DEFAULT_POINT_SCORE
     assert scoreboard.correct_tally[player.uuid] == 1
     player.log_event.assert_called_once()
 
 
 def test_can_decrement_score_for_player_with_incorrect_result(full_game_setup):
     scoreboard, player, question = full_game_setup
-    points = 10
-    question.result, question.points = "WRONG", points
+    question.result, question.points = "WRONG", DEFAULT_POINT_SCORE
+
     scoreboard.increment_score_for(player, question)
 
-    assert scoreboard.scores[player.uuid] == -1 * points
+    assert scoreboard.scores[player.uuid] == -1 * DEFAULT_POINT_SCORE
     assert scoreboard.incorrect_tally[player.uuid] == 1
     player.log_event.assert_called_once()
 
@@ -97,6 +107,7 @@ def test_can_decrement_score_for_player_with_incorrect_result(full_game_setup):
 def test_decrements_score_for_question_with_error_response(full_game_setup):
     scoreboard, player, question = full_game_setup
     question.problem = "ERROR_RESPONSE"
+
     scoreboard.increment_score_for(player, question)
 
     assert scoreboard.scores[player.uuid] == -1 * PROBLEM_DECREMENT
@@ -113,7 +124,7 @@ def test_leaderboard_orders_players_by_decreasing_socre(full_game_setup):
     scoreboard, player1, question = full_game_setup
     player2 = MagicMock()
     scoreboard.new_player(player2)
-    question.result, question.points = "CORRECT", 10
+    question.result, question.points = "CORRECT", DEFAULT_POINT_SCORE
 
     scoreboard.increment_score_for(player1, question)
     scoreboard.increment_score_for(player1, question)
@@ -131,7 +142,7 @@ def test_leaderboard_orders_players_by_decreasing_socre(full_game_setup):
 
 def test_scoreboard_penalises_higher_ranking_players_more(full_game_setup):
     scoreboard, better_player, question = full_game_setup
-    worse_player, points = MagicMock(), 10
+    worse_player, points = MagicMock(), DEFAULT_POINT_SCORE
     num_players = 2
     scoreboard.new_player(worse_player)
     question.result, question.points = "CORRECT", points
@@ -154,7 +165,11 @@ def test_reseting_player_sets_score_and_tally_to_zero_but_retain_request_count(
 ):
     scoreboard, player, question = full_game_setup
     scoreboard.new_player(player)
-    question.result, question.problem, question.points = "CORRECT", "", 10
+    question.result, question.problem, question.points = (
+        "CORRECT",
+        "",
+        DEFAULT_POINT_SCORE,
+    )
 
     scoreboard.increment_score_for(player, question)
     assert scoreboard.scores[player.uuid] == 10
@@ -170,6 +185,3 @@ def test_reseting_player_sets_score_and_tally_to_zero_but_retain_request_count(
 
     assert scoreboard.scores[player.uuid] == 0
     assert player.score == 0
-
-
-# Test Delay

@@ -347,11 +347,7 @@ def test_non_admin_of_game_can_not_delete_game(extras, cli):
 
     with patch("flaskr.session", dict()) as session:
         cli.post(f"/api/{game_id}/auth", json={"password": "dummy_password"})
-        rd = response_as_dict_if_sucecssful(
-            cli.delete(
-                f"/api/{game_id}",
-            )
-        )
+        rd = response_as_dict_if_sucecssful(cli.delete(f"/api/{game_id}"))
         assert keyset_of(rd).only_contains_the_following_keys("deleted")
         assert rd["deleted"] == game_id
 
@@ -541,3 +537,11 @@ def test_player_can_delete_itself(extras, cli):
 
     get_player_request = cli.get(f"/api/{extras[0]['id']}/players/{player['id']}")
     assert get_player_request.status_code == NOT_ACCEPTED
+
+
+@with_setup(create_a_single_game)
+def test_index_put_throws_an_error(extras, cli):
+    resp = cli.get(f"/api/{extras[0]['id']}/assist")
+
+    assert resp.status_code == ALL_GOOD
+    assert type(resp.json) is list

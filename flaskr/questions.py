@@ -72,7 +72,7 @@ class Question:
 
     # Check the player answered correctly
     def answered_correctly(self):
-        return self.answer == self.correct_answer()
+        return self.answer == str(self.correct_answer())
 
     # abstract function to be overwritten
     def correct_answer(self):
@@ -235,7 +235,7 @@ class PowerQuestion(BinaryMathsQuestion):
         return f"What is {self.n1} to the power of {self.n2}?"
 
     def correct_answer(self):
-        return self.n1**self.n2
+        return self.n1 ** self.n2
 
 
 # Ask which number from list if numbers is a square number and a cube number
@@ -265,7 +265,7 @@ class PrimesQuestion(SelectFromListOfNumbersQuestion):
 
     def correct_answer(self):
         is_prime = (
-            lambda x: all([(x % j) for j in range(2, int(x**0.5) + 1)]) and x > 1
+            lambda x: all([(x % j) for j in range(2, int(x ** 0.5) + 1)]) and x > 1
         )
         return ", ".join(map(str, filter(is_prime, self.numbers)))
 

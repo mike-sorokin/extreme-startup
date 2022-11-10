@@ -71,6 +71,16 @@ function Admin () {
     }
   }
 
+  // Send a {"stop": ""} request to stop the game
+  const sendGameEnd = async () => {
+    try {
+      const response = await updateGame(params.gameId, { stop: '' })
+      console.log(response)
+    } catch (error) {
+      // TODO
+    }
+  }
+
   function togglePauseButton (color, text) {
     return <Button compact variant="outline"
       color={color}
@@ -104,6 +114,14 @@ function Admin () {
             color={clipboard.copied ? 'teal' : 'blue'}
             onClick={() => clipboard.copy(params.gameId)}>
             {clipboard.copied ? 'Game Id Copied!' : 'Copy Game Id'}
+          </Button>
+          <Button compact variant="outline"
+            style={{ marginLeft: '10%' }}
+            color="red"
+            radius="md"
+            size="md"
+            onClick={() => sendGameEnd()}>
+            End game
           </Button>
         </div>
         <Space h="md" /> <br />

@@ -1,5 +1,5 @@
 from flaskr.event import Event
-from datetime import datetime
+import datetime as dt
 
 PROBLEM_DECREMENT = 50
 STREAK_LENGTH = 30
@@ -13,7 +13,7 @@ class Scoreboard:
         self.scores = {}
 
         # running_totals: [ {"time": timestamp, "pid": score} ]
-        self.running_totals = []
+        self.running_totals = [{"time": dt.datetime.now(dt.timezone.utc)}]
 
         self.correct_tally = {}
         self.incorrect_tally = {}
@@ -46,13 +46,21 @@ class Scoreboard:
             increment,
             question.result if question.problem == "" else question.problem,
         )
-        # Append this to cache, used for drawing graph on frontend
-        self.running_totals.append(
-            {"time": event.timestamp, f"{player.uuid}": player.score}
-        )
+        # If the last event in the cache was less than 1sec ago, append it there.
+        # Otherwise, make a new dict entry
+        prev_time = self.running_totals[-1]["time"]
+        diff = event.timestamp - prev_time
+        if diff.total_seconds() < 1:
+            self.running_totals[-1][player.uuid] = player.score
+        else:
+            self.running_totals.append(
+                {"time": event.timestamp, f"{player.uuid}": player.score}
+            )
+
         player.log_event(event)
 
         player.streak = player.streak[-STREAK_LENGTH:]
+        player.round_index += 1
 
     def record_request_for(self, player):
         self.request_counts[player.uuid] += 1

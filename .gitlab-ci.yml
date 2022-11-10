@@ -7,7 +7,6 @@ stages:
 .preamble: &preamble
   - python3 -m venv venv
   - source venv/bin/activate
-  - pip install -r test/requirements.txt
   - pip install -r flaskr/requirements.txt
 
 hello-world-test:
@@ -29,6 +28,12 @@ bot-entry-test:
   script:
     - *preamble
     - pytest test/bots/test_bot_entry.py
+
+database-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_database.py
 
 flaskr-test:
   stage: test

@@ -13,7 +13,7 @@ class Event:
         self.points_gained = points_gained
         self.response_type = response_type
         self.event_id = uuid4().hex[:8]
-        self.timestamp = dt.datetime.now(dt.timezone.utc).isoformat()
+        self.timestamp = dt.datetime.now(dt.timezone.utc)
 
     def __str__(self):
         return f"""
@@ -22,5 +22,5 @@ class Event:
         Query: {self.query},
         Difficulty: {self.difficulty}
         Points: {self.points_gained}
-        Timestamp: {self.timestamp}
+        Timestamp: {self.timestamp.isoformat()}
         """

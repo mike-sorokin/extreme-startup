@@ -17,6 +17,7 @@ from flaskr.scoreboard import Scoreboard
 from flaskr.quiz_master import QuizMaster
 from flaskr.json_encoder import JSONEncoder
 from flaskr.questions import *
+from flaskr.database import get_mongo_client
 from datetime import datetime
 import threading
 import secrets
@@ -52,9 +53,6 @@ def create_app():
 
     # players: player_id -> Player
     players = {}
-
-    # Scoreboard lock
-    lock = threading.Lock()
 
     # scoreboards: game_id -> Scoreboard
     scoreboards = {}
@@ -153,12 +151,7 @@ def create_app():
             r = request.get_json()
 
             if "round" in r:  # increment <game_id>'s round by 1
-                games[game_id].question_factory.advance_round()
-                games[game_id].round += 1  # for event logging
-
-                # wake up all sleeping threads in game if going from WARMUP -> ROUND 1
-                games[game_id].first_round_event.set()
-
+                games[game_id].advance_round(players)
                 return ("ROUND_INCREMENTED", 200)
 
             elif "pause" in r:
@@ -178,6 +171,25 @@ def create_app():
                     except RuntimeError:
                         return ("Race condition wtih lock", 429)
                     return ("GAME_UNPAUSED", 200)
+
+            elif "auto" in r:
+                if r["auto"]:  # turn on auto mode
+                    games[game_id].auto_mode = True
+                    return ("GAME_AUTO_ON", 200)
+                else:  # turn off auto mode
+                    games[game_id].auto_mode = False
+                    return ("GAME_AUTO_OFF", 200)
+
+            elif "stop" in r:
+                cli = get_mongo_client()
+                data = (encoder.default(players[pid]) for pid in games[game_id].players)
+                cli.xs[game_id].insert_many(data)
+
+                # Set the flag to kill all quiz_master threads
+                games[game_id].end_game_event.set()
+                remove_players(*games[game_id].players)
+                remove_games(game_id)
+                return ("GAME_ENDED", 200)
 
             return NOT_ACCEPTABLE
 
@@ -231,7 +243,8 @@ def create_app():
             )
 
             player_thread = threading.Thread(
-                target=quiz_master.start, args=(games[game_id].first_round_event,)
+                target=quiz_master.start,
+                args=(games[game_id].first_round_event, games[game_id].end_game_event),
             )
             player_thread.daemon = True  # for test termination
             player_thread.start()
@@ -251,6 +264,14 @@ def create_app():
             remove_players(*games[game_id].players)
             games[game_id].players.clear()
             return DELETE_SUCCESSFUL
+
+    # List of players who need help
+    @app.get("/api/<game_id>/assist")
+    def assist(game_id):
+        if game_id not in games:
+            return NOT_ACCEPTABLE
+
+        return games[game_id].players_to_assist
 
     # Managing <player_id> player
     @app.route("/api/<game_id>/players/<player_id>", methods=["GET", "PUT", "DELETE"])
@@ -360,7 +381,8 @@ def create_app():
             )
 
             player_thread = threading.Thread(
-                target=quiz_master.start, args=(games[game_id].first_round_event,)
+                target=quiz_master.start,
+                args=(games[game_id].first_round_event, games[game_id].end_game_event),
             )
             player_thread.daemon = True  # for test termination
             player_thread.start()

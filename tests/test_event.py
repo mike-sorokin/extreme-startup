@@ -22,6 +22,6 @@ def test_event_string_representation_is_correct():
         Query: {QUERY},
         Difficulty: {DIFFICULTY}
         Points: {POINTS_GAINED}
-        Timestamp: {event.timestamp}
+        Timestamp: {event.timestamp.isoformat()}
         """
     )

@@ -5,6 +5,7 @@ import sys
 sys.path.append(".")
 
 from flaskr import create_app
+from flaskr import database
 
 GET = 0
 POST = 1
@@ -73,7 +74,7 @@ create_a_couple_of_games = ((POST, "/api", {"password": "dummy_password"}, None)
 def create_a_game_with_players(cli, num_players=2):
     game = create_game(cli)
     gid = game["id"]
-    
+
     players = {}
     for _ in range(num_players):
         curr_player = create_player(cli, gid)
@@ -81,3 +82,16 @@ def create_a_game_with_players(cli, num_players=2):
         # players.append(create_player(cli, gid))
 
     return {"game": game, "players": players}
+
+
+def with_local_database(test_func):
+    """
+    Wrapper for database tests. This creates a local client and passes it into test_func
+    """
+
+    def wrapper(*args, **kwargs):
+        database.destructive_start_localhost_mongo()
+        cli = database.get_mongo_client(local=True)
+        test_func(cli, *args, **kwargs)
+
+    return wrapper
