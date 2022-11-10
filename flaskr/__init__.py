@@ -91,7 +91,7 @@ def create_app():
             scoreboards[gid] = Scoreboard()
             games[gid] = new_game
 
-            spawn_game_monitor(new_game)
+            new_game.spawn_game_monitor(players, scoreboards[gid])
             add_session_admin(gid, session)
             return encoder.encode(new_game)
 
@@ -146,25 +146,32 @@ def create_app():
             r = request.get_json()
 
             if "round" in r:  # increment <game_id>'s round by 1
+                if games[game_id].is_last_round():
+                    # Compile all game data 
+                    data = [encoder.default(players[pid]) for pid in games[game_id].players]
+
+                    # Set the flag to kill all quiz_master threads
+                    games[game_id].ended = True 
+                    remove_players(*games[game_id].players)
+                    remove_games(game_id)
+
+                    # Upload game statistics to database 
+                    cli = get_mongo_client()
+                    cli.xs[game_id].insert_many(data)
+
+                    return ("GAME_ENDED", 200)
+
                 games[game_id].advance_round(players)
                 return ("ROUND_INCREMENTED", 200)
 
             elif "pause" in r:
                 if r["pause"]:  # pause <game_id>
-                    pause_successful = games[game_id].pause_wlock.acquire(timeout=15)
-                    if not pause_successful:
-                        return ("Race condition with lock", 429)
-
-                    games[game_id].paused = True  # Kill monitor thread
+                    games[game_id].pause() # Kill monitor thread
                     return ("GAME_PAUSED", 200)
 
                 else:  # Unpause the game
-                    try:
-                        games[game_id].pause_wlock.release()
-                        games[game_id].paused = False
-                        spawn_game_monitor(games[game_id])
-                    except RuntimeError:
-                        return ("Race condition wtih lock", 429)
+                    games[game_id].unpause()
+                    games[game_id].spawn_game_monitor(players, scoreboards[game_id])
                     return ("GAME_UNPAUSED", 200)
 
             elif "auto" in r:
@@ -175,15 +182,19 @@ def create_app():
                     games[game_id].auto_mode = False
                     return ("GAME_AUTO_OFF", 200)
 
-            elif "stop" in r:
-                cli = get_mongo_client()
-                data = (encoder.default(players[pid]) for pid in games[game_id].players)
-                cli.xs[game_id].insert_many(data)
+            elif "stop" in r: # End the <game_id> instance 
+                # Compile all game data 
+                data = [encoder.default(players[pid]) for pid in games[game_id].players]
 
                 # Set the flag to kill all quiz_master threads
-                games[game_id].end_game_event.set()
+                games[game_id].ended = True 
                 remove_players(*games[game_id].players)
                 remove_games(game_id)
+
+                # Upload game statistics to database 
+                cli = get_mongo_client()
+                cli.xs[game_id].insert_many(data)
+
                 return ("GAME_ENDED", 200)
 
             return NOT_ACCEPTABLE
@@ -234,12 +245,11 @@ def create_app():
                 player,
                 games[game_id].question_factory,
                 scoreboards[game_id],
-                games[game_id].pause_rlock,
             )
 
             player_thread = threading.Thread(
                 target=quiz_master.start,
-                args=(games[game_id].first_round_event, games[game_id].end_game_event),
+                args=(games[game_id].first_round_event, games[game_id].running),
             )
             player_thread.daemon = True  # for test termination
             player_thread.start()
@@ -377,7 +387,7 @@ def create_app():
 
             player_thread = threading.Thread(
                 target=quiz_master.start,
-                args=(games[game_id].first_round_event, games[game_id].end_game_event),
+                args=(games[game_id].first_round_event, games[game_id].running),
             )
             player_thread.daemon = True  # for test termination
             player_thread.start()
@@ -395,15 +405,8 @@ def create_app():
     # Mark game as paused. Monitor thread will be killed automatically when target function returns.
     def remove_games(*gid):
         for curr_gid in gid:
-            games[curr_gid].paused = True
+            games[curr_gid].running.set()
             del games[curr_gid]
-
-    def spawn_game_monitor(game):
-        game_monitor_thread = threading.Thread(
-            target=game.monitor, args=[players, scoreboards[game.id]]
-        )
-        game_monitor_thread.daemon = True  # for test termination
-        game_monitor_thread.start()
 
     def add_session_admin(game_id, session):
         if "admin" in session:

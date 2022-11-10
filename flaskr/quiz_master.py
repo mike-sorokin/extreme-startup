@@ -10,19 +10,17 @@ class QuizMaster:
         player,
         question_factory,
         scoreboard,
-        rlock,
         rate_controller=RateController(),
     ):
         self.player = player
         self.rate_controller = rate_controller
         self.question_factory = question_factory
         self.scoreboard = scoreboard
-        self.rlock = rlock
         self.is_warmup = self.question_factory.round == 0
 
     # Continuous loop, administering questions to self.player at a rate specified by RateController
     # Every question, check if game is over. If yes, then exit the thread.
-    def start(self, warmup_over, game_over):
+    def start(self, warmup_over, running):
         # Init score as 0
         self.scoreboard.running_totals.append(
             {
@@ -30,16 +28,15 @@ class QuizMaster:
                 f"{self.player.uuid}": 0,
             }
         )
+
         while self.player.active:
-            if game_over.is_set():
-                exit()
-            self.administer_question(warmup_over)
+            self.administer_question(warmup_over, running)
 
     # Administer question involving:
     # (1) acquiring r_lock,
     # (2) send question to user HTTP get,
     # (3) adjust scoreboard/rate_controller based on response
-    def administer_question(self, warmup_over):
+    def administer_question(self, warmup_over, running):
         if self.is_warmup and warmup_over.is_set():
             self.is_warmup = False
             # Reset score to 0 once warmup ends
@@ -51,9 +48,7 @@ class QuizMaster:
             )
             self.reset_stats_and_rc()
 
-        self.rlock.acquire()  # If wlock acquired (paused), sleep here until wlock released. Many rlock acquires possible for players
-        if self.rlock.locked():
-            self.rlock.release()
+        running.wait() # Wait until running event is set to True -- i.e. when game is unpaused 
 
         question = self.question_factory.next_question()
 
