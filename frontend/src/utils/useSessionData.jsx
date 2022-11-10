@@ -10,7 +10,6 @@ function useSessionData (gameId) {
     const checkCookie = async () => {
       try {
         const response = await checkAuth(gameId)
-        console.log(response)
         setIsAdmin(response.authorized)
         setPlayerID(response.player)
       } catch (error) {
