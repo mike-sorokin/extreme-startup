@@ -174,7 +174,7 @@ def create_app():
 
             elif "stop" in r:
                 cli = get_mongo_client()
-                data = [encoder.default(players[pid]) for pid in games[game_id].players]
+                data = (encoder.default(players[pid]) for pid in games[game_id].players)
                 cli.xs[game_id].insert_many(data)
 
                 # Set the flag to kill all quiz_master threads
