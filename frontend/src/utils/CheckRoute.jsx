@@ -6,15 +6,13 @@ import { checkValidGame, checkValidPlayer } from './requests'
 import NotFound from '../components/NotFound'
 
 function CheckRoute () {
-  const [loading, setLoading] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [valid, setValid] = useState(null)
 
   const params = useParams()
 
   useEffect(() => {
     const validateUrl = async () => {
-      setLoading(true)
-
       // validate game id
       setValid(await checkValidGame(params.gameId))
 

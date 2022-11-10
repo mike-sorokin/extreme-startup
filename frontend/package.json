@@ -7,8 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest",
-    "e2e": "cypress open"
+    "e2e": "cypress open",
+    "test": "vitest"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
