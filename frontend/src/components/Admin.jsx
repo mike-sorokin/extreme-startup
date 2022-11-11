@@ -4,7 +4,7 @@ import { Badge, Button, Card, Container, Space, Title } from '@mantine/core'
 import { useClipboard } from '@mantine/hooks'
 
 import { fetchGame, updateGame } from '../utils/requests'
-import ConfirmationModal from './ConfirmationModal'
+import ConfirmationModal from '../utils/ConfirmationModal'
 
 function Admin () {
   const [playerNo, setPlayerNo] = useState(0)

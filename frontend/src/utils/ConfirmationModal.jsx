@@ -14,7 +14,7 @@ function ConfirmationModal ({ opened, setOpened, title, body, func }) {
             <Button variant="filled"
                 color="red"
                 radius="md"
-                size="md"
+                size="sm"
                 onClick={() => func}>
                 Yes
             </Button>
