@@ -84,7 +84,8 @@ function Players () {
         </thead>
         <tbody>
           {players.map(player => (
-            <tr key={player.id} onClick={() => navigate(player.id)}>
+            <tr key={player.id} onClick={() => navigate(player.id)}
+                style={(player.id == playerID) ? {background: "rgb(255,255,255,0.1)"} : {}}>
               <td>{player.id}</td>
               <td>{player.name}</td>
               <td>{player.api}</td>
