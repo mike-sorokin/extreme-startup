@@ -92,7 +92,7 @@ function Home () {
             <p>
               Extreme Startup is a software development game / workshop that allows players or teams
               to compete against each other to code and deliver new features, and score points for doing so.
-              The game is an interactive learning experience while also being fund and engaging.
+              The game is an interactive learning experience while also being fun and engaging.
               Extreme Startup revolves around the theme of satisfying market demand.
             </p>
           </Text> <br />
