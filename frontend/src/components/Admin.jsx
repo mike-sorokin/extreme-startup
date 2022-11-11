@@ -74,7 +74,7 @@ function Admin () {
   // Send a {"stop": ""} request to stop the game
   const sendGameEnd = async () => {
     try {
-      const response = await updateGame(params.gameId, { stop: '' })
+      const response = await updateGame(params.gameId, { end: '' })
       console.log(response)
     } catch (error) {
       // TODO
@@ -106,7 +106,19 @@ function Admin () {
       <Title order={1} color="white" weight={1000}>Admin Page</Title>
       <Space h="md" />
       <Card shadow="sm" p="lg" radius="md" withBorder>
-        <h3>Game ID</h3>
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <h3>Game ID</h3>
+          <div style={{ display: 'flex', marginLeft: '85%' }}>
+            <Button compact variant="filled"
+              color="red"
+              radius="md"
+              size="lg"
+              onClick={() => sendGameEnd()}>
+              End Game
+            </Button>
+          </div>
+        </div>
+        <br />
         <div style={{ display: 'inline-flex', flexDirection: 'row' }}>
           <Title order={4} color="white" weight={1000}>{params.gameId}</Title>
           <Button compact variant="outline"
@@ -114,14 +126,6 @@ function Admin () {
             color={clipboard.copied ? 'teal' : 'blue'}
             onClick={() => clipboard.copy(params.gameId)}>
             {clipboard.copied ? 'Game Id Copied!' : 'Copy Game Id'}
-          </Button>
-          <Button compact variant="outline"
-            style={{ marginLeft: '10%' }}
-            color="red"
-            radius="md"
-            size="md"
-            onClick={() => sendGameEnd()}>
-            End game
           </Button>
         </div>
         <Space h="md" /> <br />
