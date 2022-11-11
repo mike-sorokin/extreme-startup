@@ -182,7 +182,7 @@ def create_app():
                     games[game_id].auto_mode = False
                     return ("GAME_AUTO_OFF", 200)
 
-            elif "stop" in r: # End the <game_id> instance 
+            elif "end" in r: # End the <game_id> instance 
                 # Compile all game data 
                 data = [encoder.default(players[pid]) for pid in games[game_id].players]
 
