@@ -23,7 +23,7 @@ function Player () {
         setPlayerData(response)
         setEvents(response.events.reverse())
       } catch (error) {
-        // TODO
+        console.error(error)
       }
     }
 
@@ -45,11 +45,11 @@ function Player () {
       <Space h="md" />
       <Card shadow="sm" p="lg" radius="md" withBorder>
         <h3>Player ID</h3>
-        <h4 style={{ color: 'grey' }}>{playerData.id}</h4>
+        <h4 style={{ color: 'grey' }} data-cy='player-id'>{playerData.id}</h4>
         <br />
         <h3>Game ID</h3>
         <div style={{ display: 'inline-flex', flexDirection: 'row' }}>
-          <Title order={4} color="white" weight={1000}>{playerData.game_id}</Title>
+          <Title order={4} color="white" weight={1000} data-cy='game-id'>{playerData.game_id}</Title>
           <Button compact variant="outline"
             style={{ marginLeft: '10%', width: '150px' }}
             color={clipboard.copied ? 'teal' : 'blue'}
@@ -60,10 +60,10 @@ function Player () {
         <Space h="md" />
         <br />
         <h3>API</h3>
-        <h4 style={{ color: 'grey' }}>{playerData.api}</h4>
+        <h4 style={{ color: 'grey' }} data-cy='api'>{playerData.api}</h4>
         <br />
         <h3>Score</h3>
-        <Title order={4} color="white" weight={1000}>{playerData.score}</Title>
+        <Title order={4} color="white" weight={1000} data-cy='score'>{playerData.score}</Title>
         <br />
         <h3>Events</h3>
         <PlayerTable events={events} />

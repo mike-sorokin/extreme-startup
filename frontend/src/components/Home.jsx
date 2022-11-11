@@ -18,16 +18,41 @@ function Home () {
   // Creates a new game
   const handleCreateGame = async (event) => {
     event.preventDefault()
-    setOpenedChoosePwd(false)
-    setOpenedCreateGame(true)
 
     try {
       const response = await createNewGame({ password: pwd })
       showSuccessNotification('Successfully Created Game!')
       setNewGameId(response.id)
+      setOpenedChoosePwd(false)
+      setOpenedCreateGame(true)
     } catch (error) {
-      // TODO
+      console.error(error)
+      if (error.response && error.response.status === 406) {
+        console.error('password not sent in request')
+      }
+      if (error.response && error.response.status === 400) {
+        console.error('password cannot be empty')
+      }
     }
+  }
+
+  // Dynamic styling for card to make sure it is not visible once a different modal is open
+  const cardStyle = () => {
+    const styles = {
+      backgroundColor: '#2C2E33',
+      width: 'fit-content',
+      position: 'absolute',
+      left: '50%',
+      top: '50%',
+      transform: 'translate(-50%, -50%)'
+    }
+
+    // Sets visibility to hidden if another modal is open
+    if (openedChoosePwd || openedAddPlayer || openedCreateGame) {
+      styles.display = 'none'
+    }
+
+    return styles
   }
 
   return (
@@ -40,7 +65,7 @@ function Home () {
         <div>
           <form onSubmit={handleCreateGame}>
             <PasswordInput value={pwd} onChange={(e) => setPwd(e.target.value)}
-              placeholder="Game password" label="Enter game password:" required />
+              placeholder="Game password" label="Enter game password:" required data-cy="password-input" />
               <Space h="md" />
             <Button variant="outline" color="green" type="submit">Create Game!</Button>
           </form>
@@ -93,15 +118,7 @@ function Home () {
         </div>
       </Modal>
 
-      <Card shadow="sm" p="lg" radius="md" withBorder
-        style={{
-          backgroundColor: '#2C2E33',
-          width: 'fit-content',
-          position: 'absolute',
-          left: '50%',
-          top: '50%',
-          transform: 'translate(-50%, -50%)'
-        }}>
+      <Card shadow="sm" p="lg" radius="md" withBorder sx={cardStyle}>
         <Stack align="center" spacing="xl">
           <Title order={1} color="white" weight={1000}>🔥 Extreme Startup 🔥</Title>
           <Button variant="outline" color="green" radius="md" size="lg" onClick={() => setOpenedChoosePwd(true)}>Create a Game!</Button>

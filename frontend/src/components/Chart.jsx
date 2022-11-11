@@ -25,7 +25,10 @@ function Chart ({ gameId }) {
         })
         setChartData(response)
       } catch (error) {
-        console.log(error)
+        console.error(error)
+        if (error.response && error.response.status === 406) {
+          console.error('invalid game id')
+        }
       }
     }
 

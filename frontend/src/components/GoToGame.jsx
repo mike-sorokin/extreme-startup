@@ -21,7 +21,7 @@ function GoToGame (gameIdGetter) {
       <Space h="xl" />
       <Title order={5} color="white" weight={500}>Your Game ID is:</Title>
       <Space h="md" />
-      <Title order={1} color="white" weight={1000} align="center">{gameId}</Title>
+      <Title order={1} color="white" weight={1000} align="center" data-cy='game-id'>{gameId}</Title>
       <Space h="md" />
       <div style={{ flexDirection: 'row' }}>
         <Button variant="outline"
@@ -33,7 +33,8 @@ function GoToGame (gameIdGetter) {
         <Button variant="gradient"
           style={{ marginLeft: '5%' }}
           gradient={{ from: 'teal', to: 'lime', deg: 105 }}
-          onClick={goToGamePage}>To Game Page
+          onClick={goToGamePage}
+          data-cy="to-game-page">To Game Page
         </Button>
       </div>
     </div>
