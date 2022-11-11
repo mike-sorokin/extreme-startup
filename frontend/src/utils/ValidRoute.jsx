@@ -29,7 +29,13 @@ function ValidRoute () {
 
   // Show loader whilst waiting for params check
   if (loading) {
-    return <Loader />
+    return <Loader style={{
+      width: 'fit-content',
+      position: 'absolute',
+      left: '50%',
+      top: '50%',
+      transform: 'translate(-50%, -50%)'
+    }}/>
   }
 
   // If valid is true, show any child component through Outlet, else show NotFound component
