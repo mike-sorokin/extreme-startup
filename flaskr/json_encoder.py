@@ -29,7 +29,7 @@ class JSONEncoder(json.JSONEncoder):
             )
         elif isinstance(obj, Game):
             return dict(
-                id=obj.id, round=obj.round, players=obj.players, paused=obj.paused
+                id=obj.id, round=obj.round, players=obj.players, paused=not obj.running.is_set()
             )
         elif isinstance(obj, datetime.datetime):
             return obj.isoformat()
