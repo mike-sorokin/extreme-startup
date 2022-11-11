@@ -5,7 +5,7 @@ import { useClipboard } from '@mantine/hooks'
 
 import { fetchGame, updateGame } from '../utils/requests'
 
-function Admin () {
+function Admin() {
   const [playerNo, setPlayerNo] = useState(0)
   const [round, setRound] = useState(0)
   const [gamePaused, setGamePaused] = useState(false)
@@ -74,14 +74,14 @@ function Admin () {
   // Send a {"stop": ""} request to stop the game
   const sendGameEnd = async () => {
     try {
-      const response = await updateGame(params.gameId, { stop: '' })
+      const response = await updateGame(params.gameId, { end: '' })
       console.log(response)
     } catch (error) {
       // TODO
     }
   }
 
-  function togglePauseButton (color, text) {
+  function togglePauseButton(color, text) {
     return <Button compact variant="outline"
       color={color}
       radius="md"
@@ -93,7 +93,7 @@ function Admin () {
     </Button>
   }
 
-  function roundBadge (color, text) {
+  function roundBadge(color, text) {
     return <Badge size="xl" color={color} variant="filled"
       style={{ width: '200px' }}
       data-cy='current-round'>
