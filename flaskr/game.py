@@ -23,20 +23,20 @@ class Game:
 
         self.question_factory = QuestionFactory(round)
         self.round = round
-        self.max_round = self.question_factory.total_rounds() 
+        self.max_round = self.question_factory.total_rounds()
 
         self.first_round_event = threading.Event()
-        self.ended = False 
+        self.ended = False
 
         self.running = threading.Event()
-        self.running.set() 
+        self.running.set()
 
         self.players_to_assist = []
         self.auto_mode = False
 
     def is_running(self):
         return self.running.is_set()
-        
+
     def new_player(self, player_id):
         self.players.append(player_id)
 
@@ -47,6 +47,8 @@ class Game:
     # In the latter case we would want to increment round. Also in charge of informing game administrators
     def monitor(self, players_dict, scoreboard):
         while self.running.is_set():
+            if self.ended:
+                exit()
             num_players = len(self.players)
             if num_players != 0:
                 if self.auto_mode and self.round != 0:
@@ -62,7 +64,7 @@ class Game:
 
         for pid in self.players:
             players_dict[pid].round_index = 0
-        
+
     def is_last_round(self):
         return self.round == self.max_round
 
