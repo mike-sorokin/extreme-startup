@@ -138,6 +138,6 @@ docker-run-new-container:
 fly-deploy:
   stage: deploy
   script:
-    - /home/gitlab-runner/.fly/bin/fly deploy . --detach --now
+    - /home/gitlab-runner/.fly/bin/fly deploy . --detach --now --build-secret DB_PW=$DB_PW
   rules:
     - if: $CI_COMMIT_BRANCH == "master"

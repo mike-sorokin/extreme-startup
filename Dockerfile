@@ -18,6 +18,13 @@ COPY --from=node-build ./frontend/dist ./flaskr/vite
 RUN pip install --upgrade pip
 RUN pip install -r flaskr/requirements.txt
 
+# Set env variables
+ARG DB_PW=
+ENV DB_PASSWORD=$DB_PW
+
+ENV DB_USERNAME=xs-bot
+ENV DB_ADDRESS=cluster0.dvvipyf.mongodb.net
+
 EXPOSE 5000
 
 CMD python -m flask --app flaskr --debug run --host 0.0.0.0

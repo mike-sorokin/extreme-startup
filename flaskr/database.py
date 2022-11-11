@@ -22,9 +22,11 @@ def get_mongo_client(local=False):
                 except KeyError:
                     print("Warning: malformed mongo_config.json. Attempting to read environment variables.")
         try:
-            connection_string = (
-                f"mongodb+srv://{os.environ['DB_USERNAME']}:{os.environ['DB_PASSWORD']}@{os.environ['DB_ADDRESS']}"
-            )
+            pw = os.environ["DB_PASSWORD"]
+            if pw != "":
+                connection_string = (
+                    f"mongodb+srv://{os.environ['DB_USERNAME']}:{os.environ['DB_PASSWORD']}@{os.environ['DB_ADDRESS']}"
+                )
         except KeyError:
             print("Warning: environment variables not set. Using localhost DB")
 
