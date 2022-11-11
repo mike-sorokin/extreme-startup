@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 
 import { checkAuth } from './requests'
 
-export function useSessionData (gameId) {
+function useSessionData (gameId) {
   const [isAdmin, setIsAdmin] = useState(false)
   const [playerID, setPlayerID] = useState('')
 
