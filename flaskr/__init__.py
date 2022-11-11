@@ -57,6 +57,9 @@ def create_app():
     # scoreboards: game_id -> Scoreboard
     scoreboards = {}
 
+    # Temporary list of ended game ids
+    ended_games = []
+
     encoder = JSONEncoder()
 
     # This is a catch-all function that will redirect anything not caught by the other rules
@@ -116,9 +119,9 @@ def create_app():
         if game_id not in games:
             return NOT_ACCEPTABLE
 
-        if request.method == "GET": 
+        if request.method == "GET":
             res = {"authorized": is_admin(game_id, session), "player" : ""}
-            
+
             if get_player(session)[0]:
                 res["player"] =  get_player(session)[1]
 
@@ -181,13 +184,14 @@ def create_app():
                     return ("GAME_AUTO_OFF", 200)
 
             elif "stop" in r:
-                cli = get_mongo_client()
-                data = (encoder.default(players[pid]) for pid in games[game_id].players)
-                cli.xs[game_id].insert_many(data)
+                # cli = get_mongo_client()
+                # data = (encoder.default(players[pid]) for pid in games[game_id].players)
+                # cli.xs[game_id].insert_many(data)
 
                 # Set the flag to kill all quiz_master threads
                 games[game_id].end_game_event.set()
                 remove_players(*games[game_id].players)
+                ended_games.append(game_id)
                 remove_games(game_id)
                 return ("GAME_ENDED", 200)
 
@@ -272,6 +276,13 @@ def create_app():
             return NOT_ACCEPTABLE
 
         return games[game_id].players_to_assist
+
+    @app.get("/api/<game_id>/gameover")
+    def gameover(game_id):
+        r = make_response(encoder.encode({"game_over": game_id in ended_games}))
+        r.mimetype = "application/json"
+        return r
+
 
     # Managing <player_id> player
     @app.route("/api/<game_id>/players/<player_id>", methods=["GET", "PUT", "DELETE"])
@@ -421,7 +432,7 @@ def create_app():
 
     def is_player(player_id, session):
         return ("player" in session) and (player_id in session["player"])
-    
+
     def get_player(session):
         if "player" in session:
             return True, session["player"]

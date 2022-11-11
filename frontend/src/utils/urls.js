@@ -21,6 +21,10 @@ export function adminUrl (gameId) {
   return `/${gameId}/admin`
 }
 
+export function gameReviewUrl (gameId) {
+  return `/review/${gameId}`
+}
+
 /**
  * URLs for requests
  */
@@ -64,4 +68,9 @@ export function playerEventsAPI (gameId, playerId) {
 // Management of a specific event for a player
 export function eventAPI (gameId, playerId, eventId) {
   return `${API_PREFIX}/${gameId}/players/${playerId}/events/${eventId}`
+}
+
+// Management of a specific event for a player
+export function gameoverAPI (gameId) {
+  return `${API_PREFIX}/${gameId}/gameover`
 }

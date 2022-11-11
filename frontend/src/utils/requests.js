@@ -1,6 +1,9 @@
 import axios from 'axios'
 
-import { homeAPI, gameAPI, authAPI, playersAPI, playerAPI, playerEventsAPI, eventAPI, scoresAPI } from './urls'
+import {
+  homeAPI, gameAPI, authAPI, playersAPI, playerAPI,
+  playerEventsAPI, eventAPI, scoresAPI, gameoverAPI
+} from './urls'
 import { alertError, showFailureNotification, showErrorNotification, playersAsArray, HTTPError } from './utils'
 
 const instance = axios.create({
@@ -495,5 +498,20 @@ export async function checkValidPlayer (gameId, playerId) {
     return true
   } catch (error) {
     return false
+  }
+}
+
+/**
+ * Check if a game requested was ended id is valid
+ * @async
+ * @param {string} gameId The game id you are checking
+ * @returns {Promise<boolean>} true if game was ended false otherwise
+ */
+export async function checkGameEnded (gameId) {
+  try {
+    const response = await instance.get(gameoverAPI(gameId))
+    return response.data.game_over
+  } catch (error) {
+    alertError(error)
   }
 }
