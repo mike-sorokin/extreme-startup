@@ -1,6 +1,5 @@
 from uuid import uuid4
 from flaskr.question_factory import QuestionFactory
-from readerwriterlock import rwlock
 import threading
 import time
 
@@ -11,27 +10,33 @@ ADVANCE_RATIO = 0.2
 # 0 -> No server response
 STREAK_CHARS = ["1", "X", "0"]
 
+class GamesMaster:
+    pass
+
 # Most fundamental object in application -- stores information of players, scoreboard, questions gen., etc.
 class Game:
     def __init__(self, admin_password, round=0):
         self.id = uuid4().hex[:8]
-        self.players = []
-        self.round = round
-
-        self.question_factory = QuestionFactory(round)
-        self.first_round_event = threading.Event()
-        self.end_game_event = threading.Event()
-
-        self.paused = False
-        pauser = rwlock.RWLockWrite()
-        self.pause_rlock, self.pause_wlock = pauser.gen_rlock(), pauser.gen_wlock()
-
         self.admin_password = admin_password
 
-        self.players_to_assist = []
+        self.players = []
 
+        self.question_factory = QuestionFactory(round)
+        self.round = round
+        self.max_round = self.question_factory.total_rounds() 
+
+        self.first_round_event = threading.Event()
+        self.ended = False 
+
+        self.running = threading.Event()
+        self.running.set() 
+
+        self.players_to_assist = []
         self.auto_mode = False
 
+    def is_running(self):
+        return self.running.is_set()
+        
     def new_player(self, player_id):
         self.players.append(player_id)
 
@@ -41,10 +46,7 @@ class Game:
     #   (2) balance catching-up after a drought of points vs. escaping with the lead.
     # In the latter case we would want to increment round. Also in charge of informing game administrators
     def monitor(self, players_dict, scoreboard):
-        while not self.paused:
-            if self.end_game_event.is_set():
-                exit()
-
+        while self.running.is_set():
             num_players = len(self.players)
             if num_players != 0:
                 if self.auto_mode and self.round != 0:
@@ -60,6 +62,22 @@ class Game:
 
         for pid in self.players:
             players_dict[pid].round_index = 0
+        
+    def is_last_round(self):
+        return self.round == self.max_round
+
+    def pause(self):
+        self.running.clear()
+
+    def unpause(self):
+        self.running.set()
+
+    def spawn_game_monitor(self, players_dict, scoreboard):
+        game_monitor_thread = threading.Thread(
+            target=self.monitor, args=[players_dict, scoreboard]
+        )
+        game_monitor_thread.daemon = True  # for test termination
+        game_monitor_thread.start()
 
     def __update_players_to_assist(self, players_dict):
         for pid in self.players:
