@@ -75,20 +75,6 @@ function Home () {
   return (
     <div className="Home">
       <Modal centered
-        opened={openedReview}
-        onClose={() => setOpenedReview(false)}
-        title="Enter Game ID"
-        withCloseButton={false}>
-        <div>
-          <form onSubmit={handleGameReview}>
-            <TextInput value={gameReviewId} onChange={(e) => setGameReviewId(e.target.value)}
-              placeholder="Game ID" label="Enter game ID:" required data-cy="game-review-id-input" />
-              <Space h="md" />
-            <Button variant="outline" color="green" type="submit">Review Game!</Button>
-          </form>
-        </div>
-      </Modal>
-      <Modal centered
         opened={openedChoosePwd}
         onClose={() => setOpenedChoosePwd(false)}
         title="Choose a password"
@@ -99,6 +85,20 @@ function Home () {
               placeholder="Game password" label="Enter game password:" required data-cy="password-input" />
               <Space h="md" />
             <Button variant="outline" color="green" type="submit">Create Game!</Button>
+          </form>
+        </div>
+      </Modal>
+      <Modal centered
+        opened={openedReview}
+        onClose={() => setOpenedReview(false)}
+        title="Enter Game ID"
+        withCloseButton={false}>
+        <div>
+          <form onSubmit={handleGameReview}>
+            <TextInput value={gameReviewId} onChange={(e) => setGameReviewId(e.target.value)}
+              placeholder="Game ID" label="Enter game ID:" required data-cy="game-review-id-input" />
+              <Space h="md" />
+            <Button variant="outline" color="green" type="submit">Review Game!</Button>
           </form>
         </div>
       </Modal>
