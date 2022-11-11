@@ -93,18 +93,19 @@ function Home () {
               Extreme Startup is a software development game / workshop that allows players or teams
               to compete against each other to code and deliver new features, and score points for doing so.
               The game is an interactive learning experience while also being fun and engaging.
-              Extreme Startup revolves around the theme of satisfying market demand.
+              Extreme Startup revolves around the theme of satisfying market demand by encouraging players
+              to stay alert and adapt to frequently changing requests for service.
             </p>
-          </Text> <br />
+          </Text> <Space h="xs" />
           <Text>
             <p>
               The main outline of Extreme Startup is that a number of players deploy an API end-point, register that
-              endpoint with the game server, and then the game server starts sending them requests. Their
-              API endpoint should then respond to each request, and if they respond correctly they score points.
+              end-point with the game server, and then the game server starts sending them requests. Their
+              API end-point should then respond to each request, and if they respond correctly they score points.
               Each game has a number of rounds, where new types of requests are given when the round increments.
               When the game ends, the player / team with the most points wins!
             </p>
-          </Text> <br />
+          </Text> <Space h="xs" />
           <Text>
             <p>
               In order to play Extreme Startup you will need a pipeline and an API end-point ready to deploy.
