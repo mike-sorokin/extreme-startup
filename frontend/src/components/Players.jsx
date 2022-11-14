@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { Button, Container, Table, Title } from '@mantine/core'
 
 import { deleteAllPlayers, deletePlayer, fetchAllPlayers } from '../utils/requests'
+import { gameUrl } from '../utils/urls'
 import { withCurrentPlayerLiftedIfPresent } from '../utils/utils'
 import useSessionData from '../utils/useSessionData'
 
@@ -37,7 +38,7 @@ function Players () {
     event.stopPropagation()
     try {
       await deletePlayer(params.gameId, playerId)
-      navigate('/' + params.gameId)
+      navigate(gameUrl(params.gameId))
     } catch (error) {
       console.error(error)
       if (error.response && error.response.status === 401) {
@@ -85,7 +86,7 @@ function Players () {
         <tbody>
           {players.map(player => (
             <tr key={player.id} onClick={() => navigate(player.id)}
-                style={(player.id == playerID) ? {background: "rgb(255,255,255,0.1)"} : {}}>
+                style={(player.id === playerID) ? { background: 'rgb(255,255,255,0.1)' } : {}}>
               <td>{player.id}</td>
               <td>{player.name}</td>
               <td>{player.api}</td>

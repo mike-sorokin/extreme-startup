@@ -3,6 +3,7 @@ import { Outlet, useNavigate, useParams } from 'react-router-dom'
 import { Loader } from '@mantine/core'
 
 import { checkAuth } from './requests'
+import { gameUrl } from './urls'
 import { showErrorNotification } from './utils'
 import NotFound from '../components/NotFound'
 
@@ -21,7 +22,7 @@ function AdminRoute () {
       // If response.authorized is false, navigate to game page and show error
       if (!response.authorized) {
         setLoading(false)
-        navigate('/' + params.gameId)
+        navigate(gameUrl(params.gameId))
         showErrorNotification('Error', 'Not authorised')
       }
 

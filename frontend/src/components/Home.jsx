@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Button, Card, Center, Modal, PasswordInput, Space, Stack, Text, TextInput, Title } from '@mantine/core'
 
 import { createNewGame } from '../utils/requests'
+import { gameReviewUrl } from '../utils/urls'
 import { showSuccessNotification } from '../utils/utils'
 
 import AddPlayer from './AddPlayer'
@@ -47,7 +48,7 @@ function Home () {
       console.log(event)
       console.log(gameReviewId)
       // Check game id existed, if so redirect them to a new page with the GameReview component
-      navigate('/review/' + gameReviewId)
+      navigate(gameReviewUrl(gameReviewId))
     } catch (error) {
 
     }

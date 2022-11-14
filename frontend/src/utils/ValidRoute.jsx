@@ -15,7 +15,6 @@ function ValidRoute () {
   const params = useParams()
 
   useEffect(() => {
-
     const checkGameOver = async () => {
       const gameDeletedResponse = await checkGameEnded(params.gameId)
       if (gameDeletedResponse) {
@@ -25,13 +24,14 @@ function ValidRoute () {
 
     const validateUrl = async () => {
       // validate game id
-
       const response = await checkValidGame(params.gameId)
 
+      // If game id not found then check if the game was ended
       if (!response) {
         checkGameOver()
       }
       setValid(response)
+
       // validate player id if necessary
       if (params.id) {
         setValid(await checkValidPlayer(params.gameId, params.id))
