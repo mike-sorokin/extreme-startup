@@ -1,5 +1,4 @@
 from crypt import methods
-from uuid import uuid4
 from flask import (
     Flask,
     request,
@@ -14,7 +13,6 @@ from flaskr.games_manager import GamesManager
 from flaskr.json_encoder import JSONEncoder
 from flaskr.questions import *
 from flaskr.database import get_mongo_client
-from datetime import datetime
 import threading
 import secrets
 from random import randint
@@ -45,15 +43,7 @@ def create_app():
     app.config["SECRET_KEY"] = secrets.token_hex()
 
     db_client = get_mongo_client()
-
-    # games = {}
     games_manager = GamesManager(db_client)
-
-    # players: player_id -> Player
-    players = {}
-
-    # scoreboards: game_id -> Scoreboard
-    scoreboards = {}
 
     encoder = JSONEncoder()
 
@@ -223,7 +213,7 @@ def create_app():
             return NOT_ACCEPTABLE
 
         if request.method == "GET":  # fetch player with <player_id>
-            return encoder.encode(games_manager.get_game_players(game_id, player_id))
+            return encoder.encode(games_manager.get_game_players(game_id, player_id)[player_id])
         elif (
             request.method == "PUT"
         ):  # update player (change name/api, NOT event management)

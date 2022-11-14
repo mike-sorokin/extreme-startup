@@ -83,7 +83,7 @@ class GamesManager:
 
         for gid in list(gids):
             # Compile all game data
-            data = [JSONEncoder().encode(player) for player in self.games[game_id].get_players().values()] 
+            data = [JSONEncoder().encode(player) for player in self.games[gid].get_players().values()] 
         
             self.end_game(gid) # ensures monitor threads are killed
             self.remove_game_players(gid)
@@ -91,4 +91,5 @@ class GamesManager:
             del self.games[gid]
 
             # Upload game statistics to database
-            self.db_client.xs[gid].insert_many(data)
+            if len(data) > 0: 
+                self.db_client.xs[gid].insert_many(data)
