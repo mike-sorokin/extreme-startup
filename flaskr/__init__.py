@@ -135,7 +135,7 @@ def create_app():
 
             elif "pause" in r:
                 if r["pause"]:  # pause <game_id>
-                    games_manager.pause(game_id)  # Kill monitor thread
+                    games_manager.pause_game(game_id)  # Kill monitor thread
                     return ("GAME_PAUSED", 200)
 
                 else:  # Unpause the game
