@@ -134,6 +134,24 @@ export async function updateGame (gameId, data) {
 }
 
 /**
+ * (PUT, "/api/(gameId)")
+ * Toggles automatic round advacement
+ *
+ * @async
+ * @param  {string} gameId
+ * @param  {{"auto": boolean}} data Object containing boolean for whether auto round advancement should be enabled/disabled
+ * @return {Promise<string>} "GAME_AUTO_ON" or "GAME_AUTO_OFF"
+ */
+export async function updateAutoRoundAdvance (gameId, data) {
+  try {
+    const response = await instance.put(gameAPI(gameId), data)
+    return response.data
+  } catch (error) {
+    alertError(error)
+  }
+}
+
+/**
  * (DELETE, "/api/(gameId)")
  * Drops a given game
  * @async
