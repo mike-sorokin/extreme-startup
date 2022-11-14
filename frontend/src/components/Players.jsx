@@ -56,13 +56,15 @@ function Players () {
       if (error.response && error.response.status === 401) {
         alert('401 - Unauthenticated request')
       }
+    } finally {
+      setOpenedWithdrawAll(false)
     }
   }
 
   return (
     <div>
       <ConfirmationModal opened={openedWithdrawAll} setOpened={setOpenedWithdrawAll}
-        title='Withdraw All' body='Are you sure you want to withdraw everyone from the game?'
+        title='Withdraw All Players' body='Are you sure you want to withdraw everyone from the game?'
         func={withdrawAllPlayers} />
       <Container size="xl" px="sm">
         <Title order={1} color="white" weight={1000}>Players</Title>

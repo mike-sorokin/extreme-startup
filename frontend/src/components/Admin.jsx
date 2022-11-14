@@ -71,6 +71,9 @@ function Admin () {
       console.log(response)
     } catch (error) {
       // TODO
+    } finally {
+      setOpenedEndGame(false)
+      window.location.reload()
     }
   }
 
@@ -96,7 +99,8 @@ function Admin () {
 
   return (
     <div>
-      <ConfirmationModal opened={openedEndGame} setOpened={setOpenedEndGame} title='End Game' body='Are you sure you want to end the game?' func={sendGameEnd} />
+      <ConfirmationModal opened={openedEndGame} setOpened={setOpenedEndGame}
+        title='End Game' body='Are you sure you want to end the game?' func={sendGameEnd} />
       <Container size="xl" px="xs">
         <Title order={1} color="white" weight={1000}>Admin Page</Title>
         <Space h="md" />

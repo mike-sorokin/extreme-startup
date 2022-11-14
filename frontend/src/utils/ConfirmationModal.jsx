@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button, Center, Modal, Space, Text } from '@mantine/core'
 
-function ConfirmationModal ({ opened, setOpened, title, body, func }) {
+function ConfirmationModal ({ opened, setOpened, title, body, func, buttonColor = 'red', buttonText = 'Yes' }) {
   return <Modal centered
         opened={opened}
         onClose={() => setOpened(false)}
@@ -12,11 +12,11 @@ function ConfirmationModal ({ opened, setOpened, title, body, func }) {
           <Space h="md" />
           <Center>
             <Button variant="filled"
-                color="red"
+                color={buttonColor}
                 radius="md"
                 size="sm"
-                onClick={() => func}>
-                Yes
+                onClick={func}>
+                {buttonText}
             </Button>
           </Center>
         </div>
