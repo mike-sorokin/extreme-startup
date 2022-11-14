@@ -1,6 +1,8 @@
 from uuid import uuid4
 from flaskr.question_factory import QuestionFactory
 from flaskr.scoreboard import Scoreboard
+from flaskr.player import Player
+from flaskr.quiz_master import QuizMaster
 import threading
 import time
 
@@ -11,61 +13,21 @@ ADVANCE_RATIO = 0.2
 # 0 -> No server response
 STREAK_CHARS = ["1", "X", "0"]
 
-
-class GamesManager:
-    def __new__(cls):
-        if not hasattr(cls, "instance"):
-            cls.instance = super(GamesManager, cls).__new__(cls)
-            cls.instance.games = {}
-        return cls.instance
-
-    def get_all_games(self):
-        return self.games
-
-    def get_game(self, game_id):
-        if game_id not in self.game:
-            return None
-        return self.games[game_id]
-
-    def new_game(self, password):
-        assert password != ""
-        new_game = Game(password)
-        gid = new_game.id
-        self.games[gid] = new_game
-        new_game.spawn_game_monitor()
-        return new_game
-
-    def game_exists(self, game_id):
-        return game_id in self.games
-
-    def game_has_password(self, game_id, password):
-        return self.games[game_id].compare_password(password)
-
-    def game_in_last_round(self, game_id):
-        return self.games[game_id].is_last_round()
-
-    def delete_games(self, *game_id):
-        # Delete all game in game_id; if game_id is not provided, delete all games
-        gids = game_id if game_id else self.games.keys
-        for gid in list(gids):
-            self.games[gid].remove_all_players()
-            self.games[gid].pause()
-            del self.games[gid]
-
-
 # Most fundamental object in application -- stores information of players, scoreboard, questions gen., etc.
 class Game:
     def __init__(self, admin_password, round=0):
         self.id = uuid4().hex[:8]
         self.admin_password = admin_password
 
+        # player_id -> Player 
         self.players = {}
         self.scoreboard = Scoreboard()
+
         self.question_factory = QuestionFactory(round)
         self.round = round
 
         self.first_round_event = threading.Event()
-        self.ended = False
+        self.ended = False  # only toggle this variable once 
 
         self.running = threading.Event()
         self.running.set()
@@ -82,8 +44,27 @@ class Game:
     def is_last_round(self):
         return self.round == self.question_factory.total_rounds()
 
-    def new_player(self, player_id):
-        self.players.append(player_id)
+    # return newly created player
+    def new_player(self, name, api):
+        player = Player(self.id, name, api)
+        self.scoreboard.new_player(player)
+        self.players[player.uuid] = player
+
+        quiz_master = QuizMaster(
+            player,
+            self.question_factory,
+            self.scoreboard,
+        )
+
+        player_thread = threading.Thread(
+            target=quiz_master.start,
+            args=(self.first_round_event, self.running),
+        )
+
+        player_thread.daemon = True  # for test termination
+        player_thread.start()
+
+        return player
 
     # Automatation of round advancement & "Player-in-need" identification
     # Aim of this monitor:
@@ -91,7 +72,7 @@ class Game:
     #   (2) balance catching-up after a drought of points vs. escaping with the lead.
     # In the latter case we would want to increment round. Also in charge of informing game administrators
     def monitor(self):
-        while self.running.is_set():
+        while not self.ended and self.running.is_set():
             num_players = len(self.players)
             if num_players != 0:
                 if self.auto_mode and self.round != 0:
@@ -109,23 +90,46 @@ class Game:
             self.players[pid].round_index = 0
 
     def is_last_round(self):
-        return self.round == self.max_round
+        return self.round == self.question_factory.total_rounds()
 
     def pause(self):
         self.running.clear()
 
     def unpause(self):
         self.running.set()
+    
+    def end(self):
+        self.ended = True
 
-    def remove_all_players(self):
-        pass
+    # Mark player as inactive. Thread will be killed automatically when target function returns
+    def remove_players(self, *player_id):
+        pids = player_id if player_id else self.players.keys()
+
+        for pid in list(pids):
+            assert pid in self.players
+
+            self.players[pid].active = False
+            del self.players[pid]
+
+    # returns: dict { player_id -> Player }
+    def get_players(self, *player_id):
+        pids = player_id if player_id else self.players.keys()
+        return {pid: self.players[pid] for pid in list(pids)} 
+    
+    def update_player(self, player_id, name=None, api=None):
+        if name:
+            self.players[player_id].name = name 
+        
+        if api:
+            self.players[player_id].api = api
 
     def spawn_game_monitor(self):
-        game_monitor_thread = threading.Thread(
-            target=self.monitor, args=[self.players_dict, self.scoreboard]
-        )
+        game_monitor_thread = threading.Thread(target=self.monitor)
         game_monitor_thread.daemon = True  # for test termination
         game_monitor_thread.start()
+
+    def get_player_events(self, player_id):
+        return self.players[player_id].events
 
     def __update_players_to_assist(self):
         for pid in self.players:
