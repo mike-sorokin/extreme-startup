@@ -12,7 +12,7 @@ from flask import (
     jsonify,
 )
 from flaskr.player import Player
-from flaskr.game import Game
+from flaskr.game import Game, GamesManager
 from flaskr.scoreboard import Scoreboard
 from flaskr.quiz_master import QuizMaster
 from flaskr.json_encoder import JSONEncoder
@@ -48,8 +48,8 @@ def create_app():
 
     app.config["SECRET_KEY"] = secrets.token_hex()
 
-    # games: game_id -> game object
-    games = {}
+    # games = {}
+    games_manager = GamesManager()
 
     # players: player_id -> Player
     players = {}
@@ -77,7 +77,7 @@ def create_app():
     @app.route("/api", methods=["GET", "POST", "DELETE"])
     def api_index():
         if request.method == "GET":  # fetch all games
-            return encoder.encode(games)
+            return encoder.encode(games_manager.get_all_games())
 
         elif (
             request.method == "POST"
@@ -85,35 +85,28 @@ def create_app():
             if "password" not in request.get_json():
                 return NOT_ACCEPTABLE
 
-            password = request.get_json()["password"]
-            new_game = Game(password)
-            gid = new_game.id
-            scoreboards[gid] = Scoreboard()
-            games[gid] = new_game
+            new_game = games_manager.new_game(request.get_json()["password"])
 
-            new_game.spawn_game_monitor(players, scoreboards[gid])
             add_session_admin(gid, session)
             return encoder.encode(new_game)
 
         elif (
             request.method == "DELETE"
         ):  # delete all games - only for admin of all games
-            all_gids = list(games.keys())
-            for gid in all_gids:
-                if not is_admin(gid, session):
-                    return UNAUTHORIZED
+            for gid in list(games_manager.get_all_games().keys()):
+                if is_admin(gid, session):
+                    continue
+                return UNAUTHORIZED
 
-            remove_players(*[p for g in games.values() for p in g.players])
+            games_manager.delete_games()
 
-            # garbage collect each game's question_factory
-            remove_games(*all_gids)
             return DELETE_SUCCESSFUL
 
     @app.route("/api/<game_id>/auth", methods=["GET", "POST"])
     def admin_authentication(
         game_id,
     ):  # check if passkey valid for <game_id> and authenticate user with session if yes
-        if game_id not in games:
+        if not games_manager.game_exists(game_id):
             return NOT_ACCEPTABLE
 
         if request.method == "GET":
@@ -124,7 +117,7 @@ def create_app():
                 return NOT_ACCEPTABLE
 
             password = request.get_json()["password"]
-            if password == games[game_id].admin_password:
+            if games_manager.game_has_password(game_id, password):
                 add_session_admin(game_id, session)
                 return {"valid": True}
 
@@ -133,11 +126,11 @@ def create_app():
     # Managing a specific game
     @app.route("/api/<game_id>", methods=["GET", "PUT", "DELETE"])
     def game(game_id):
-        if game_id not in games:
+        if not games_manager.game_exists(game_id):
             return NOT_ACCEPTABLE
 
         if request.method == "GET":  # fetch game with <game_id>
-            return encoder.encode(games[game_id])
+            return encoder.encode(games_manager.get_game(game_id))
 
         elif request.method == "PUT":  # update game settings --- only admin can do this
             if not is_admin(game_id, session):
@@ -146,16 +139,18 @@ def create_app():
             r = request.get_json()
 
             if "round" in r:  # increment <game_id>'s round by 1
-                if games[game_id].is_last_round():
-                    # Compile all game data 
-                    data = [encoder.default(players[pid]) for pid in games[game_id].players]
+                if games_manager.game_in_last_round(game_id):
+                    # Compile all game data
+                    data = [
+                        encoder.default(players[pid]) for pid in games[game_id].players
+                    ]
 
                     # Set the flag to kill all quiz_master threads
-                    games[game_id].ended = True 
+                    games[game_id].ended = True
                     remove_players(*games[game_id].players)
                     remove_games(game_id)
 
-                    # Upload game statistics to database 
+                    # Upload game statistics to database
                     cli = get_mongo_client()
                     cli.xs[game_id].insert_many(data)
 
@@ -166,7 +161,7 @@ def create_app():
 
             elif "pause" in r:
                 if r["pause"]:  # pause <game_id>
-                    games[game_id].pause() # Kill monitor thread
+                    games[game_id].pause()  # Kill monitor thread
                     return ("GAME_PAUSED", 200)
 
                 else:  # Unpause the game
@@ -182,16 +177,16 @@ def create_app():
                     games[game_id].auto_mode = False
                     return ("GAME_AUTO_OFF", 200)
 
-            elif "end" in r: # End the <game_id> instance 
-                # Compile all game data 
+            elif "end" in r:  # End the <game_id> instance
+                # Compile all game data
                 data = [encoder.default(players[pid]) for pid in games[game_id].players]
 
                 # Set the flag to kill all quiz_master threads
-                games[game_id].ended = True 
+                games[game_id].ended = True
                 remove_players(*games[game_id].players)
                 remove_games(game_id)
 
-                # Upload game statistics to database 
+                # Upload game statistics to database
                 cli = get_mongo_client()
                 cli.xs[game_id].insert_many(data)
 
