@@ -22,8 +22,9 @@ function AdminRoute () {
       // If response.authorized is false, navigate to game page and show error
       if (!response.authorized) {
         setLoading(false)
+        showErrorNotification('Error', 'You are not authorized to view the admin page!')
         navigate(gameUrl(params.gameId))
-        showErrorNotification('Error', 'Not authorised')
+        return
       }
 
       setAdmin(response.authorized)
@@ -35,7 +36,13 @@ function AdminRoute () {
 
   // Show loader whilst waiting for authentication check
   if (loading) {
-    return <Loader />
+    return <Loader style={{
+      width: 'fit-content',
+      position: 'absolute',
+      left: '50%',
+      top: '50%',
+      transform: 'translate(-50%, -50%)'
+    }}/>
   }
 
   // If admin is true, show any child component through Outlet, else show NotFound component

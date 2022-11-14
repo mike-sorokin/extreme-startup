@@ -35,7 +35,6 @@ class QuestionFactory:
         return random.choice(available_question_types)()
 
     # Adjust window to send differnt questions for next round
-    # TODO: If changing from warm up -> first round, reset all scores/metrics/rates for players i.e. "clean state"
     def advance_round(self):
         self.round += 1
         self.adjust_window()
@@ -43,3 +42,6 @@ class QuestionFactory:
     def adjust_window(self):
         self.window_end = max(1, self.round * 2)
         self.window_start = max(0, self.window_end - 4)
+
+    def total_rounds(self):
+        return MAX_ROUND

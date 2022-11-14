@@ -47,7 +47,7 @@ def test_game_defaults_to_round_zero(basic_game):
 
 
 def test_game_defaults_to_not_paused(basic_game):
-    assert basic_game.paused == False
+    assert basic_game.running.is_set()
 
 
 def test_game_defaults_to_no_assists(basic_game):

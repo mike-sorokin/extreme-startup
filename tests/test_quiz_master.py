@@ -9,39 +9,35 @@ import pytest
 
 @pytest.fixture()
 def basic_quiz_master():
-    player, rc, question_factory, scoreboard, lock, e = (
+    player, rc, question_factory, scoreboard, warmup_over, running = (
         Mock(),
         Mock(),
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
+        Mock()
     )
 
     yield (
-        QuizMaster(player, question_factory, scoreboard, lock, rc),
+        QuizMaster(player, question_factory, scoreboard, rc),
         player,
         rc,
         question_factory,
         scoreboard,
-        lock,
-        e,
+        warmup_over,
+        running,
     )
 
 
 def test_quiz_master_sends_questions_while_player_active(basic_quiz_master):
-    quiz_master, _, rc, _, scoreboard, lock, e = basic_quiz_master
+    quiz_master, _, rc, _, scoreboard, warmup_over, running = basic_quiz_master
 
-    lock.acquire.return_value = True
-    lock.release.return_value = True
-
-    quiz_master.administer_question(e)
+    quiz_master.administer_question(warmup_over, running)
 
     # assertion(s)
     scoreboard.record_request_for.assert_called()
     scoreboard.increment_score_for.assert_called()
-    lock.acquire.assert_called()
-    lock.release.assert_called()
+    running.wait.assert_called()
     rc.wait_for_next_request.assert_called()
     rc.update_algorithm_based_on_score.assert_called()
 
