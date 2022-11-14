@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Badge, Button, Card, Container, Space, Title } from '@mantine/core'
+import { Badge, Button, Card, Container, Space, Switch, Title } from '@mantine/core'
 import { useClipboard } from '@mantine/hooks'
 
-import { fetchGame, updateGame } from '../utils/requests'
+import { fetchGame, updateAutoRoundAdvance, updateGame } from '../utils/requests'
 import ConfirmationModal from '../utils/ConfirmationModal'
 
 function Admin () {
@@ -11,6 +11,7 @@ function Admin () {
   const [round, setRound] = useState(0)
   const [gamePaused, setGamePaused] = useState(false)
   const [openedEndGame, setOpenedEndGame] = useState(false)
+  const [autoAdvance, setAutoAdvance] = useState(false)
 
   const params = useParams()
   const clipboard = useClipboard({ timeout: 500 })
@@ -43,6 +44,20 @@ function Admin () {
       if (response === 'ROUND_INCREMENTED') {
         setRound(round + 1)
       }
+    } catch (error) {
+      console.error(error)
+      if (error.response && error.response.status === 401) {
+        alert('401 - Unauthenticated request')
+      }
+    }
+  }
+
+  // Toggle automatic round advancement
+  const toggleAutoAdvance = async (e) => {
+    const isAuto = e.currentTarget.checked
+    try {
+      const response = await updateAutoRoundAdvance(params.gameId, { auto: isAuto })
+      setAutoAdvance(response === 'GAME_AUTO_ON')
     } catch (error) {
       console.error(error)
       if (error.response && error.response.status === 401) {
@@ -148,6 +163,11 @@ function Admin () {
               : togglePauseButton('yellow', 'Pause')
             }
           </div>
+          <Switch
+            label="Automatic Round Advancement"
+            size="md"
+            checked={autoAdvance} onChange={(e) => toggleAutoAdvance(e)}
+          />
         </Card>
       </Container>
     </div>
