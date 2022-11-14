@@ -1,8 +1,8 @@
 from flaskr.json_encoder import JSONEncoder
 from flaskr.game import Game
 
-class GamesManager:
 
+class GamesManager:
     def __init__(self, db_client):
         self.games = {}
         self.db_client = db_client
@@ -36,14 +36,14 @@ class GamesManager:
 
     def game_in_last_round(self, game_id):
         return self.games[game_id].is_last_round()
-    
+
     def pause_game(self, game_id):
         self.games[game_id].pause()
-    
+
     def unpause_game(self, game_id):
         self.games[game_id].spawn_game_monitor()
         self.games[game_id].unpause()
-    
+
     def end_game(self, game_id):
         self.games[game_id].end()
 
@@ -52,10 +52,10 @@ class GamesManager:
 
     def set_auto_mode(self, game_id):
         self.games[game_id].auto_mode = True
-    
+
     def clear_auto_mode(self, game_id):
         self.games[game_id].auto_mode = False
-    
+
     def get_game_running_totals(self, game_id):
         return self.games[game_id].scoreboard.running_totals
 
@@ -73,7 +73,7 @@ class GamesManager:
 
     def update_player(self, game_id, player_id, name=None, api=None):
         self.games[game_id].update_player(player_id, name, api)
-    
+
     def get_player_events(self, game_id, player_id):
         return self.games[game_id].get_events(player_id)
 
@@ -83,13 +83,16 @@ class GamesManager:
 
         for gid in list(gids):
             # Compile all game data
-            data = [JSONEncoder().encode(player) for player in self.games[gid].get_players().values()] 
-        
-            self.end_game(gid) # ensures monitor threads are killed
+            data = [
+                JSONEncoder().default(player)
+                for player in self.games[gid].get_players().values()
+            ]
+
+            self.end_game(gid)  # ensures monitor threads are killed
             self.remove_game_players(gid)
-            self.unpause_game(gid) # removes dangling administering question threads
+            self.unpause_game(gid)  # removes dangling administering question threads
             del self.games[gid]
 
             # Upload game statistics to database
-            if len(data) > 0: 
+            if len(data) > 0:
                 self.db_client.xs[gid].insert_many(data)

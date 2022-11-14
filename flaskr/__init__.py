@@ -135,7 +135,7 @@ def create_app():
 
             elif "pause" in r:
                 if r["pause"]:  # pause <game_id>
-                    games_manager.pause(game_id) # Kill monitor thread 
+                    games_manager.pause(game_id)  # Kill monitor thread
                     return ("GAME_PAUSED", 200)
 
                 else:  # Unpause the game
@@ -157,6 +157,9 @@ def create_app():
             return NOT_ACCEPTABLE
 
         elif request.method == "DELETE":  # delete game with <game_id>
+            if not is_admin(game_id, session):
+                return UNAUTHORIZED
+
             games_manager.delete_games(game_id)
             return {"deleted": game_id}
 
@@ -165,7 +168,7 @@ def create_app():
         if not games_manager.game_exists(game_id):
             return NOT_ACCEPTABLE
 
-        cumulative_sums = games_manager.get_game_running_totals(game_id) 
+        cumulative_sums = games_manager.get_game_running_totals(game_id)
         r = make_response(encoder.encode(cumulative_sums))
         r.mimetype = "application/json"
         return r
@@ -177,12 +180,16 @@ def create_app():
             return NOT_ACCEPTABLE
 
         if request.method == "GET":  # fetch all <game_id>'s players
-            r = make_response(encoder.encode({"players": games_manager.get_game_players(game_id)}))
+            r = make_response(
+                encoder.encode({"players": games_manager.get_game_players(game_id)})
+            )
             r.mimetype = "application/json"
             return r
 
         elif request.method == "POST":  # create a new player -- initialise thread
-            new_player = games_manager.add_player_to_game(game_id, request.get_json()["name"], request.get_json()["api"])
+            new_player = games_manager.add_player_to_game(
+                game_id, request.get_json()["name"], request.get_json()["api"]
+            )
             session["player"] = new_player.uuid
 
             r = make_response(encoder.encode(new_player))
@@ -209,11 +216,16 @@ def create_app():
     # Managing <player_id> player
     @app.route("/api/<game_id>/players/<player_id>", methods=["GET", "PUT", "DELETE"])
     def player(game_id, player_id):
-        if not (games_manager.game_exists(game_id) and games_manager.player_exists(game_id, player_id)):
+        if not (
+            games_manager.game_exists(game_id)
+            and games_manager.player_exists(game_id, player_id)
+        ):
             return NOT_ACCEPTABLE
 
         if request.method == "GET":  # fetch player with <player_id>
-            return encoder.encode(games_manager.get_game_players(game_id, player_id)[player_id])
+            return encoder.encode(
+                games_manager.get_game_players(game_id, player_id)[player_id]
+            )
         elif (
             request.method == "PUT"
         ):  # update player (change name/api, NOT event management)
@@ -221,28 +233,39 @@ def create_app():
                 return UNAUTHORIZED
 
             if "name" in request.get_json():
-                games_manager.update_player(game_id, player_id, name=request.get_json()["name"])
+                games_manager.update_player(
+                    game_id, player_id, name=request.get_json()["name"]
+                )
 
             if "api" in request.get_json():
-                games_manager.update_player(game_id, player_id, api=request.get_json()["api"])
+                games_manager.update_player(
+                    game_id, player_id, api=request.get_json()["api"]
+                )
 
-            return encoder.encode(games_manager.get_game_players(game_id, player_id))
+            return encoder.encode(
+                games_manager.get_game_players(game_id, player_id)[player_id]
+            )
 
         elif request.method == "DELETE":  # delete player with id
             if not (is_admin(game_id, session) or is_player(player_id, session)):
                 return UNAUTHORIZED
 
-            games_manager.remove_game_players(game_id, player_id) 
+            games_manager.remove_game_players(game_id, player_id)
             return {"deleted": player_id}
 
     # Managing events for <player_id>
     @app.route("/api/<game_id>/players/<player_id>/events", methods=["GET"])
     def player_events(game_id, player_id):
-        if not (games_manager.game_exists(game_id) and games_manager.player_exists(game_id, player_id)):
+        if not (
+            games_manager.game_exists(game_id)
+            and games_manager.player_exists(game_id, player_id)
+        ):
             return NOT_ACCEPTABLE
 
         if request.method == "GET":  # fetch all events for <game_id> player <player_id>
-            return encoder.encode({"events": games_manager.get_player_events(game_id, player_id)})
+            return encoder.encode(
+                {"events": games_manager.get_player_events(game_id, player_id)}
+            )
 
     # Managing one event
     @app.route(
@@ -250,13 +273,18 @@ def create_app():
         methods=["GET"],
     )
     def player_event(game_id, player_id, event_id):
-        if (
-            not (games_manager.game_exists(game_id) and games_manager.player_exists(game_id, player_id))
-            or event_id not in map(lambda e: e.event_id, games_manager.get_player_events(game_id, player_id))
+        if not (
+            games_manager.game_exists(game_id)
+            and games_manager.player_exists(game_id, player_id)
+        ) or event_id not in map(
+            lambda e: e.event_id, games_manager.get_player_events(game_id, player_id)
         ):
             return NOT_ACCEPTABLE
 
-        event = filter(lambda e: e.id == event_id, games_manager.get_player_events(game_id, player_id))[0]
+        event = filter(
+            lambda e: e.id == event_id,
+            games_manager.get_player_events(game_id, player_id),
+        )[0]
         if request.method == "GET":  # fetch event with <event_id>
             return encoder.encode(event)
 
