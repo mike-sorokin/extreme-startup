@@ -70,13 +70,3 @@ function Chart ({ gameId }) {
 }
 
 export default Chart
-// TEMPORARY
-// <LineChart width={750} height={450} data={speeddata}>
-//   <XAxis dataKey="time" type="number"/>
-//   <YAxis type="number" yAxisId={1}/>
-//   <CartesianGrid stroke="#111" strokeDasharray="5 5" />
-//
-//   <Line type="monotone" connectNulls key="speed" dataKey="speed" stroke="#8884d8" yAxisId={1}/>
-//   <Line type="monotone" connectNulls key="velocity" dataKey="velocity" stroke="#82ca9d" yAxisId={1}/>
-//   <Tooltip />
-// </LineChart>

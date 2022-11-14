@@ -9,20 +9,10 @@ function Admin () {
   const [playerNo, setPlayerNo] = useState(0)
   const [round, setRound] = useState(0)
   const [gamePaused, setGamePaused] = useState(false)
-  // const [isAdmin, setIsAdmin] = useState(false)
 
   const params = useParams()
   const clipboard = useClipboard({ timeout: 500 })
 
-  // const updateSessionData = async () => {
-  //   const admin = await checkAuth(params.gameId)
-  //   setIsAdmin(admin)
-  //   console.log(isAdmin)
-  // }
-
-  // updateSessionData()
-
-  // Fetches game data every 2 seconds (current round and number of players)
   useEffect(() => {
     const getGameData = async () => {
       try {
@@ -132,7 +122,7 @@ function Admin () {
         <h3>Number of Players</h3>
         <h4 style={{ color: 'grey' }} data-cy='number-of-players'>{playerNo}</h4>
         <br />
-        <h3>Current Round</h3>
+          <h3>Current Round</h3>
         <div style={{ display: 'inline-flex', flexDirection: 'row' }}>
           {gamePaused ? roundBadge('yellow', 'PAUSED') : (round > 0 ? roundBadge('lime', 'Round ' + String(round)) : roundBadge('cyan', 'WARMUP'))}
           <Button compact variant="outline"
