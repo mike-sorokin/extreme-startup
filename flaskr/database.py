@@ -40,12 +40,10 @@ def destructive_start_localhost_mongo():
 
     # This kills any running mongo instance. Try using mongo first, but if not found, use mongosh.
     try:
-        subprocess.run(
-            ["mongo", "--eval", "\"db.getSiblingDB('admin').shutdownServer()\""]
-        )
+        subprocess.run(["mongo", "--eval", "db.getSiblingDB('admin').shutdownServer()"])
     except FileNotFoundError:
         subprocess.run(
-            ["mongosh", "--eval", "\"db.getSiblingDB('admin').shutdownServer()\""]
+            ["mongosh", "--eval", "db.getSiblingDB('admin').shutdownServer()"]
         )
 
     # Remove and remake flaskr/db
