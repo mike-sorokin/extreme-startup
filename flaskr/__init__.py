@@ -12,7 +12,7 @@ from flaskr.player import Player
 from flaskr.games_manager import GamesManager
 from flaskr.json_encoder import JSONEncoder
 from flaskr.questions import *
-from flaskr.database import get_mongo_client
+from flaskr.database import get_mongo_client, destructive_start_localhost_mongo
 import threading
 import secrets
 from random import randint
@@ -36,13 +36,16 @@ UNAUTHORIZED = ("Unauthenticated request", 401)
 METHOD_NOT_ALLOWED = ("HTTP Method not allowed", 405)
 
 
-def create_app():
+def create_app(use_local_db=False):
     app = Flask(__name__, static_folder="vite")
     app.url_map.strict_slashes = False
 
     app.config["SECRET_KEY"] = secrets.token_hex()
 
-    db_client = get_mongo_client(local=app.config["TESTING"])
+    if use_local_db:
+        destructive_start_localhost_mongo()
+    db_client = get_mongo_client(local=use_local_db)
+
     games_manager = GamesManager(db_client)
 
     encoder = JSONEncoder()

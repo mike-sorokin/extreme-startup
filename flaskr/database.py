@@ -30,8 +30,16 @@ def destructive_start_localhost_mongo():
     Clean flaskr/_db.
     Starts a local mongod database using flaskr/db as the store.
     """
-    # This kills any running mongo instance
-    os.system("mongo --eval \"db.getSiblingDB('admin').shutdownServer()\"")
+
+    # This kills any running mongo instance. Try using mongo first, but if not found, use mongosh.
+    try:
+        subprocess.run(
+            ["mongo", "--eval", "\"db.getSiblingDB('admin').shutdownServer()\""]
+        )
+    except FileNotFoundError:
+        subprocess.run(
+            ["mongosh", "--eval", "\"db.getSiblingDB('admin').shutdownServer()\""]
+        )
 
     # Remove and remake flaskr/db
     db_path = os.path.join(os.path.dirname(__file__), "_db")

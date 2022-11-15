@@ -51,7 +51,7 @@ def with_setup(server_setup=None, **callable_setup_kwargs):
     def inner(test_func):
         def wrapper():
             # Connect to our flask app.
-            app = create_app()
+            app = create_app(use_local_db=True)
             app.config.update({"TESTING": True})
             client = app.test_client()
 
