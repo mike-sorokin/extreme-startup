@@ -26,15 +26,15 @@ class Scoreboard:
 
         if increment > 0:
             self.correct_tally[player.uuid] += 1
-            player.streak = player.streak + "1"
+            player.streak += "1"
 
         elif increment < 0:
             self.incorrect_tally[player.uuid] += 1
 
             if question.problem == "ERROR_RESPONSE":
-                player.streak = player.streak + "0"
+                player.streak += "0"
             else:
-                player.streak = player.streak + "X"
+                player.streak += "X"
 
         self.record_request_for(player)
         player.score = self.scores[player.uuid]

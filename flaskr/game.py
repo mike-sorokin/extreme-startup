@@ -1,7 +1,6 @@
 from uuid import uuid4
 from flaskr.question_factory import QuestionFactory
 from flaskr.scoreboard import Scoreboard
-from flaskr.player import Player
 from flaskr.quiz_master import QuizMaster
 import threading
 import time
@@ -19,7 +18,7 @@ class Game:
         self.id = uuid4().hex[:8]
         self.admin_password = admin_password
 
-        # player_id -> Player 
+        # player_id -> Player
         self.players = {}
         self.scoreboard = Scoreboard()
 
@@ -27,7 +26,7 @@ class Game:
         self.round = round
 
         self.first_round_event = threading.Event()
-        self.ended = False  # only toggle this variable once 
+        self.ended = False  # only toggle this variable once
 
         self.running = threading.Event()
         self.running.set()
@@ -44,9 +43,7 @@ class Game:
     def is_last_round(self):
         return self.round == self.question_factory.total_rounds()
 
-    # return newly created player
-    def new_player(self, name, api):
-        player = Player(self.id, name, api)
+    def add_player(self, player):
         self.scoreboard.new_player(player)
         self.players[player.uuid] = player
 
@@ -97,7 +94,7 @@ class Game:
 
     def unpause(self):
         self.running.set()
-    
+
     def end(self):
         self.ended = True
 
@@ -114,12 +111,12 @@ class Game:
     # returns: dict { player_id -> Player }
     def get_players(self, *player_id):
         pids = player_id if player_id else self.players.keys()
-        return {pid: self.players[pid] for pid in list(pids)} 
-    
+        return {pid: self.players[pid] for pid in list(pids)}
+
     def update_player(self, player_id, name=None, api=None):
         if name:
-            self.players[player_id].name = name 
-        
+            self.players[player_id].name = name
+
         if api:
             self.players[player_id].api = api
 

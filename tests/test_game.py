@@ -19,12 +19,10 @@ def basic_game():
 @pytest.fixture()
 def basic_game_with_five_players():
     game, players = Game(PASSWORD), [Mock() for _ in range(5)]
-    players_dict = {}
 
     for i, player in enumerate(players):
-        player.id = DUMMY_ID + str(i)
-        game.new_player(player.id)
-        players_dict[player.id] = player
+        player.uuid = DUMMY_ID + str(i)
+        game.add_player(player)
 
     players[0].streak = ARBITRARY_RESPONSE_SEQ + "0X" * 8
     players[1].streak = ARBITRARY_RESPONSE_SEQ + "1" + "X" * 16
@@ -35,7 +33,7 @@ def basic_game_with_five_players():
     for i in range(len(players)):
         players[i].round_index = len(players[i].streak)
 
-    return game, players, players_dict
+    return game, players
 
 
 def test_game_initialises_with_no_players(basic_game):
@@ -59,41 +57,45 @@ def test_game_defaults_to_manual_mode(basic_game):
 
 
 def test_game_can_append_new_players(basic_game):
-    basic_game.new_player("dummy_id")
+    player1 = Mock()
+    player1.uuid = "dummy_id_1"
+    basic_game.add_player(player1)
     assert len(basic_game.players) == 1
-    assert "dummy_id" in basic_game.players
+    assert player1.uuid in basic_game.players
 
-    basic_game.new_player("dummy_id_2")
+    player2 = Mock()
+    player2.uuid = "dummy_id_2"
+    basic_game.add_player(player2)
     assert len(basic_game.players) == 2
-    assert "dummy_id_2" in basic_game.players
+    assert player2.uuid in basic_game.players
 
 
 def test_players_with_more_than_fifteen_incorect_gets_added_to_assistance_list(
-    basic_game_with_five_players
+    basic_game_with_five_players,
 ):
-    game, players, players_dict = basic_game_with_five_players
-    game._Game__update_players_to_assist(players_dict)
+    game, players = basic_game_with_five_players
+    game._Game__update_players_to_assist()
 
-    assert players[0].id in game.players_to_assist
-    assert players[1].id in game.players_to_assist
-    assert players[2].id in game.players_to_assist
+    assert players[0].uuid in game.players_to_assist
+    assert players[1].uuid in game.players_to_assist
+    assert players[2].uuid in game.players_to_assist
     assert len(game.players_to_assist) == 3
 
 
 def test_player_who_gets_one_correct_after_requiring_assistance_no_longer_needs_help(
-    basic_game_with_five_players
+    basic_game_with_five_players,
 ):
-    game, players, players_dict = basic_game_with_five_players
-    game._Game__update_players_to_assist(players_dict)
+    game, players = basic_game_with_five_players
+    game._Game__update_players_to_assist()
 
-    players[0].streak += "1"
-    players[0].round_index += 1
+    game.players[players[0].uuid].streak += "1"
+    game.players[players[0].uuid].round_index += 1
 
-    game._Game__update_players_to_assist(players_dict)
+    game._Game__update_players_to_assist()
 
-    assert players[0].id not in game.players_to_assist
-    assert players[1].id in game.players_to_assist
-    assert players[2].id in game.players_to_assist
+    assert players[0].uuid not in game.players_to_assist
+    assert players[1].uuid in game.players_to_assist
+    assert players[2].uuid in game.players_to_assist
     assert len(game.players_to_assist) == 2
 
 

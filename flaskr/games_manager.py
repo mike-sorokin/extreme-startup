@@ -1,5 +1,6 @@
 from flaskr.json_encoder import JSONEncoder
 from flaskr.game import Game
+from flaskr.player import Player
 
 
 class GamesManager:
@@ -66,7 +67,8 @@ class GamesManager:
         self.games[game_id].remove_players(*player_id)
 
     def add_player_to_game(self, game_id, name, api):
-        return self.games[game_id].new_player(name, api)
+        player = Player(game_id, name, api)
+        return self.games[game_id].add_player(player)
 
     def get_players_to_assist(self, game_id):
         return self.games[game_id].players_to_assist
@@ -94,5 +96,5 @@ class GamesManager:
             del self.games[gid]
 
             # Upload game statistics to database
-            if len(data) > 0:
-                self.db_client.xs[gid].insert_many(data)
+            # if len(data) > 0:
+            #     self.db_client.xs[gid].insert_many(data)
