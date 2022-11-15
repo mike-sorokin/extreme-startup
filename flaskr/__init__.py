@@ -42,7 +42,8 @@ def create_app():
 
     app.config["SECRET_KEY"] = secrets.token_hex()
 
-    db_client = get_mongo_client(local=app.config["TESTING"])
+    db_client = get_mongo_client()
+
     games_manager = GamesManager(db_client)
 
     encoder = JSONEncoder()
@@ -287,6 +288,27 @@ def create_app():
         )[0]
         if request.method == "GET":  # fetch event with <event_id>
             return encoder.encode(event)
+
+    @app.get("/api/<game_id>/review/existed")
+    def game_existed(game_id):
+        pass
+
+    @app.get("/api/<game_id>/review/finalboard")
+    def total_player_scores(game_id):
+        pass
+
+    @app.get("/api/<game_id>/review/finalgraph")
+    def final_game_graph(game_id):
+        pass
+
+    @app.get("/api/<game_id>/review/stats")
+    def review_stats(game_id):
+        pass
+
+    @app.get("/api/<game_id>/review/analysis")
+    def review_analysis(game_id):
+        pass 
+
 
     # FORGIVE ME
     bot_responses = {n: [f"Bot{n}", 0] for n in range(100)}

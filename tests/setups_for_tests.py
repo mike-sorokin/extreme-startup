@@ -90,7 +90,6 @@ def with_local_database(test_func):
     """
 
     def wrapper(*args, **kwargs):
-        database.destructive_start_localhost_mongo()
         cli = database.get_mongo_client(local=True)
         test_func(cli, *args, **kwargs)
 

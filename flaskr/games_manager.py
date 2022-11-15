@@ -83,18 +83,36 @@ class GamesManager:
         # Delete all game in game_id; if game_id is not provided, delete all games
         gids = game_id if game_id else self.games.keys()
 
-        for gid in list(gids):
-            # Compile all game data
-            data = [
-                JSONEncoder().default(player)
-                for player in self.games[gid].get_players().values()
-            ]
+        for gid in list(gids): 
+            # Copy player/scoreboard data for game review. 
+            player_data = self.games[gid].get_players()
+            scoreboard_data = self.games[gid].scoreboard
 
             self.end_game(gid)  # ensures monitor threads are killed
-            self.remove_game_players(gid)
+            self.remove_game_players(gid) # kills administering question threads 
             self.unpause_game(gid)  # removes dangling administering question threads
             del self.games[gid]
 
-            # Upload game statistics to database
-            if len(data) > 0:
-                self.db_client.xs[gid].insert_many(data)
+            self.analyse_game(gid, player_data, scoreboard_data) 
+    
+
+    def analyse_game(self, game_id, player_data, scoreboard_data):
+        """
+        Args:
+        player_data :: { player_id -> Player }
+        scoreboard_data :: Scoreboard
+        """
+
+        encoded_players = [
+            JSONEncoder().default(player)
+            for player in player_data.values()
+        ]
+
+        # Upload basic-game data 
+        # data :: List[Player BSON]
+        self.upload_data(game_id, encoded_players)
+
+
+    def upload_data(self, game_id, data):
+        if len(data) > 0:
+            self.db_client.xs[game_id].insert_many(data)

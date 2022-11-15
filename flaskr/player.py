@@ -7,12 +7,18 @@ class Player:
         self.uuid = uuid4().hex[:8]
         self.game_id = game_id
         self.name = name
+
         self.score = 0
+
         self.api = api
         self.events = []
+
         self.active = True
-        self.streak = ""
         self.round_index = 0
+
+        self.streak = ""
+        self.curr_streak_length = 0
+        self.longest_streak = 0  # for post-game-analysis
 
     def log_event(self, event):
         self.events.append(event)

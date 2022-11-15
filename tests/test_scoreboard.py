@@ -3,7 +3,7 @@ import sys
 sys.path.append(".")
 
 from flaskr.scoreboard import Scoreboard
-from unittest.mock import Mock, MagicMock
+from unittest.mock import Mock
 import pytest
 
 PROBLEM_DECREMENT = 50
@@ -11,13 +11,18 @@ DEFAULT_POINT_SCORE = 10
 
 
 @pytest.fixture()
-def game_setup():  # (scoreboard, player, question)
-    return (Scoreboard(), MagicMock())
+def game_setup():  # (scoreboard, question)
+    return (Scoreboard(), Mock())
 
 
 @pytest.fixture()
 def game_with_player_setup():
-    sb, player = Scoreboard(), MagicMock()
+    sb, player = Scoreboard(), Mock()
+
+    player.longest_streak = player.curr_streak_length = 0
+    player.round_index = 0
+    player.streak = ""
+
     sb.new_player(player)
     yield (sb, player)
     del sb, player
@@ -25,7 +30,11 @@ def game_with_player_setup():
 
 @pytest.fixture()
 def full_game_setup():
-    sb, player, question = Scoreboard(), MagicMock(), Mock()
+    sb, player, question = Scoreboard(), Mock(), Mock()
+    player.longest_streak = player.curr_streak_length = 0
+    player.streak = ""
+    player.round_index = 0
+
     sb.new_player(player)
     yield (sb, player, question)
     del sb, player, question
@@ -77,7 +86,6 @@ def test_scoring_increases_round_index(full_game_setup):
     scoreboard, player, question = full_game_setup
     question.result, question.points = "CORRECT", DEFAULT_POINT_SCORE
 
-    player.round_index = 0
     scoreboard.increment_score_for(player, question)
     assert player.round_index == 1
 
@@ -120,9 +128,12 @@ def test_decrements_score_for_question_with_error_response(full_game_setup):
     assert scoreboard.incorrect_tally[player.uuid] == 2
 
 
-def test_leaderboard_orders_players_by_decreasing_socre(full_game_setup):
+def test_leaderboard_orders_players_by_decreasing_score(full_game_setup):
     scoreboard, player1, question = full_game_setup
-    player2 = MagicMock()
+    player2 = Mock()
+    player2.streak = ""
+    player2.curr_streak_length = player2.longest_streak = player2.round_index = 0
+    
     scoreboard.new_player(player2)
     question.result, question.points = "CORRECT", DEFAULT_POINT_SCORE
 
@@ -142,7 +153,9 @@ def test_leaderboard_orders_players_by_decreasing_socre(full_game_setup):
 
 def test_scoreboard_penalises_higher_ranking_players_more(full_game_setup):
     scoreboard, better_player, question = full_game_setup
-    worse_player, points = MagicMock(), DEFAULT_POINT_SCORE
+    worse_player, points = Mock(), DEFAULT_POINT_SCORE
+    worse_player.streak = ""
+    worse_player.round_index = 0
     num_players = 2
     scoreboard.new_player(worse_player)
     question.result, question.points = "CORRECT", points
