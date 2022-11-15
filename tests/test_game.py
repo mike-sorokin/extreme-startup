@@ -19,13 +19,14 @@ def basic_game():
 @pytest.fixture()
 def basic_game_with_five_players():
     game, players = Game(PASSWORD), [Mock() for _ in range(5)]
-    game.pause()
 
     for i, player in enumerate(players):
         player.uuid = DUMMY_ID + str(i)
         player.streak = ""
         player.round_index = 0
+        player.active = False # avoid race conditions with additional streak vals
         game.add_player(player)
+
 
     players[0].streak = ARBITRARY_RESPONSE_SEQ + "0X" * 8
     players[1].streak = ARBITRARY_RESPONSE_SEQ + "1" + "X" * 16

@@ -30,6 +30,7 @@ def destructive_start_localhost_mongo():
     Clean flaskr/_db.
     Starts a local mongod database using flaskr/db as the store.
     """
+
     # This kills any running mongo instance
     os.system("mongo --eval \"db.getSiblingDB('admin').shutdownServer()\"")
 
