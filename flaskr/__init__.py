@@ -36,15 +36,13 @@ UNAUTHORIZED = ("Unauthenticated request", 401)
 METHOD_NOT_ALLOWED = ("HTTP Method not allowed", 405)
 
 
-def create_app(use_local_db=False):
+def create_app():
     app = Flask(__name__, static_folder="vite")
     app.url_map.strict_slashes = False
 
     app.config["SECRET_KEY"] = secrets.token_hex()
 
-    if use_local_db:
-        destructive_start_localhost_mongo()
-    db_client = get_mongo_client(local=use_local_db)
+    db_client = get_mongo_client()
 
     games_manager = GamesManager(db_client)
 

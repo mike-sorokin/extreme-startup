@@ -4,24 +4,31 @@ import pymongo, os, json, subprocess, shutil
 def get_mongo_client(local=False):
     """
     Attempts to open flaskr/mongo_config.json and connect to the database there.
-    If not found, or if local=True, then connects to localhost:27017
+    If not found, or if local=True, then boots a local server and connects to it.
+    This local server will be completely fresh
     """
-    connection_string = "mongodb://localhost:27017"
+
+    if local:
+        destructive_start_localhost_mongo()
+        return pymongo.MongoClient("mongodb://localhost:27017")
+
     config_path = os.path.join(os.path.dirname(__file__), "mongo_config.json")
 
-    # Try to update connection_string to json config
-    if os.path.isfile(config_path) and not local:
+    # Try to update connect to json config, if it exists
+    if os.path.isfile(config_path):
         with open(config_path) as f:
             cfg = json.load(f)
             try:
-                connection_string = (
+                conn_str = (
                     f"mongodb+srv://{cfg['user']}:{cfg['password']}@{cfg['address']}"
                 )
+                return pymongo.MongoClient(conn_str)
             except KeyError:
                 print("Warning: malformed mongo_config.json. Using localhost DB.")
-
-    client = pymongo.MongoClient(connection_string)
-    return client
+                return get_mongo_client(local=True)
+    else:
+        print("Warning: mongo_config.json not found. Using localhost DB")
+        return get_mongo_client(local=True)
 
 
 def destructive_start_localhost_mongo():
