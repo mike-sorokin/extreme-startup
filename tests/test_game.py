@@ -22,6 +22,8 @@ def basic_game_with_five_players():
 
     for i, player in enumerate(players):
         player.uuid = DUMMY_ID + str(i)
+        player.streak = ""
+        player.round_index = 0
         game.add_player(player)
 
     players[0].streak = ARBITRARY_RESPONSE_SEQ + "0X" * 8
@@ -59,12 +61,16 @@ def test_game_defaults_to_manual_mode(basic_game):
 def test_game_can_append_new_players(basic_game):
     player1 = Mock()
     player1.uuid = "dummy_id_1"
+    player1.streak = ""
+    player1.round_index = 0
     basic_game.add_player(player1)
     assert len(basic_game.players) == 1
     assert player1.uuid in basic_game.players
 
     player2 = Mock()
     player2.uuid = "dummy_id_2"
+    player2.streak = ""
+    player2.round_index = 0
     basic_game.add_player(player2)
     assert len(basic_game.players) == 2
     assert player2.uuid in basic_game.players
