@@ -42,7 +42,7 @@ def create_app():
 
     app.config["SECRET_KEY"] = secrets.token_hex()
 
-    db_client = get_mongo_client()
+    db_client = get_mongo_client(local=app.config["TESTING"])
     games_manager = GamesManager(db_client)
 
     encoder = JSONEncoder()
