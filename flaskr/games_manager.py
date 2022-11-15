@@ -96,5 +96,5 @@ class GamesManager:
             del self.games[gid]
 
             # Upload game statistics to database
-            if len(data) > 0:
-                self.db_client.xs[gid].insert_many(data)
+            # if len(data) > 0:
+            #     self.db_client.xs[gid].insert_many(data)

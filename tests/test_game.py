@@ -19,6 +19,7 @@ def basic_game():
 @pytest.fixture()
 def basic_game_with_five_players():
     game, players = Game(PASSWORD), [Mock() for _ in range(5)]
+    game.pause()
 
     for i, player in enumerate(players):
         player.uuid = DUMMY_ID + str(i)
