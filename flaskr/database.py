@@ -4,40 +4,31 @@ import pymongo, os, json, subprocess, shutil
 def get_mongo_client(local=False):
     """
     Attempts to open flaskr/mongo_config.json and connect to the database there.
-    Also attempts to read DB_ADDRESS, DB_USERNAME, DB_PASSWORD from environment variables.
-    If not found, or if local=True, then connects to localhost:27017
+    If not found, or if local=True, then boots a local server and connects to it.
+    This local server will be completely fresh
     """
-    connection_string = "mongodb://localhost:27017"
-    config_path = os.path.join(os.path.dirname(__file__), "mongo_config.json")
-    print("Connecting to MongoDB...")
-    # Try to update connection_string to json config
-    if not local:
-        print("Attempting connection to server...")
-        if os.path.isfile(config_path):
-            print("Config file found!")
-            with open(config_path) as f:
-                cfg = json.load(f)
-                try:
-                    connection_string = (
-                        f"mongodb+srv://{cfg['user']}:{cfg['password']}@{cfg['address']}"
-                    )
-                except KeyError:
-                    print("Warning: malformed mongo_config.json. Attempting to read environment variables.")
-        else:
-            print("Reading environment variables...")
-            try:
-                print(os.environ["DB_USERNAME"], os.environ['DB_PASSWORD'], os.environ['DB_ADDRESS'])
-                print(os.environ)
-                pw = os.environ["DB_PASSWORD"]
-                if pw != "":
-                    connection_string = (
-                        f"mongodb+srv://{os.environ['DB_USERNAME']}:{os.environ['DB_PASSWORD']}@{os.environ['DB_ADDRESS']}"
-                    )
-            except KeyError:
-                print("Warning: environment variables not set. Using localhost DB")
 
-    client = pymongo.MongoClient(connection_string)
-    return client
+    if local:
+        destructive_start_localhost_mongo()
+        return pymongo.MongoClient("mongodb://localhost:27017")
+
+    config_path = os.path.join(os.path.dirname(__file__), "mongo_config.json")
+
+    # Try to update connect to json config, if it exists
+    if os.path.isfile(config_path):
+        with open(config_path) as f:
+            cfg = json.load(f)
+            try:
+                conn_str = (
+                    f"mongodb+srv://{cfg['user']}:{cfg['password']}@{cfg['address']}"
+                )
+                return pymongo.MongoClient(conn_str)
+            except KeyError:
+                print("Warning: malformed mongo_config.json. Using localhost DB.")
+                return get_mongo_client(local=True)
+    else:
+        print("Warning: mongo_config.json not found. Using localhost DB")
+        return get_mongo_client(local=True)
 
 
 def destructive_start_localhost_mongo():
@@ -46,8 +37,14 @@ def destructive_start_localhost_mongo():
     Clean flaskr/_db.
     Starts a local mongod database using flaskr/db as the store.
     """
-    # This kills any running mongo instance
-    os.system("mongo --eval \"db.getSiblingDB('admin').shutdownServer()\"")
+
+    # This kills any running mongo instance. Try using mongo first, but if not found, use mongosh.
+    try:
+        subprocess.run(["mongo", "--eval", "db.getSiblingDB('admin').shutdownServer()"])
+    except FileNotFoundError:
+        subprocess.run(
+            ["mongosh", "--eval", "db.getSiblingDB('admin').shutdownServer()"]
+        )
 
     # Remove and remake flaskr/db
     db_path = os.path.join(os.path.dirname(__file__), "_db")
