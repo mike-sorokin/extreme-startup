@@ -96,21 +96,45 @@ class GamesManager:
             self.unpause_game(gid)  # removes dangling administering question threads
             del self.games[gid]
 
-            self.analyse_game(gid, player_data, scoreboard_data)
+            if len(player_data) > 0:
+                self.analyse_game(gid, player_data, scoreboard_data)
 
     def analyse_game(self, game_id, player_data, scoreboard):
         """
         Args:
+        game_id :: uuid4() [8 chars]
         player_data :: { player_id -> Player }
-        scoreboard_data :: Scoreboard
+        scoreboard :: Scoreboard
         """
 
-        encoded_players = [
-            JSONEncoder().default(player) for player in player_data.values()
-        ]
+        encoded_players = []
+        finalboard = {}
+        finalgraph = scoreboard.running_totals
+        stats = {}
+        analysis = []
 
-        finalboard = {
-            id: {
+        num_players = len(player_data) 
+
+        total_requests = 0
+        total_player_avg_streak = 0.0
+
+        total_on_fire_duration = 0
+        total_num_of_on_fires = 0
+
+        longest_streak_length = 0
+        longest_on_fire_duration = 0 
+        longest_on_fire_team = None  
+
+        total_player_success_rate = 0.0
+        best_success_rate = { "team": None, "value": 0.0 } 
+
+        most_epic_fail = {}
+        most_epic_comeback = {} 
+
+        for (id, player) in player_data.items(): 
+            player_events = player.get_events()
+            encoded_players.append(JSONEncoder().default(player))
+            finalboard[id] = {
                 "player_id": id,
                 "name": player.name,
                 "score": player.score,
@@ -118,17 +142,74 @@ class GamesManager:
                 "success_ratio": scoreboard.current_total_correct(player)
                 / scoreboard.total_requests_for(player),
             }
-            for id, player in player_data.items()
+
+            total_requests += scoreboard.total_requests_for(player)
+            
+            total_streak_length = 0
+            total_num_of_streaks = 0
+            is_on_streak = False
+            curr_streak_length = 0 
+
+            player_success_rate = scoreboard.current_total_correct(player) / scoreboard.total_requests_for(player)
+            total_player_success_rate += player_success_rate
+
+            if player_success_rate > best_success_rate["value"]:
+                best_success_rate["team"] = player.name
+                best_success_rate["value"] = player_success_rate
+
+            for (i, event) in enumerate(player_events):
+                if is_on_streak and event.points_gained < 0: 
+                    total_streak_length += curr_streak_length
+                    total_num_of_streaks += 1
+
+                    if curr_streak_length > 6: # was on fire 
+                        strk_duration  = (event.timestamp - player_events[i-curr_streak_length].timestamp).total_seconds()
+
+                        total_on_fire_duration += strk_duration
+                        total_num_of_on_fires += 1
+
+                        if curr_streak_length > longest_streak_length: 
+                            longest_fire_duration = strk_duration
+                            logest_on_fire_team = player.name
+
+                    longest_streak_length = max(longest_streak_length, curr_streak_length)
+
+                    curr_streak_length = 0
+                    is_on_streak = False
+
+                elif event.points_gained > 0:
+                    curr_streak_length += 1
+
+                    if not is_on_streak and curr_streak_length >= 2:
+                        is_on_streak = True 
+                    
+            total_player_avg_streak += total_streak_length / (total_num_of_streaks if total_num_of_streaks > 0 else 1)        
+
+        # Log game global stats
+        stats["total_requests"] = total_requests
+        stats["average_streak"] = total_player_avg_streak / num_players
+
+        if total_num_of_on_fires > 0: 
+            stats["average_on_fire_duration"] = average_on_fire_duration 
+        else: 
+            stats["average_on_fire_duration"] = "N/A"
+
+        stats["longest_on_fire_duration"] = {
+            "achieved_by_team" : longest_on_fire_team,
+            "duration" : longest_on_fire_duration,
+            "streak_len": longest_streak_length
         }
 
-        finalgraph = scoreboard.running_totals
+        stats["longest_streak"] = {
+            "streak_len" : longest_streak_length,
+            "duration" : longest_on_fire_duration
+        }
 
-        stats = {"total"}
+        stats["average_success_rate"] = total_player_success_rate / num_players
 
-        analysis = []
+        # Log game analysis 
 
-        # Upload basic-game data
-        # data :: List[Player BSON]
+        # Upload game data + review/analysis
         self.upload_data(
             game_id,
             encoded_players,
@@ -139,9 +220,8 @@ class GamesManager:
         )
 
     def upload_data(self, game_id, players_data, **reviews_items):
-        if len(players_data) > 0:
-            print("Writing to database")
-            self.db_client.xs[f"{game_id}_players"].insert_many(players_data)
-            self.db_client.xs[f"{game_id}_review"].insert_many(
-                [{"item": k, "stats": v} for k, v in reviews_items.items()]
-            )
+        
+        self.db_client.xs[f"{game_id}_players"].insert_many(players_data)
+        self.db_client.xs[f"{game_id}_review"].insert_many(
+            [{"item": k, "stats": v} for k, v in reviews_items.items()]
+        )
