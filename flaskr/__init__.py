@@ -160,6 +160,10 @@ def create_app():
                 games_manager.delete_games(game_id)
                 return ("GAME_ENDED", 200)
 
+            elif "assisting" in r: # r["assisting"] is player_name 
+                games_manager.assist_player(game_id, r["assisting"])
+                return ("ASSISTING {}".format(r["assisting"].upper()), 200) 
+
             return NOT_ACCEPTABLE
 
         elif request.method == "DELETE":  # delete game with <game_id>

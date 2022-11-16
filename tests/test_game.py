@@ -22,6 +22,7 @@ def basic_game_with_five_players():
 
     for i, player in enumerate(players):
         player.uuid = DUMMY_ID + str(i)
+        player.name = player.uuid
         player.streak = ""
         player.round_index = 0
         player.active = False # avoid race conditions with additional streak vals
@@ -53,7 +54,9 @@ def test_game_defaults_to_not_paused(basic_game):
 
 
 def test_game_defaults_to_no_assists(basic_game):
-    assert len(basic_game.players_to_assist) == 0
+    assert len(basic_game.players_to_assist) == 2
+    assert len(basic_game.players_to_assist["needs_assistance"]) == 0
+    assert len(basic_game.players_to_assist["being_assisted"]) == 0
 
 
 def test_game_defaults_to_manual_mode(basic_game):
@@ -84,10 +87,10 @@ def test_players_with_more_than_fifteen_incorect_gets_added_to_assistance_list(
     game, players = basic_game_with_five_players
     game._Game__update_players_to_assist()
 
-    assert players[0].uuid in game.players_to_assist
-    assert players[1].uuid in game.players_to_assist
-    assert players[2].uuid in game.players_to_assist
-    assert len(game.players_to_assist) == 3
+    assert players[0].name in game.players_to_assist["needs_assistance"]
+    assert players[1].name in game.players_to_assist["needs_assistance"]
+    assert players[2].name in game.players_to_assist["needs_assistance"]
+    assert len(game.players_to_assist["needs_assistance"]) == 3
 
 
 def test_player_who_gets_one_correct_after_requiring_assistance_no_longer_needs_help(
@@ -101,10 +104,10 @@ def test_player_who_gets_one_correct_after_requiring_assistance_no_longer_needs_
 
     game._Game__update_players_to_assist()
 
-    assert players[0].uuid not in game.players_to_assist
-    assert players[1].uuid in game.players_to_assist
-    assert players[2].uuid in game.players_to_assist
-    assert len(game.players_to_assist) == 2
+    assert players[0].name not in game.players_to_assist["needs_assistance"]
+    assert players[1].name in game.players_to_assist["needs_assistance"]
+    assert players[2].name in game.players_to_assist["needs_assistance"]
+    assert len(game.players_to_assist["needs_assistance"]) == 2
 
 
 # TODO: Tets auto_increment_round

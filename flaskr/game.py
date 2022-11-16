@@ -31,7 +31,7 @@ class Game:
         self.running = threading.Event()
         self.running.set()
 
-        self.players_to_assist = []
+        self.players_to_assist = { "needs_assistance": [], "being_assisted": [] }
         self.auto_mode = False
 
     def compare_password(self, password):
@@ -120,6 +120,13 @@ class Game:
         if api:
             self.players[player_id].api = api
 
+    def assist_player(self, player_name):
+        assert player_name in self.players_to_assist["needs_assistance"]
+
+        # needs_assistance -> being_assisted
+        self.players_to_assist["needs_assitance"].remove(player_name)
+        self.players_to_assist["being_assisted"].add(player_name)
+
     def spawn_game_monitor(self):
         game_monitor_thread = threading.Thread(target=self.monitor)
         game_monitor_thread.daemon = True  # for test termination
@@ -129,8 +136,12 @@ class Game:
         return self.players[player_id].events
 
     def __update_players_to_assist(self):
+        needs_assistance = self.players_to_assist["needs_assistance"]
+        being_assisted = self.players_to_assist["being_assisted"]
+
         for pid in self.players:
             curr_player = self.players[pid]
+            curr_name = curr_player.name
             streak, round_index = curr_player.streak, curr_player.round_index
             round_streak = streak[-round_index:] if round_index != 0 else ""
 
@@ -140,11 +151,17 @@ class Game:
                 streak_length(round_streak, "".join(STREAK_CHARS[1:])),
             )
 
-            if c_tail > 0 and pid in self.players_to_assist:
-                self.players_to_assist.remove(pid)
+            if c_tail > 0:
+                try:
+                    if curr_name in needs_assistance:
+                        needs_assistance.remove(curr_name)
+                    elif curr_name in being_assisted:
+                        being_assisted.remove(curr_name) 
+                except:
+                    print("MONITOR THREAD: TRIED REMOVING " + curr_name + " FROM needs_assitance/being_assisted WHEN MAIN THREAD ATTEMPTED MODIFYING SAID LISTS. CONTINUING ON...")
 
-            elif ic_tail > 15 and pid not in self.players_to_assist:
-                self.players_to_assist.append(pid)
+            elif ic_tail > 15 and (curr_name not in needs_assistance and curr_name not in being_assisted):
+                needs_assistance.append(curr_name)
 
     def __auto_increment_round(self):
         ratio_threshold = 0.4
