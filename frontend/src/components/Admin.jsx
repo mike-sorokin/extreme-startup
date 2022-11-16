@@ -4,6 +4,8 @@ import { Badge, Button, Card, Container, Group, Space, Stack, Text, Title } from
 import { useClipboard } from '@mantine/hooks'
 
 import { fetchGame, updateGame } from '../utils/requests'
+import usePrevious from '../utils/usePrevious'
+import { showGeneralNotification } from '../utils/utils'
 import ConfirmationModal from '../utils/ConfirmationModal'
 
 function Admin () {
@@ -13,6 +15,7 @@ function Admin () {
   const [openedEndGame, setOpenedEndGame] = useState(false)
   const [teamsNeedingHelp, setTeamsNeedingHelp] = useState([])
   const [teamsBeingHelped, setTeamsBeingHelped] = useState([])
+  const prevList = usePrevious(teamsNeedingHelp)
 
   const params = useParams()
   const clipboard = useClipboard({ timeout: 500 })
@@ -22,7 +25,6 @@ function Admin () {
     const getGameData = async () => {
       try {
         const response = await fetchGame(params.gameId)
-        console.log(response)
         setRound(response.round)
         setGamePaused(response.paused)
         setPlayerNo(response.players.length)
@@ -40,6 +42,14 @@ function Admin () {
       clearInterval(timer)
     }
   }, [params.gameId])
+
+  useEffect(() => {
+    for (const team of teamsNeedingHelp) {
+      if (!prevList.includes(team)) {
+        showGeneralNotification('Notification', 'There are teams needing assistance!')
+      }
+    }
+  }, [teamsNeedingHelp])
 
   // Increments round
   const advanceRound = async () => {
@@ -85,8 +95,7 @@ function Admin () {
   // Send a put request to update which teams are being helped
   const setHelping = async (team) => {
     try {
-      const response = await updateGame(params.gameId, { assisting: team })
-      console.log(response)
+      await updateGame(params.gameId, { assisting: team })
       setTeamsNeedingHelp(teamsNeedingHelp.filter((value) => { return value !== team }))
       setTeamsBeingHelped([...teamsBeingHelped, team])
     } catch (error) {
@@ -169,7 +178,8 @@ function Admin () {
         </Card>
       </Container>
       <Space h="lg" />
-      <Container size="xl" px="xs">
+      {(teamsNeedingHelp.length >= 1 || teamsBeingHelped.length >= 1) &&
+        <Container size="xl" px="xs">
         <Title order={2} color="dimmed"> Teams needing assistance </Title>
         <Space h="md" />
         <Card>
@@ -186,13 +196,14 @@ function Admin () {
               <Card shadow="sm" p="xs" sx={ (theme) => ({ '&:hover': { backgroundColor: theme.colors.dark[5] } })} key={team}>
                 <Group position="apart">
                   <Text sx={{ paddingLeft: '1rem' }}>{team}</Text>
-                  <Button variant="light" color="green">Being helped!</Button>
+                  <Button variant="light" color="green" >Being helped!</Button>
                   </Group>
               </Card>
             ))}
           </Stack>
         </Card>
       </Container>
+      }
 
     </>
   )
