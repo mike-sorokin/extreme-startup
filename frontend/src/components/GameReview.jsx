@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Table } from '@mantine/core'
+import FinalChart from './FinalChart'
 
 function GameReview () {
   const params = useParams()
@@ -93,9 +94,12 @@ function GameReview () {
   return (
     <>
       <h1>Game Review: {params.gameId}</h1>
-
-      {/* SlideShow or for now list of bullet points */}
       <div>
+        <h3>Final Chart</h3>
+        <FinalChart gameId={params.gameId} />
+      </div>
+      <div>
+        <h3>Analysis</h3>
         <ul>
           <li>Total Requests is {stats.total_requests}</li>
           <li>Average Streak is {stats.average_streak}</li>
