@@ -300,7 +300,11 @@ def create_app():
 
     @app.get("/api/<game_id>/review/finalboard")
     def total_player_scores(game_id):
-        pass
+        if not game_id in db_client.xs.list_collection_names():
+            return ("Game id not found", 404)
+        return db_client.xs[f"{game_id}-review"].find_one({"item": "finalboard"})[
+            "stats"
+        ]
 
     @app.get("/api/<game_id>/review/finalgraph")
     def final_game_graph(game_id):
