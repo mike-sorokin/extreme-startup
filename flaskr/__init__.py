@@ -96,11 +96,11 @@ def create_app():
         if not games_manager.game_exists(game_id):
             return NOT_ACCEPTABLE
 
-        if request.method == "GET": 
-            res = {"authorized": is_admin(game_id, session), "player" : ""}
-            
+        if request.method == "GET":
+            res = {"authorized": is_admin(game_id, session), "player": ""}
+
             if get_player(session)[0]:
-                res["player"] =  get_player(session)[1]
+                res["player"] = get_player(session)[1]
 
             return res
 
@@ -296,7 +296,7 @@ def create_app():
 
     @app.get("/api/<game_id>/review/existed")
     def game_existed(game_id):
-        pass
+        return {"existed": game_id in db_client.xs.list_collection_names()}
 
     @app.get("/api/<game_id>/review/finalboard")
     def total_player_scores(game_id):
@@ -312,8 +312,7 @@ def create_app():
 
     @app.get("/api/<game_id>/review/analysis")
     def review_analysis(game_id):
-        pass 
-
+        pass
 
     # FORGIVE ME
     bot_responses = {n: [f"Bot{n}", 0] for n in range(100)}
@@ -385,7 +384,7 @@ def create_app():
 
     def is_player(player_id, session):
         return ("player" in session) and (player_id in session["player"])
-    
+
     def get_player(session):
         if "player" in session:
             return True, session["player"]
