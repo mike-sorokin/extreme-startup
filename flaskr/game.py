@@ -124,8 +124,8 @@ class Game:
         assert player_name in self.players_to_assist["needs_assistance"]
 
         # needs_assistance -> being_assisted
-        self.players_to_assist["needs_assitance"].remove(player_name)
-        self.players_to_assist["being_assisted"].add(player_name)
+        self.players_to_assist["needs_assistance"].remove(player_name)
+        self.players_to_assist["being_assisted"].append(player_name)
 
     def spawn_game_monitor(self):
         game_monitor_thread = threading.Thread(target=self.monitor)
