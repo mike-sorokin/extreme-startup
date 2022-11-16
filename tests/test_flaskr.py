@@ -4,7 +4,6 @@ from utils_for_tests import *
 from setups_for_tests import *
 from unittest.mock import patch
 
-
 @with_setup()
 def test_index_blank_get(_, cli):
     resp = cli.get("/api/")

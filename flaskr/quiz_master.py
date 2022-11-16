@@ -29,7 +29,7 @@ class QuizMaster:
             }
         )
 
-        while self.player.active:
+        while self.player.active: # NOTE: game.ended => not player.active
             self.administer_question(warmup_over, running)
 
     # Administer question involving:
@@ -48,8 +48,6 @@ class QuizMaster:
             )
             self.reset_stats_and_rc()
 
-        running.wait() # Wait until running event is set to True -- i.e. when game is unpaused 
-
         question = self.question_factory.next_question()
 
         question.ask(self.player)
@@ -60,6 +58,8 @@ class QuizMaster:
         self.rate_controller = self.rate_controller.update_algorithm_based_on_score(
             self.scoreboard.current_score(self.player)
         )
+
+        running.wait() # Wait until running event is set to True -- i.e. when game is unpaused 
 
     def reset_stats_and_rc(self):
         self.player.streak = ""
