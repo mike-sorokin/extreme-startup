@@ -63,6 +63,9 @@ class GamesManager:
     def get_game_players(self, game_id, *player_id):
         return self.games[game_id].get_players(*player_id)
 
+    def get_score_for_player(self, game_id, player_id):
+        return self.games[game_id].scoreboard.scores[player_id]
+
     def remove_game_players(self, game_id, *player_id):
         self.games[game_id].remove_players(*player_id)
 
@@ -120,7 +123,7 @@ class GamesManager:
 
         finalgraph = scoreboard.running_totals
 
-        stats = {}
+        stats = {"total"}
 
         analysis = []
 
