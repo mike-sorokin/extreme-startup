@@ -118,7 +118,7 @@ class GamesManager:
             for id, player in player_data.items()
         }
 
-        finalgraph = {}
+        finalgraph = scoreboard.running_totals
 
         stats = {}
 
