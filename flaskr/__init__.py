@@ -46,6 +46,9 @@ def create_app():
 
     games_manager = GamesManager(db_client)
 
+    # Temporary list of ended game ids
+    ended_games = []
+
     encoder = JSONEncoder()
 
     # This is a catch-all function that will redirect anything not caught by the other rules
@@ -96,9 +99,9 @@ def create_app():
         if not games_manager.game_exists(game_id):
             return NOT_ACCEPTABLE
 
-        if request.method == "GET": 
+        if request.method == "GET":
             res = {"authorized": is_admin(game_id, session), "player" : ""}
-            
+
             if get_player(session)[0]:
                 res["player"] =  get_player(session)[1]
 
@@ -158,6 +161,7 @@ def create_app():
 
             elif "end" in r:  # End the <game_id> instance
                 games_manager.delete_games(game_id)
+                ended_games.append(game_id)           # <-------------------- TODO REMOVE LATER AND ASAP(AP)
                 return ("GAME_ENDED", 200)
 
             return NOT_ACCEPTABLE
@@ -218,6 +222,12 @@ def create_app():
             return NOT_ACCEPTABLE
 
         return games_manager.get_players_to_assist(game_id)
+
+    @app.get("/api/<game_id>/gameover")
+    def gameover(game_id):
+        r = make_response(encoder.encode({"game_over": game_id in ended_games}))
+        r.mimetype = "application/json"
+        return r
 
     # Managing <player_id> player
     @app.route("/api/<game_id>/players/<player_id>", methods=["GET", "PUT", "DELETE"])
@@ -293,6 +303,10 @@ def create_app():
         )[0]
         if request.method == "GET":  # fetch event with <event_id>
             return encoder.encode(event)
+
+    @app.get("/api/<game_id>/review/players")
+    def game_existed_players(game_id):
+        pass
 
     @app.get("/api/<game_id>/review/existed")
     def game_existed(game_id):
@@ -385,7 +399,7 @@ def create_app():
 
     def is_player(player_id, session):
         return ("player" in session) and (player_id in session["player"])
-    
+
     def get_player(session):
         if "player" in session:
             return True, session["player"]

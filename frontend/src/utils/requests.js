@@ -1,6 +1,10 @@
 import axios from 'axios'
 
-import { homeAPI, gameAPI, authAPI, playersAPI, playerAPI, playerEventsAPI, eventAPI, scoresAPI } from './urls'
+import {
+  homeAPI, gameAPI, authAPI, playersAPI, playerAPI,
+  playerEventsAPI, eventAPI, scoresAPI, gameoverAPI,
+  reviewAPIs
+} from './urls'
 import { alertError, showFailureNotification, showErrorNotification, playersAsArray, HTTPError } from './utils'
 
 const instance = axios.create({
@@ -199,12 +203,14 @@ export async function createModerator (gameId, data) {
  * Fetches all scores in a given game
  * @async
  * @param  {string} gameId
+ * @param  {boolean} loadOldGame Flag indicating that the game was completed
  * @return {Promise<Array<obj(time:timestamp, player1: player1score, ..., playerN: playerNscores)>>}
  * List of all score records corresponding to a timestamp
  */
-export async function fetchGameScores (gameId) {
+export async function fetchGameScores (gameId, loadOldGame) {
   try {
-    const response = await instance.get(scoresAPI(gameId))
+    const apiEndPoint = loadOldGame ? reviewAPIs(gameId).finalgraph : scoresAPI(gameId)
+    const response = await instance.get(apiEndPoint)
     response.data.forEach((pt) => {
       pt.time = (new Date(pt.time)).getTime()
     })
@@ -221,11 +227,13 @@ export async function fetchGameScores (gameId) {
  * Fetches all players in a given game
  * @async
  * @param  {string} gameId
+ * @param  {boolean} loadOldGame Flag indicating that the game was completed
  * @return {Promise<Player[]>} List of all player JSON objects
  */
-export async function fetchAllPlayers (gameId) {
+export async function fetchAllPlayers (gameId, loadOldGame) {
   try {
-    const response = await instance.get(playersAPI(gameId))
+    const apiEndPoint = loadOldGame ? reviewAPIs(gameId).players : playersAPI(gameId)
+    const response = await instance.get(apiEndPoint)
     return playersAsArray(response.data.players)
   } catch (error) {
     alertError(error)
@@ -495,5 +503,20 @@ export async function checkValidPlayer (gameId, playerId) {
     return true
   } catch (error) {
     return false
+  }
+}
+
+/**
+ * Check if a game requested was ended id is valid
+ * @async
+ * @param {string} gameId The game id you are checking
+ * @returns {Promise<boolean>} true if game was ended false otherwise
+ */
+export async function checkGameEnded (gameId) {
+  try {
+    const response = await instance.get(gameoverAPI(gameId))
+    return response.data.game_over
+  } catch (error) {
+    alertError(error)
   }
 }
