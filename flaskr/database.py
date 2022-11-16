@@ -8,7 +8,7 @@ def get_mongo_client(local=False):
     This local server will be completely fresh
     """
 
-    if os.environ["USE_LOCAL_MONGO_DB"]:
+    if "USE_LOCAL_MONGO_DB" in os.environ:
         return pymongo.MongoClient("mongodb://localhost:27017")
 
 
