@@ -74,3 +74,14 @@ export function eventAPI (gameId, playerId, eventId) {
 export function gameoverAPI (gameId) {
   return `${API_PREFIX}/${gameId}/gameover`
 }
+
+export function reviewAPIs (gameId) {
+  const urlFor = (suffix) => `${API_PREFIX}/${gameId}/review/` + suffix
+  return {
+    players: urlFor('players'),
+    finalgraph: urlFor('finalgraph'),
+    finalboard: urlFor('finalboard'),
+    stats: urlFor('stats'),
+    analysis: urlFor('analysis'),
+  }
+}

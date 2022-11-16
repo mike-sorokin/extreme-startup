@@ -12,10 +12,11 @@ function FinalChart({ gameId }) {
   // Also refetch the entire player list, just in case
   const getChartData = async () => {
     try {
-      const pResponse = await fetchAllPlayers(gameId)
+      const loadOldGame = true
+      const pResponse = await fetchAllPlayers(gameId, loadOldGame)
       setPlayerIds(pResponse.map((p) => ({ id: p.id, name: p.name })))
 
-      const response = await fetchGameScores(gameId)
+      const response = await fetchGameScores(gameId, loadOldGame)
       const startTime = response[0].time
 
       response.forEach((pt) => {
