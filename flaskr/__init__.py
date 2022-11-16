@@ -30,10 +30,10 @@ ERROR_405 = 405
 DELETE_SUCCESS = 204
 UNAUTHORIZED_CODE = 401
 
-DELETE_SUCCESSFUL = ("Successfully deleted", 204)
-NOT_ACCEPTABLE = ("Unacceptable request - Requested resource not found", 406)
-UNAUTHORIZED = ("Unauthenticated request", 401)
-METHOD_NOT_ALLOWED = ("HTTP Method not allowed", 405)
+DELETE_SUCCESSFUL = ("Successfully deleted", DELETE_SUCCESS)
+NOT_ACCEPTABLE = ("Unacceptable request - Requested resource not found", NOT_ACCEPTED)
+UNAUTHORIZED = ("Unauthenticated request", UNAUTHORIZED_CODE)
+METHOD_NOT_ALLOWED = ("HTTP Method not allowed", ERROR_405)
 
 
 def create_app():
@@ -301,7 +301,7 @@ def create_app():
     @app.get("/api/<game_id>/review/finalboard")
     def total_player_scores(game_id):
         if not game_id in db_client.xs.list_collection_names():
-            return ("Game id not found", 404)
+            return ("Game id not found", NOT_FOUND)
         return db_client.xs[f"{game_id}-review"].find_one({"item": "finalboard"})[
             "stats"
         ]
@@ -309,7 +309,7 @@ def create_app():
     @app.get("/api/<game_id>/review/finalgraph")
     def final_game_graph(game_id):
         if not game_id in db_client.xs.list_collection_names():
-            return ("Game id not found", 404)
+            return ("Game id not found", NOT_FOUND)
         return db_client.xs[f"{game_id}-review"].find_one({"item": "finalgraph"})[
             "stats"
         ]
