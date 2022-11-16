@@ -82,8 +82,7 @@ function Admin () {
   // Send a {"stop": ""} request to stop the game
   const sendGameEnd = async () => {
     try {
-      const response = await updateGame(params.gameId, { end: '' })
-      console.log(response)
+      await updateGame(params.gameId, { end: '' })
     } catch (error) {
       // TODO
     } finally {
