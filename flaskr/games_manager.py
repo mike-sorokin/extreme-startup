@@ -138,7 +138,7 @@ class GamesManager:
     def upload_data(self, game_id, players_data, **reviews_items):
         if len(players_data) > 0:
             print("Writing to database")
-            self.db_client.xs[game_id].insert_many(players_data)
-            self.db_client.xs[f"{game_id}-review"].insert_many(
+            self.db_client.xs[f"{game_id}_players"].insert_many(players_data)
+            self.db_client.xs[f"{game_id}_review"].insert_many(
                 [{"item": k, "stats": v} for k, v in reviews_items.items()]
             )

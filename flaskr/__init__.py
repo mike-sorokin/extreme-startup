@@ -296,21 +296,21 @@ def create_app():
 
     @app.get("/api/<game_id>/review/existed")
     def game_existed(game_id):
-        return {"existed": game_id in db_client.xs.list_collection_names()}
+        return {"existed": f"{game_id}_players" in db_client.xs.list_collection_names()}
 
     @app.get("/api/<game_id>/review/finalboard")
     def total_player_scores(game_id):
-        if not game_id in db_client.xs.list_collection_names():
+        if not f"{game_id}_players" in db_client.xs.list_collection_names():
             return ("Game id not found", NOT_FOUND)
-        return db_client.xs[f"{game_id}-review"].find_one({"item": "finalboard"})[
+        return db_client.xs[f"{game_id}_review"].find_one({"item": "finalboard"})[
             "stats"
         ]
 
     @app.get("/api/<game_id>/review/finalgraph")
     def final_game_graph(game_id):
-        if not game_id in db_client.xs.list_collection_names():
+        if not f"{game_id}_players" in db_client.xs.list_collection_names():
             return ("Game id not found", NOT_FOUND)
-        return db_client.xs[f"{game_id}-review"].find_one({"item": "finalgraph"})[
+        return db_client.xs[f"{game_id}_review"].find_one({"item": "finalgraph"})[
             "stats"
         ]
 
