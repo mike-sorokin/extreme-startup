@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { Outlet, useParams } from 'react-router-dom'
 import { Loader } from '@mantine/core'
 
-import { checkValidGame, checkValidPlayer } from './requests'
-import NotFound from '../components/NotFound'
+import { checkValidGame, checkValidPlayer } from '../requests'
+import NotFound from '../../components/NotFound'
 
 function ValidRoute () {
   const [loading, setLoading] = useState(true)

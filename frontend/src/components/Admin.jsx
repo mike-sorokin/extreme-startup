@@ -4,7 +4,7 @@ import { Badge, Button, Card, Container, Group, Space, Stack, Text, Title } from
 import { useClipboard } from '@mantine/hooks'
 
 import { fetchGame, updateGame } from '../utils/requests'
-import usePrevious from '../utils/usePrevious'
+import usePrevious from '../utils/hooks/usePrevious'
 import { showGeneralNotification } from '../utils/utils'
 import ConfirmationModal from '../utils/ConfirmationModal'
 

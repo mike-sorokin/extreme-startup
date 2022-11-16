@@ -8,8 +8,8 @@ import Admin from './components/Admin'
 import Leaderboard from './components/Leaderboard'
 import NotFound from './components/NotFound'
 
-import AdminRoute from './utils/AdminRoute'
-import ValidRoute from './utils/ValidRoute'
+import AdminRoute from './utils/routes/AdminRoute'
+import ValidRoute from './utils/routes/ValidRoute'
 
 function App () {
   return (

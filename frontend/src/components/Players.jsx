@@ -5,7 +5,7 @@ import { Button, Container, Table, Title } from '@mantine/core'
 import { deleteAllPlayers, deletePlayer, fetchAllPlayers } from '../utils/requests'
 import { withCurrentPlayerLiftedIfPresent } from '../utils/utils'
 import ConfirmationModal from '../utils/ConfirmationModal'
-import useSessionData from '../utils/useSessionData'
+import useSessionData from '../utils/hooks/useSessionData'
 
 function Players () {
   const params = useParams()

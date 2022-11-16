@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-import { checkAuth } from './requests'
+import { checkAuth } from '../requests'
 
 function useSessionData (gameId) {
   const [isAdmin, setIsAdmin] = useState(false)
