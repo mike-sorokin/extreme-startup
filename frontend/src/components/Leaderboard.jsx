@@ -20,7 +20,7 @@ function Leaderboard () {
         const sortedResponse = response.sort((a, b) => { return b.score - a.score })
         setLeaderboard(sortedResponse)
       } catch (error) {
-        // TODO
+        console.error(error)
       }
     }
 

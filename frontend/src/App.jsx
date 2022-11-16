@@ -6,18 +6,27 @@ import Player from './components/Player'
 import Players from './components/Players'
 import Admin from './components/Admin'
 import Leaderboard from './components/Leaderboard'
+import NotFound from './components/NotFound'
+
+import AdminRoute from './utils/AdminRoute'
+import ValidRoute from './utils/ValidRoute'
 
 function App () {
   return (
-    <Router>
+    <Router >
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/:gameId" element={<Game />} >
-          <Route path="players" element={<Players />} />
-          <Route path="players/:id" element={<Player />} />
-          <Route path="admin" element={<Admin />} />
-          <Route index element={<Leaderboard />} />
+        <Route element={<ValidRoute />}>
+          <Route path="/:gameId" element={<Game />} >
+            <Route path="players" element={<Players />} />
+            <Route path="players/:id" element={<Player />} />
+            <Route element={<AdminRoute />} >
+              <Route path="admin" element={<Admin />} />
+            </Route>
+            <Route index element={<Leaderboard />} />
+          </Route>
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   )

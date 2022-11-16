@@ -1,5 +1,5 @@
 # First we compile the node stuff
-FROM node:16-alpine as node-build
+FROM node:19-alpine as node-build
 COPY ./frontend ./frontend
 WORKDIR frontend
 
@@ -8,7 +8,7 @@ RUN npm ci
 RUN npm run build
 
 # Then we run the python stuff
-FROM python:3
+FROM python:3.11
 COPY ./flaskr ./flaskr
 
 # Copy pre-compiled node stuff
@@ -17,6 +17,13 @@ COPY --from=node-build ./frontend/dist ./flaskr/vite
 # Install reqs
 RUN pip install --upgrade pip
 RUN pip install -r flaskr/requirements.txt
+
+# Set env variables
+ARG DB_PW=
+ENV DB_PASSWORD=$DB_PW
+
+ENV DB_USERNAME=xs-bot
+ENV DB_ADDRESS=cluster0.dvvipyf.mongodb.net
 
 EXPOSE 5000
 

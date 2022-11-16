@@ -1,6 +1,6 @@
-# fly.toml file generated for extreme-restartup on 2022-10-13T19:06:03+01:00
+# fly.toml file generated for extreme-startup on 2022-11-11T14:33:06Z
 
-app = "extreme-restartup"
+app = "extreme-startup"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []

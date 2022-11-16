@@ -1,0 +1,6 @@
+{
+  "id": "mock-game-id",
+  "round": 15,
+  "players": [{}, {}, {}],
+  "paused": false 
+}

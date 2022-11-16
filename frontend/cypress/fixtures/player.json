@@ -1,0 +1,37 @@
+{
+  "id": "mock_id",
+  "game_id": "mock_game_id",
+  "name": "mock_walter",
+  "score": -420,
+  "api": "https://www.savewalterwhite.com",
+  "streak": "X01X01",
+  "events": [
+    {
+      "id": "mock_event_id_1",
+      "player_id": "mock_id",
+      "query": "Who was in paris?",
+      "difficulty": 21,
+      "points_gained": 420,
+      "response_type": "NO_SERVER_RESPONSE",
+      "timestamp": "mock_timestamp"
+    },
+    {
+      "id": "mock_event_id_2",
+      "player_id": "mock_id",
+      "query": "When did I ask?",
+      "difficulty": 0,
+      "points_gained": -420,
+      "response_type": "WRONG",
+      "timestamp": "time"
+    },
+    {
+      "id": "mock_event_id_3",
+      "player_id": "mock_id",
+      "query": "What's up dog?",
+      "difficulty": -1,
+      "points_gained": 0,
+      "response_type": "CORRECT",
+      "timestamp": "5th June"
+    }
+  ]
+}

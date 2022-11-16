@@ -4,14 +4,15 @@ import { Badge, Button, Card, Container, Space, Title } from '@mantine/core'
 import { useClipboard } from '@mantine/hooks'
 
 import { fetchGame, updateGame } from '../utils/requests'
+import ConfirmationModal from '../utils/ConfirmationModal'
 
 function Admin () {
   const [playerNo, setPlayerNo] = useState(0)
   const [round, setRound] = useState(0)
   const [gamePaused, setGamePaused] = useState(false)
+  const [openedEndGame, setOpenedEndGame] = useState(false)
 
   const params = useParams()
-
   const clipboard = useClipboard({ timeout: 500 })
 
   // Fetches game data every 2 seconds (current round and number of players)
@@ -23,7 +24,7 @@ function Admin () {
         setGamePaused(response.paused)
         setPlayerNo(response.players.length)
       } catch (error) {
-        // TODO
+        console.error(error)
       }
     }
 
@@ -38,10 +39,15 @@ function Admin () {
   // Increments round
   const advanceRound = async () => {
     try {
-      await updateGame(params.gameId, { round: round + 1 })
-      setRound(round + 1)
+      const response = await updateGame(params.gameId, { round: round + 1 })
+      if (response === 'ROUND_INCREMENTED') {
+        setRound(round + 1)
+      }
     } catch (error) {
-      // TODO
+      console.error(error)
+      if (error.response && error.response.status === 401) {
+        alert('401 - Unauthenticated request')
+      }
     }
   }
 
@@ -49,20 +55,25 @@ function Admin () {
   const togglePauseRound = async () => {
     try {
       const response = await updateGame(params.gameId, { pause: (gamePaused ? '' : 'p') })
-      console.log(response)
       setGamePaused(response === 'GAME_PAUSED')
     } catch (error) {
-      // TODO
+      console.error(error)
+      if (error.response && error.response.status === 401) {
+        alert('401 - Unauthenticated request')
+      }
     }
   }
 
   // Send a {"stop": ""} request to stop the game
   const sendGameEnd = async () => {
     try {
-      const response = await updateGame(params.gameId, { stop: '' })
+      const response = await updateGame(params.gameId, { end: '' })
       console.log(response)
     } catch (error) {
       // TODO
+    } finally {
+      setOpenedEndGame(false)
+      window.location.reload()
     }
   }
 
@@ -72,80 +83,74 @@ function Admin () {
       radius="md"
       size="md"
       style={{ marginLeft: '10%', width: '110px' }}
-      onClick={() => togglePauseRound()}>
+      onClick={() => togglePauseRound()}
+      data-cy='pause-game-button'>
       {text}
     </Button>
   }
 
   function roundBadge (color, text) {
     return <Badge size="xl" color={color} variant="filled"
-      style={{ width: '200px' }}>
+      style={{ width: '200px' }}
+      data-cy='current-round'>
       {text}
     </Badge>
   }
 
   return (
-    <Container size="xl" px="xs">
-      <Title order={1} color="white" weight={1000}>Admin Page</Title>
-      <Space h="md" />
-      <Card shadow="sm" p="lg" radius="md" withBorder>
-        <h3>Game ID</h3>
-        <div style={{ display: 'inline-flex', flexDirection: 'row' }}>
-          <Title order={4} color="white" weight={1000}>{params.gameId}</Title>
-          <Button compact variant="outline"
-            style={{ marginLeft: '10%', width: '150px' }}
-            color={clipboard.copied ? 'teal' : 'blue'}
-            onClick={() => clipboard.copy(params.gameId)}>
-            {clipboard.copied ? 'Game Id Copied!' : 'Copy Game Id'}
-          </Button>
-          <Button compact variant="outline"
-            style={{ marginLeft: '10%' }}
-            color="red"
-            radius="md"
-            size="md"
-            onClick={() => sendGameEnd()}>
-            End game
-          </Button>
-        </div>
-        <Space h="md" /> <br />
-        <h3>Number of Players</h3>
-        <h4 style={{ color: 'grey' }}>{playerNo}</h4>
-        <br />
-        <h3>Current Round</h3>
-        <div style={{ display: 'inline-flex', flexDirection: 'row' }}>
-          {gamePaused ? roundBadge('yellow', 'PAUSED') : (round > 0 ? roundBadge('lime', 'Round ' + String(round)) : roundBadge('cyan', 'WARMUP'))}
-          <Button compact variant="outline"
-            style={{ marginLeft: '10%' }}
-            color="indigo"
-            radius="md"
-            size="md"
-            onClick={() => advanceRound()}>
-            Advance Round
-          </Button>
-          {gamePaused
-            ? togglePauseButton('green', 'Resume')
-            : togglePauseButton('yellow', 'Pause')
-          }
-        </div>
-        {/* <div style={roundsBarStyle}>
-          <div>
-            <h3>Current Round</h3>
+    <div>
+      <ConfirmationModal opened={openedEndGame} setOpened={setOpenedEndGame}
+        title='End Game' body='Are you sure you want to end the game?' func={sendGameEnd} />
+      <Container size="xl" px="xs">
+        <Title order={1} color="white" weight={1000}>Admin Page</Title>
+        <Space h="md" />
+        <Card shadow="sm" p="lg" radius="md" withBorder>
+          <div style={{ display: 'flex', flexDirection: 'row' }}>
+            <h3>Game ID</h3>
+            <div style={{ display: 'flex', marginLeft: '85%' }}>
+              <Button compact variant="filled"
+                color="red"
+                radius="md"
+                size="lg"
+                onClick={() => setOpenedEndGame(true)}>
+                End Game
+              </Button>
+            </div>
           </div>
-          <Button variant="outline"
-            color="indigo"
-            radius="md"
-            size="md"
-            onClick={() => advanceRound()}>
-            Advance Round
-          </Button>
-          { gamePaused
-            ? togglePauseButton('green', 'Resume')
-            : togglePauseButton('yellow', 'Pause')
-          }
-        </div>
-        {<h4 style={{ color: 'grey' }}>{gamePaused ? 'PAUSED' : (round > 0 ? round : 'WARMUP')}</h4>} */}
-      </Card>
-    </Container>
+          <br />
+          <div style={{ display: 'inline-flex', flexDirection: 'row' }}>
+            <Title order={4} color="white" weight={1000}>{params.gameId}</Title>
+            <Button compact variant="outline"
+              style={{ marginLeft: '10%', width: '150px' }}
+              color={clipboard.copied ? 'teal' : 'blue'}
+              onClick={() => clipboard.copy(params.gameId)}>
+              {clipboard.copied ? 'Game Id Copied!' : 'Copy Game Id'}
+            </Button>
+          </div>
+          <Space h="md" /> <br />
+          <h3>Number of Players</h3>
+          <h4 style={{ color: 'grey' }} data-cy='number-of-players'>{playerNo}</h4>
+          <br />
+          <h3>Current Round</h3>
+          <div style={{ display: 'inline-flex', flexDirection: 'row' }}>
+            {gamePaused ? roundBadge('yellow', 'PAUSED') : (round > 0 ? roundBadge('lime', 'Round ' + String(round)) : roundBadge('cyan', 'WARMUP'))}
+            <Button compact variant="outline"
+              style={{ marginLeft: '10%' }}
+              color="indigo"
+              radius="md"
+              size="md"
+              onClick={() => advanceRound()}
+              data-cy='advance-round-button'>
+              Advance Round
+            </Button>
+            {gamePaused
+              ? togglePauseButton('green', 'Resume')
+              : togglePauseButton('yellow', 'Pause')
+            }
+          </div>
+        </Card>
+      </Container>
+    </div>
   )
 }
 
