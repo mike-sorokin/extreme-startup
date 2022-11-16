@@ -2,7 +2,8 @@ import axios from 'axios'
 
 import {
   homeAPI, gameAPI, authAPI, playersAPI, playerAPI,
-  playerEventsAPI, eventAPI, scoresAPI, gameoverAPI
+  playerEventsAPI, eventAPI, scoresAPI, gameoverAPI,
+  reviewAPIs
 } from './urls'
 import { alertError, showFailureNotification, showErrorNotification, playersAsArray, HTTPError } from './utils'
 
@@ -208,7 +209,7 @@ export async function createModerator (gameId, data) {
  */
 export async function fetchGameScores (gameId, loadOldGame) {
   try {
-    const apiEndPoint = loadOldGame ? playerAPI(gameId) : reviewAPIs(gameId).finalgraph
+    const apiEndPoint = loadOldGame ? reviewAPIs(gameId).finalgraph : scoresAPI(gameId)
     const response = await instance.get(apiEndPoint)
     response.data.forEach((pt) => {
       pt.time = (new Date(pt.time)).getTime()
@@ -231,7 +232,7 @@ export async function fetchGameScores (gameId, loadOldGame) {
  */
 export async function fetchAllPlayers (gameId, loadOldGame) {
   try {
-    const apiEndPoint = loadOldGame ? playerAPI(gameId) : reviewAPIs(gameId).players
+    const apiEndPoint = loadOldGame ? reviewAPIs(gameId).players : playersAPI(gameId)
     const response = await instance.get(apiEndPoint)
     return playersAsArray(response.data.players)
   } catch (error) {

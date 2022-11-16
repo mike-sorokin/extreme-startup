@@ -304,6 +304,10 @@ def create_app():
         if request.method == "GET":  # fetch event with <event_id>
             return encoder.encode(event)
 
+    @app.get("/api/<game_id>/review/players")
+    def game_existed_players(game_id):
+        pass
+
     @app.get("/api/<game_id>/review/existed")
     def game_existed(game_id):
         pass

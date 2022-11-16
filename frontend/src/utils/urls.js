@@ -78,6 +78,7 @@ export function gameoverAPI (gameId) {
 export function reviewAPIs (gameId) {
   const urlFor = (suffix) => `${API_PREFIX}/${gameId}/review/` + suffix
   return {
+    existed: urlFor('existed'),
     players: urlFor('players'),
     finalgraph: urlFor('finalgraph'),
     finalboard: urlFor('finalboard'),
