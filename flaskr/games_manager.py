@@ -140,7 +140,7 @@ class GamesManager:
                 "score": player.score,
                 "longest_streak": player.longest_streak,
                 "success_ratio": scoreboard.current_total_correct(player)
-                / scoreboard.total_requests_for(player),
+                / (scoreboard.total_requests_for(player) if scoreboard.total_requests_for(player) > 0 else 1),
             }
 
             total_requests += scoreboard.total_requests_for(player)
