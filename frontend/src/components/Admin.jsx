@@ -66,19 +66,6 @@ function Admin () {
     }
   }
 
-  // Send a {"pause": ""} request to unpause, {"pause": "p"} to pause
-  const togglePauseRound = async () => {
-    try {
-      const response = await updateGame(params.gameId, { pause: (gamePaused ? '' : 'p') })
-      setGamePaused(response === 'GAME_PAUSED')
-    } catch (error) {
-      console.error(error)
-      if (error.response && error.response.status === 401) {
-        alert('401 - Unauthenticated request')
-      }
-    }
-  }
-
   // Send a {"stop": ""} request to stop the game
   const sendGameEnd = async () => {
     try {
@@ -89,6 +76,19 @@ function Admin () {
     } finally {
       setOpenedEndGame(false)
       window.location.reload()
+    }
+  }
+
+  // Send a {"pause": ""} request to unpause, {"pause": "p"} to pause
+  const togglePauseRound = async () => {
+    try {
+      const response = await updateGame(params.gameId, { pause: (gamePaused ? '' : 'p') })
+      setGamePaused(response === 'GAME_PAUSED')
+    } catch (error) {
+      console.error(error)
+      if (error.response && error.response.status === 401) {
+        alert('401 - Unauthenticated request')
+      }
     }
   }
 
@@ -163,11 +163,13 @@ function Admin () {
               : togglePauseButton('yellow', 'Pause')
             }
           </div>
-          <Switch
-            label="Automatic Round Advancement"
-            size="md"
-            checked={autoAdvance} onChange={(e) => toggleAutoAdvance(e)}
-          />
+          {round > 0
+            ? <Switch
+                label="Automatic Round Advancement"
+                size="md"
+                checked={autoAdvance} onChange={(e) => toggleAutoAdvance(e)}
+              />
+            : <></>}
         </Card>
       </Container>
     </div>
