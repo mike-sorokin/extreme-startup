@@ -5,7 +5,7 @@ import { useClipboard } from '@mantine/hooks'
 
 import { fetchGame, updateAutoRoundAdvance, updateGame } from '../utils/requests'
 import ConfirmationModal from '../utils/ConfirmationModal'
-import { showErrorNotification } from '../utils/utils'
+import { showInfoNotification } from '../utils/utils'
 
 function Admin () {
   const [playerNo, setPlayerNo] = useState(0)
@@ -23,7 +23,7 @@ function Admin () {
       try {
         const response = await fetchGame(params.gameId)
         if (autoAdvance && response.round > round) {
-          showErrorNotification('Round Advancement', 'The round has been automatically advanced')
+          showInfoNotification('Round Advancement', 'The round has been automatically advanced')
         }
         setRound(response.round)
         setGamePaused(response.paused)
