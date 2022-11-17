@@ -1,5 +1,6 @@
 from flaskr.event import Event
 import datetime as dt
+from math import floor, ceil
 
 PROBLEM_DECREMENT = 50
 STREAK_LENGTH = 30
@@ -28,7 +29,9 @@ class Scoreboard:
             self.correct_tally[player.uuid] += 1
             player.streak += "1"
             player.curr_streak_length += 1
-            player.longest_streak = max(player.longest_streak, player.curr_streak_length)
+            player.longest_streak = max(
+                player.longest_streak, player.curr_streak_length
+            )
 
         elif increment < 0:
             self.incorrect_tally[player.uuid] += 1
@@ -37,7 +40,7 @@ class Scoreboard:
                 player.streak += "0"
             else:
                 player.streak += "X"
-            
+
             player.curr_streak_length = 0
 
         self.record_request_for(player)
@@ -112,6 +115,34 @@ class Scoreboard:
 
     def leaderboard_position(self, player):
         return list(self.leaderboard().keys()).index(player.uuid) + 1
+
+    def leaderboard_position_id(self, player_id):
+        return list(self.leaderboard().keys()).index(player_id) + 1
+
+    def leaderboard_first_player_id(self):
+        return list(self.leaderboard().keys())[0]
+
+    def leaderboard_last_player_id(self):
+        return list(self.leaderboard().keys())[-1]
+
+    def player_in_top_k_percentile(self, player_id, k):
+        return list(self.leaderboard().keys()).index(player_id) + 1 <= (
+            k * len(self.scores) / 100
+        )
+
+    def player_in_bottom_k_percentile(self, player_id, k):
+        return list(self.leaderboard().keys()).index(player_id) + 1 > (
+            (100 - k) * len(self.scores) / 100
+        )
+
+    def leaderboard_top_k_precentile_players(self, k):
+        end_index = floor(k * len(self.scores) / 100)
+        return list(self.leaderboard())[0:end_index]
+
+    def leaderboard_bottom_k_percentile_players(self, k):
+        from_index = ceil((100 - k) * len(self.scores) / 100)
+        end_index = len(self.scores)
+        return list(self.leaderboard())[from_index:end_index]
 
     # Identity points delta based on question.result
     def score(self, question, leaderboard_position):
