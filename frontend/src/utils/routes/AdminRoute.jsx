@@ -5,6 +5,7 @@ import { Loader } from '@mantine/core'
 import { checkAuth } from '../requests'
 import { gameUrl } from '../urls'
 import { showErrorNotification } from '../utils'
+
 import NotFound from '../../components/NotFound'
 
 function AdminRoute () {

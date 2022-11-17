@@ -1,6 +1,6 @@
+import React from 'react'
 import { showNotification } from '@mantine/notifications'
 import { IconCheck, IconX, IconAlertTriangle, IconInfoSquare } from '@tabler/icons'
-import { React } from 'react'
 
 export function str (obj) {
   return JSON.stringify(obj)
