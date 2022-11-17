@@ -10,7 +10,6 @@ function GameReview() {
   const navigate = useNavigate()
 
   const [finalLeaderboard, setFinalLeaderboard] = useState([])
-  const [finalChart, setFinalChart] = useState({})
   const [stats, setStats] = useState({})
   const [keyPoints, setKeyPoints] = useState([])
 
@@ -86,8 +85,8 @@ function GameReview() {
         ])
 
         setFinalLeaderboard(leaderboardResponse)
-        setStats(mockStats)
-        setKeyPoints(mockKeyPoints)
+        // setStats(mockStats)
+        // setKeyPoints(mockKeyPoints)
       } catch (error) {
         console.error(error)
       }
@@ -96,12 +95,29 @@ function GameReview() {
     getReviewData()
   }, [])
 
+  const asMappable = (leaderboard) => {
+    if (Array.isArray(leaderboard)) {
+      return leaderboard
+    } else {
+      return Object.keys(leaderboard).map(key => leaderboard[key])
+    }
+  }
+
+  const chartPlayersOfLeaderBoard = (leaderboard) => {
+    return asMappable(leaderboard).map(p => {
+      return {
+        id: p.id,
+        name: p.name
+      }
+    })
+  }
+
   return (
     <>
       <h1>Game Review: {params.gameId}</h1>
       <div>
         <h3>Final Chart</h3>
-        <FinalChart gameId={params.gameId} players={finalLeaderboard.map(p => p.id)}/>
+        <FinalChart gameId={params.gameId} players={chartPlayersOfLeaderBoard(finalLeaderboard)} />
       </div>
       <div>
         <h3>Analysis</h3>
@@ -145,7 +161,7 @@ function GameReview() {
       </div>
 
       <h3>Final leaderboard</h3>
-      <FinalBoard finalBoard={finalLeaderboard}/>
+      <FinalBoard finalBoard={asMappable(finalLeaderboard)} />
       <Table>
         <thead>
           <tr>
@@ -183,7 +199,7 @@ function GameReview() {
         </thead>
         <tbody>
           {
-            keyPoints.map((keyPoint) => (
+            mockKeyPoints.map((keyPoint) => (
               <tr key={keyPoint.id}>
                 <td>{keyPoint.title}</td>
                 <td style={{ width: '300px' }}>{keyPoint.description}</td>

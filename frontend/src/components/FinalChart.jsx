@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Line, LineChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import { MD5 } from 'crypto-js'
 
-import { fetchAllPlayers, fetchGameScores } from '../utils/requests'
+import { fetchGameScores } from '../utils/requests'
 
 function FinalChart({ gameId, players }) {
   const [chartData, setChartData] = useState([])
@@ -29,6 +29,9 @@ function FinalChart({ gameId, players }) {
     return colour.concat(hash)
   }
 
+  console.log("lmao")
+  console.log(players)
+
   return (
     <div>
       {
@@ -42,7 +45,7 @@ function FinalChart({ gameId, players }) {
         <YAxis type="number" yAxisId={1} />
         <CartesianGrid stroke="#111" strokeDasharray="5 5" />
 
-        {players.map((p) => {
+        {players?.map((p) => {
           return <Line
             key={p.id}
             connectNulls
