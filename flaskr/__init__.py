@@ -316,11 +316,15 @@ def create_app():
 
     @app.get("/api/<game_id>/review/stats")
     def review_stats(game_id):
-        pass
+        if not f"{game_id}_players" in db_client.xs.list_collection_names():
+            return ("Game id not found", NOT_FOUND)
+        return db_client.xs[f"{game_id}_review"].find_one({"item": "stats"})["stats"]
 
     @app.get("/api/<game_id>/review/analysis")
     def review_analysis(game_id):
-        pass
+        if not f"{game_id}_players" in db_client.xs.list_collection_names():
+            return ("Game id not found", NOT_FOUND)
+        return db_client.xs[f"{game_id}_review"].find_one({"item": "analysis"})["stats"]
 
     # FORGIVE ME
     bot_responses = {n: [f"Bot{n}", 0] for n in range(100)}

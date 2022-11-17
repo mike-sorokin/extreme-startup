@@ -90,15 +90,16 @@ class GamesManager:
             # Copy player/scoreboard data for game review.
             player_data = self.games[gid].get_players()
             scoreboard_data = self.games[gid].scoreboard
+            analysis_event_data = self.games[gid].analysis_events
 
             self.end_game(gid)  # ensures monitor threads are killed
             self.remove_game_players(gid)  # kills administering question threads
             self.unpause_game(gid)  # removes dangling administering question threads
             del self.games[gid]
 
-            self.analyse_game(gid, player_data, scoreboard_data)
+            self.analyse_game(gid, player_data, scoreboard_data, analysis_event_data)
 
-    def analyse_game(self, game_id, player_data, scoreboard):
+    def analyse_game(self, game_id, player_data, scoreboard, analysis_events):
         """
         Args:
         player_data :: { player_id -> Player }
@@ -123,9 +124,9 @@ class GamesManager:
 
         finalgraph = scoreboard.running_totals
 
-        stats = {}
+        analysis = [JSONEncoder().default(event) for event in analysis_events]
 
-        analysis = []
+        stats = {}
 
         # Upload basic-game data
         # data :: List[Player BSON]

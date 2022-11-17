@@ -17,8 +17,8 @@ class AnalysisEvent:
     def get_time(self):
         return self.time
 
-    def get_player(self):
-        return self.player
+    def get_player_id(self):
+        return self.player_id
 
 
 class AnalysisMonitor:
