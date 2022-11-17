@@ -79,6 +79,9 @@ class GamesManager:
     def get_player_events(self, game_id, player_id):
         return self.games[game_id].get_events(player_id)
 
+    def assist_player(self, game_id, player_name):
+        self.games[game_id].assist_player(player_name)
+
     def delete_games(self, *game_id):
         # Delete all game in game_id; if game_id is not provided, delete all games
         gids = game_id if game_id else self.games.keys()

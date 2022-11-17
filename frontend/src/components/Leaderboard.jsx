@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Badge, ColorSwatch, Container, Group, Space, Table, Title } from '@mantine/core'
+import { MD5 } from 'crypto-js'
 
 import { fetchAllPlayers } from '../utils/requests'
-import useSessionData from '../utils/useSessionData'
-import { MD5 } from 'crypto-js'
+import useSessionData from '../utils/hooks/useSessionData'
 
 import Chart from './Chart'
 

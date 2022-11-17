@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react'
 import { Outlet, useNavigate, useParams } from 'react-router-dom'
 import { Loader } from '@mantine/core'
 
-import { checkAuth } from './requests'
-import { gameUrl } from './urls'
-import { showErrorNotification } from './utils'
-import NotFound from '../components/NotFound'
+import { checkAuth } from '../requests'
+import { gameUrl } from '../urls'
+import { showErrorNotification } from '../utils'
+
+import NotFound from '../../components/NotFound'
 
 function AdminRoute () {
   const [loading, setLoading] = useState(true)

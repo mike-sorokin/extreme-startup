@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Badge, Button, Card, Container, Space, Switch, Title } from '@mantine/core'
+import { Badge, Button, Card, Container, Group, Space, Stack, Switch, Text, Title } from '@mantine/core'
 import { useClipboard } from '@mantine/hooks'
 
 import { fetchGame, updateAutoRoundAdvance, updateGame } from '../utils/requests'
-import ConfirmationModal from '../utils/ConfirmationModal'
 import { showInfoNotification } from '../utils/utils'
+import usePrevious from '../utils/hooks/usePrevious'
+
+import ConfirmationModal from '../utils/ConfirmationModal'
 
 function Admin () {
   const [playerNo, setPlayerNo] = useState(0)
   const [round, setRound] = useState(0)
   const [gamePaused, setGamePaused] = useState(false)
   const [openedEndGame, setOpenedEndGame] = useState(false)
+  const [teamsNeedingHelp, setTeamsNeedingHelp] = useState([])
+  const [teamsBeingHelped, setTeamsBeingHelped] = useState([])
+  const prevList = usePrevious(teamsNeedingHelp)
   const [autoAdvance, setAutoAdvance] = useState(false)
 
   const params = useParams()
@@ -28,6 +33,8 @@ function Admin () {
         setRound(response.round)
         setGamePaused(response.paused)
         setPlayerNo(response.players.length)
+        setTeamsNeedingHelp(response.players_to_assist.needs_assistance)
+        setTeamsBeingHelped(response.players_to_assist.being_assisted)
       } catch (error) {
         console.error(error)
       }
@@ -40,6 +47,14 @@ function Admin () {
       clearInterval(timer)
     }
   }, [params.gameId])
+
+  useEffect(() => {
+    for (const team of teamsNeedingHelp) {
+      if (!prevList.includes(team)) {
+        showInfoNotification('Notification', 'There are teams needing assistance!')
+      }
+    }
+  }, [teamsNeedingHelp])
 
   // Increments round
   const advanceRound = async () => {
@@ -73,8 +88,7 @@ function Admin () {
   // Send a {"stop": ""} request to stop the game
   const sendGameEnd = async () => {
     try {
-      const response = await updateGame(params.gameId, { end: '' })
-      console.log(response)
+      await updateGame(params.gameId, { end: '' })
     } catch (error) {
       // TODO
     } finally {
@@ -96,6 +110,18 @@ function Admin () {
     }
   }
 
+  // Send a put request to update which teams are being helped
+  const setHelping = async (team) => {
+    try {
+      await updateGame(params.gameId, { assisting: team })
+      setTeamsNeedingHelp(teamsNeedingHelp.filter((value) => { return value !== team }))
+      setTeamsBeingHelped([...teamsBeingHelped, team])
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  // Template helper functions below
   function togglePauseButton (color, text) {
     return <Button compact variant="outline"
       color={color}
@@ -117,7 +143,7 @@ function Admin () {
   }
 
   return (
-    <div>
+    <>
       <ConfirmationModal opened={openedEndGame} setOpened={setOpenedEndGame}
         title='End Game' body='Are you sure you want to end the game?' func={sendGameEnd} />
       <Container size="xl" px="xs">
@@ -176,7 +202,35 @@ function Admin () {
             : <></>}
         </Card>
       </Container>
-    </div>
+      <Space h="lg" />
+      {(teamsNeedingHelp.length >= 1 || teamsBeingHelped.length >= 1) &&
+        <Container size="xl" px="xs">
+        <Title order={2} color="dimmed"> Teams needing assistance </Title>
+        <Space h="md" />
+        <Card>
+          <Stack>
+            {teamsNeedingHelp?.map((team) => (
+              <Card shadow="sm" p="xs" sx={ (theme) => ({ '&:hover': { backgroundColor: theme.colors.dark[5] } })} key={team}>
+                <Group position="apart">
+                    <Text sx={{ paddingLeft: '1rem' }}>{team}</Text>
+                    <Button variant="light" onClick={() => { setHelping(team) }}>I am helping</Button>
+                  </Group>
+              </Card>
+            ))}
+            {teamsBeingHelped?.map((team) => (
+              <Card shadow="sm" p="xs" sx={ (theme) => ({ '&:hover': { backgroundColor: theme.colors.dark[5] } })} key={team}>
+                <Group position="apart">
+                  <Text sx={{ paddingLeft: '1rem' }}>{team}</Text>
+                  <Button variant="light" color="green" >Being helped!</Button>
+                  </Group>
+              </Card>
+            ))}
+          </Stack>
+        </Card>
+      </Container>
+      }
+
+    </>
   )
 }
 
