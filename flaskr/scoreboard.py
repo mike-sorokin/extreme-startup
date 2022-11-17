@@ -33,7 +33,7 @@ class Scoreboard:
         elif increment < 0:
             self.incorrect_tally[player.uuid] += 1
 
-            if question.problem == "ERROR_RESPONSE":
+            if question.problem in ["ERROR_RESPONSE", "NO_SERVER_RESPONSE"]:
                 player.streak += "0"
             else:
                 player.streak += "X"
