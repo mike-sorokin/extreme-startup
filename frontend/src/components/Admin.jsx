@@ -4,7 +4,7 @@ import { Badge, Button, Card, Container, Group, Space, Stack, Switch, Text, Titl
 import { useClipboard } from '@mantine/hooks'
 
 import { fetchGame, updateAutoRoundAdvance, updateGame } from '../utils/requests'
-import { showGeneralNotification, showErrorNotification } from '../utils/utils'
+import { showInfoNotification } from '../utils/utils'
 import usePrevious from '../utils/hooks/usePrevious'
 
 import ConfirmationModal from '../utils/ConfirmationModal'
@@ -28,7 +28,7 @@ function Admin () {
       try {
         const response = await fetchGame(params.gameId)
         if (autoAdvance && response.round > round) {
-          showErrorNotification('Round Advancement', 'The round has been automatically advanced')
+          showInfoNotification('Round Advancement', 'The round has been automatically advanced')
         }
         setRound(response.round)
         setGamePaused(response.paused)
@@ -51,7 +51,7 @@ function Admin () {
   useEffect(() => {
     for (const team of teamsNeedingHelp) {
       if (!prevList.includes(team)) {
-        showGeneralNotification('Notification', 'There are teams needing assistance!')
+        showInfoNotification('Notification', 'There are teams needing assistance!')
       }
     }
   }, [teamsNeedingHelp])

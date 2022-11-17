@@ -1,6 +1,6 @@
 import React from 'react'
 import { showNotification } from '@mantine/notifications'
-import { IconCheck, IconX, IconAlertTriangle, IconInfoSquare } from '@tabler/icons'
+import { IconCheck, IconX, IconAlertTriangle, IconInfoCircle } from '@tabler/icons'
 
 export function str (obj) {
   return JSON.stringify(obj)
@@ -38,12 +38,12 @@ export function showErrorNotification (header, msg) {
   })
 }
 
-export function showGeneralNotification (header, msg) {
+export function showInfoNotification (header, msg) {
   showNotification({
     title: header,
     message: msg,
-    icon: <IconInfoSquare size={18} />,
-    color: 'indigo'
+    icon: <IconInfoCircle size={18} />,
+    color: 'blue'
   })
 }
 
