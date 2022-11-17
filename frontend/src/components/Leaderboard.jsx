@@ -12,7 +12,7 @@ function Leaderboard () {
   const [leaderboard, setLeaderboard] = useState([])
 
   const params = useParams()
-  const [isAdmin, playerID] = useSessionData(params.gameId)
+  const [, playerID] = useSessionData(params.gameId)
 
   // Fetches list of all players every 2 seconds and sorts in descending order based on score
   useEffect(() => {

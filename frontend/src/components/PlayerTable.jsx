@@ -24,7 +24,8 @@ function PlayerTable ({ events }) {
               <td>{event.points_gained}</td>
               <td>{event.timestamp}</td>
               <td>
-                {event.response_type === 'NO_SERVER_RESPONSE' && (
+                {(event.response_type === 'NO_SERVER_RESPONSE' ||
+                  event.response_type === 'ERROR_RESPONSE') && (
                   <Badge color="yellow"> NO RESPONSE </Badge>
                 )}
                 {event.response_type === 'WRONG' && (
