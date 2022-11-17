@@ -8,7 +8,7 @@ import { withCurrentPlayerLiftedIfPresent } from '../utils/utils'
 import ConfirmationModal from '../utils/ConfirmationModal'
 import useSessionData from '../utils/hooks/useSessionData'
 
-function Players() {
+function Players () {
   const params = useParams()
   const navigate = useNavigate()
 
@@ -79,7 +79,6 @@ function Players() {
             </div>
             : <></>
         }
-
 
         <hr />
 
