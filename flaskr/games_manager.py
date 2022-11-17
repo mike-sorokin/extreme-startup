@@ -110,8 +110,8 @@ class GamesManager:
             JSONEncoder().default(player) for player in player_data.values()
         ]
 
-        finalboard = {
-            id: {
+        finalboard = [
+            {
                 "player_id": id,
                 "name": player.name,
                 "score": player.score,
@@ -120,7 +120,8 @@ class GamesManager:
                 / scoreboard.total_requests_for(player),
             }
             for id, player in player_data.items()
-        }
+        ]
+        finalboard.sort(key=lambda x: -x["score"])
 
         finalgraph = scoreboard.running_totals
 
