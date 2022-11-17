@@ -472,6 +472,15 @@ export async function deleteEvent (gameId, playerId, eventId) {
   }
 }
 
+export async function fetchFinalLeaderboard (gameId) {
+  try {
+    const response = await instance.get(reviewAPIs(gameId).finalboard)
+    return response.data
+  } catch (error) {
+    alertError(error)
+  }
+}
+
 // Helper functions
 
 /**

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Table } from '@mantine/core'
 import FinalChart from './FinalChart'
+import FinalBoard from './FinalBoard'
 
 function GameReview () {
   const params = useParams()
@@ -138,6 +139,7 @@ function GameReview () {
       </div>
 
       <h3>Final leaderboard</h3>
+      <FinalBoard/>
       <Table>
         <thead>
           <tr>
