@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Table } from '@mantine/core'
 import FinalChart from './FinalChart'
 import FinalBoard from './FinalBoard'
+import { fetchFinalLeaderboard } from '../utils/requests'
 
 function GameReview() {
   const params = useParams()
@@ -80,11 +81,11 @@ function GameReview() {
     const getReviewData = async () => {
       try {
         // Fetch game data here
+        const [leaderboardResponse] = await Promise.all([
+          fetchFinalLeaderboard(params.gameId),
+        ])
 
-        
-
-        setFinalLeaderboard(mockLeaderboard)
-        setFinalChart(mockChart)
+        setFinalLeaderboard(leaderboardResponse)
         setStats(mockStats)
         setKeyPoints(mockKeyPoints)
       } catch (error) {
@@ -144,7 +145,7 @@ function GameReview() {
       </div>
 
       <h3>Final leaderboard</h3>
-      <FinalBoard/>
+      <FinalBoard finalBoard={finalLeaderboard}/>
       <Table>
         <thead>
           <tr>
