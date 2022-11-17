@@ -79,6 +79,9 @@ function GameReview() {
     const getReviewData = async () => {
       try {
         // Fetch game data here
+
+        
+
         setFinalLeaderboard(mockLeaderboard)
         setFinalChart(mockChart)
         setStats(mockStats)
@@ -96,7 +99,7 @@ function GameReview() {
       <h1>Game Review: {params.gameId}</h1>
       <div>
         <h3>Final Chart</h3>
-        <FinalChart gameId={params.gameId} />
+        <FinalChart gameId={params.gameId} players={finalLeaderboard.map(p => p.id)}/>
       </div>
       <div>
         <h3>Analysis</h3>
@@ -151,7 +154,7 @@ function GameReview() {
           </tr>
         </thead>
         <tbody>
-          {
+          {/* {
             finalLeaderboard.map((player) => (
               <tr key={player.player_id}>
                 <td>{player.player_id}</td>
@@ -161,7 +164,7 @@ function GameReview() {
                 <td>{player.success_ratio * 100}%</td>
               </tr>
             ))
-          }
+          } */}
         </tbody>
       </Table>
 
