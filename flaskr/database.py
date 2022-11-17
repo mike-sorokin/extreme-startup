@@ -1,4 +1,4 @@
-import pymongo, os, json, subprocess, shutil
+import pymongo, os, json, subprocess, shutil, os
 
 
 def get_mongo_client(local=False):
@@ -7,6 +7,10 @@ def get_mongo_client(local=False):
     If not found, or if local=True, then boots a local server and connects to it.
     This local server will be completely fresh
     """
+
+    if "USE_LOCAL_MONGO_DB" in os.environ:
+        return pymongo.MongoClient("mongodb://localhost:27017")
+
 
     if local:
         destructive_start_localhost_mongo()

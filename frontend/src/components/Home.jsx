@@ -1,17 +1,23 @@
 import React, { useState } from 'react'
-import { Button, Card, Center, Modal, PasswordInput, Space, Stack, Text, Title } from '@mantine/core'
+import { useNavigate } from 'react-router-dom'
+import { Button, Card, Center, Modal, PasswordInput, Space, Stack, Text, TextInput, Title } from '@mantine/core'
 
 import { createNewGame } from '../utils/requests'
+import { gameReviewUrl } from '../utils/urls'
 import { showSuccessNotification } from '../utils/utils'
 
 import AddPlayer from './AddPlayer'
 import GoToGame from './GoToGame'
 
 function Home () {
+  const navigate = useNavigate()
+
   const [openedChoosePwd, setOpenedChoosePwd] = useState(false)
   const [openedCreateGame, setOpenedCreateGame] = useState(false)
   const [openedAddPlayer, setOpenedAddPlayer] = useState(false)
   const [openedInfo, setOpenedInfo] = useState(false)
+  const [openedReview, setOpenedReview] = useState(false)
+  const [gameReviewId, setGameReviewId] = useState('')
   const [newGameId, setNewGameId] = useState('')
   const [pwd, setPwd] = useState('')
 
@@ -36,6 +42,18 @@ function Home () {
     }
   }
 
+  const handleGameReview = async (event) => {
+    event.preventDefault()
+    try {
+      console.log(event)
+      console.log(gameReviewId)
+      // Check game id existed, if so redirect them to a new page with the GameReview component
+      navigate(gameReviewUrl(gameReviewId))
+    } catch (error) {
+
+    }
+  }
+
   // Dynamic styling for card to make sure it is not visible once a different modal is open
   const cardStyle = () => {
     const styles = {
@@ -48,7 +66,7 @@ function Home () {
     }
 
     // Sets visibility to hidden if another modal is open
-    if (openedChoosePwd || openedAddPlayer || openedCreateGame) {
+    if (openedChoosePwd || openedAddPlayer || openedCreateGame || openedInfo || openedReview) {
       styles.display = 'none'
     }
 
@@ -68,6 +86,20 @@ function Home () {
               placeholder="Game password" label="Enter game password:" required data-cy="password-input" />
               <Space h="md" />
             <Button variant="outline" color="green" type="submit">Create Game!</Button>
+          </form>
+        </div>
+      </Modal>
+      <Modal centered
+        opened={openedReview}
+        onClose={() => setOpenedReview(false)}
+        title="Enter Game ID"
+        withCloseButton={false}>
+        <div>
+          <form onSubmit={handleGameReview}>
+            <TextInput value={gameReviewId} onChange={(e) => setGameReviewId(e.target.value)}
+              placeholder="Game ID" label="Enter game ID:" required data-cy="game-review-id-input" />
+              <Space h="md" />
+            <Button variant="outline" color="green" type="submit">Review Game!</Button>
           </form>
         </div>
       </Modal>
@@ -125,6 +157,7 @@ function Home () {
           <Title order={1} color="white" weight={1000}>🔥 Extreme Startup 🔥</Title>
           <Button variant="outline" color="green" radius="md" size="lg" onClick={() => setOpenedChoosePwd(true)}>Create a Game!</Button>
           <Button variant="outline" color="orange" radius="md" size="lg" onClick={() => setOpenedAddPlayer(true)}>Join a Game!</Button>
+          <Button variant="outline" radius="md" size="lg" onClick={() => setOpenedReview(true)}>Review a Game</Button>
           <Button variant="outline" color="pink" radius="xl" onClick={() => setOpenedInfo(true)}>
             About Extreme Startup
           </Button>

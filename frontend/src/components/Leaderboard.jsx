@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { Badge, ColorSwatch, Container, Group, Space, Table, Title } from '@mantine/core'
 
 import { fetchAllPlayers } from '../utils/requests'
+import useSessionData from '../utils/useSessionData'
 import { MD5 } from 'crypto-js'
 
 import Chart from './Chart'
@@ -11,6 +12,7 @@ function Leaderboard () {
   const [leaderboard, setLeaderboard] = useState([])
 
   const params = useParams()
+  const [isAdmin, playerID] = useSessionData(params.gameId)
 
   // Fetches list of all players every 2 seconds and sorts in descending order based on score
   useEffect(() => {
@@ -66,7 +68,7 @@ function Leaderboard () {
           <tbody>
             {
               leaderboard.map((player) => (
-                <tr key={player.id}>
+                <tr key={player.id} style={(player.id === playerID) ? { background: 'rgb(255,255,255,0.1)' } : {}}>
                   <td>{player.id}</td>
                   <td style={{ color: stringToColour(player.name) }}>{player.name}</td>
 

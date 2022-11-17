@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Badge, Button, Card, Container, Group, Space, Stack, Text, Title } from '@mantine/core'
+import { Badge, Button, Card, Container, Group, Space, Stack, Switch, Text, Title } from '@mantine/core'
 import { useClipboard } from '@mantine/hooks'
 
-import { fetchGame, updateGame } from '../utils/requests'
+import { fetchGame, updateAutoRoundAdvance, updateGame } from '../utils/requests'
+import { showGeneralNotification, showErrorNotification } from '../utils/utils'
 import usePrevious from '../utils/hooks/usePrevious'
-import { showGeneralNotification } from '../utils/utils'
 import ConfirmationModal from '../utils/ConfirmationModal'
 
 function Admin () {
@@ -16,6 +16,7 @@ function Admin () {
   const [teamsNeedingHelp, setTeamsNeedingHelp] = useState([])
   const [teamsBeingHelped, setTeamsBeingHelped] = useState([])
   const prevList = usePrevious(teamsNeedingHelp)
+  const [autoAdvance, setAutoAdvance] = useState(false)
 
   const params = useParams()
   const clipboard = useClipboard({ timeout: 500 })
@@ -25,6 +26,9 @@ function Admin () {
     const getGameData = async () => {
       try {
         const response = await fetchGame(params.gameId)
+        if (autoAdvance && response.round > round) {
+          showErrorNotification('Round Advancement', 'The round has been automatically advanced')
+        }
         setRound(response.round)
         setGamePaused(response.paused)
         setPlayerNo(response.players.length)
@@ -66,11 +70,12 @@ function Admin () {
     }
   }
 
-  // Send a {"pause": ""} request to unpause, {"pause": "p"} to pause
-  const togglePauseRound = async () => {
+  // Toggle automatic round advancement
+  const toggleAutoAdvance = async (e) => {
+    const isAuto = e.currentTarget.checked
     try {
-      const response = await updateGame(params.gameId, { pause: (gamePaused ? '' : 'p') })
-      setGamePaused(response === 'GAME_PAUSED')
+      const response = await updateAutoRoundAdvance(params.gameId, { auto: isAuto })
+      setAutoAdvance(response === 'GAME_AUTO_ON')
     } catch (error) {
       console.error(error)
       if (error.response && error.response.status === 401) {
@@ -91,6 +96,19 @@ function Admin () {
     }
   }
 
+  // Send a {"pause": ""} request to unpause, {"pause": "p"} to pause
+  const togglePauseRound = async () => {
+    try {
+      const response = await updateGame(params.gameId, { pause: (gamePaused ? '' : 'p') })
+      setGamePaused(response === 'GAME_PAUSED')
+    } catch (error) {
+      console.error(error)
+      if (error.response && error.response.status === 401) {
+        alert('401 - Unauthenticated request')
+      }
+    }
+  }
+
   // Send a put request to update which teams are being helped
   const setHelping = async (team) => {
     try {
@@ -102,7 +120,7 @@ function Admin () {
     }
   }
 
-  // Template helpers
+  // Template helper functions below
   function togglePauseButton (color, text) {
     return <Button compact variant="outline"
       color={color}
@@ -174,6 +192,13 @@ function Admin () {
               : togglePauseButton('yellow', 'Pause')
             }
           </div>
+          {round > 0
+            ? <Switch
+                label="Automatic Round Advancement"
+                size="md"
+                checked={autoAdvance} onChange={(e) => toggleAutoAdvance(e)}
+              />
+            : <></>}
         </Card>
       </Container>
       <Space h="lg" />

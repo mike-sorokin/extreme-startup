@@ -3,6 +3,7 @@ import { Outlet, useNavigate, useParams } from 'react-router-dom'
 import { Loader } from '@mantine/core'
 
 import { checkAuth } from '../requests'
+import { gameUrl } from '../urls'
 import { showErrorNotification } from '../utils'
 import NotFound from '../../components/NotFound'
 
@@ -22,7 +23,7 @@ function AdminRoute () {
       if (!response.authorized) {
         setLoading(false)
         showErrorNotification('Error', 'You are not authorized to view the admin page!')
-        navigate('/' + params.gameId)
+        navigate(gameUrl(params.gameId))
         return
       }
 

@@ -6,6 +6,7 @@ import Player from './components/Player'
 import Players from './components/Players'
 import Admin from './components/Admin'
 import Leaderboard from './components/Leaderboard'
+import GameReview from './components/GameReview'
 import NotFound from './components/NotFound'
 
 import AdminRoute from './utils/routes/AdminRoute'
@@ -26,6 +27,7 @@ function App () {
             <Route index element={<Leaderboard />} />
           </Route>
         </Route>
+        <Route path="/review/:gameId" element={<GameReview />}/>
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>

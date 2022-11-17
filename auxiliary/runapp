@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 set -e
+
+export USE_LOCAL_MONGO_DB="true"
 # Clean up
 rm -rf env frontend/node_modules
 rm -rf flaskr/static flaskr/templates
