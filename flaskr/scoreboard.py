@@ -40,7 +40,6 @@ class Scoreboard:
             
             player.curr_streak_length = 0
 
-        self.record_request_for(player)
         player.score = self.scores[player.uuid]
         event = Event(
             player.uuid,

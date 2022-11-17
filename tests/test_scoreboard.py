@@ -185,6 +185,7 @@ def test_reseting_player_sets_score_and_tally_to_zero_but_retain_request_count(
     )
 
     scoreboard.increment_score_for(player, question)
+    scoreboard.record_request_for(player)
     assert scoreboard.scores[player.uuid] == 10
     assert scoreboard.correct_tally[player.uuid] == 1
     assert scoreboard.incorrect_tally[player.uuid] == 0

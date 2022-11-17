@@ -113,6 +113,7 @@ class GamesManager:
 
         # Log game analysis 
 
+
         # Upload game data + review/analysis
         self.upload_data(
             game_id,
@@ -193,18 +194,18 @@ class GamesManager:
                 if is_on_streak and (i + 1 == len(player_events) or event.points_gained < 0):  # qustion response wrong or error response 
                     # curr_streak has ended! 
                     # account for this and reset is_on_streak to false 
+                    curr_streak_length += int(i + 1 == len(player_events))
                     total_streak_length += curr_streak_length
                     total_num_of_streaks += 1
 
                     if curr_streak_length > 6: # player was on fire 
-                        strk_duration  = (event.timestamp - player_events[i-curr_streak_length].timestamp).total_seconds()
-
+                        strk_duration  = (event.timestamp - player_events[i - curr_streak_length + 1].timestamp).total_seconds()
                         total_on_fire_duration += strk_duration
                         total_num_of_on_fires += 1
 
                         if curr_streak_length > longest_streak_length: 
-                            longest_fire_duration = strk_duration
-                            logest_on_fire_team = player.name
+                            longest_on_fire_duration = strk_duration
+                            longest_on_fire_team = player.name
 
                     longest_streak_length = max(longest_streak_length, curr_streak_length)
 
@@ -225,6 +226,7 @@ class GamesManager:
             return encoded_players, finalboard, { "total_requests" : 0 }
 
         # LOG global game stats
+        stats["num_players"] = num_players
         stats["total_requests"] = total_requests
         stats["average_streak"] = total_player_avg_streak / num_players
 
@@ -247,7 +249,6 @@ class GamesManager:
         return encoded_players, finalboard, stats
 
     def upload_data(self, game_id, players_data, **reviews_items):
-        
         self.db_client.xs[f"{game_id}_players"].insert_many(players_data)
         self.db_client.xs[f"{game_id}_review"].insert_many(
             [{"item": k, "stats": v} for k, v in reviews_items.items()]
