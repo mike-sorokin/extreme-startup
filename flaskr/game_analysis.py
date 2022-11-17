@@ -129,7 +129,6 @@ class EpicComebackMonitor(AnalysisMonitor):
 
     def check(self):
         # INVARIANCE: Player are can't be in potential_players and transition_players at the same time
-        print("<<3", self.potential_players, self.transition_players)
         for pid in self.scoreboard.leaderboard_bottom_k_percentile_players(20):
             try:
                 curr_pos = self.scoreboard.leaderboard_position_id(pid)
@@ -146,7 +145,6 @@ class EpicComebackMonitor(AnalysisMonitor):
                 player_in_top_percentile = self.scoreboard.player_in_top_k_percentile(
                     pid, 20
                 )
-                print("<<4", player_in_top_percentile)
             except ValueError:
                 del self.potential_players[pid]
                 continue
@@ -188,6 +186,8 @@ class EpicFailMonitor(AnalysisMonitor):
     gradually over a long period of time. If check pass, log corresponding event.
     """
 
+    DURATION_REQUIRED = 5
+
     def __init__(self, logger, scoreboard):
         super().__init__(logger, scoreboard)
         self.potential_players = dict()  # player_id -> highest_score
@@ -206,14 +206,12 @@ class EpicFailMonitor(AnalysisMonitor):
             if pid in self.potential_players:
                 self.potential_players[pid] = min(self.potential_players[pid], curr_pos)
             else:
-                self.potential_players[pid] = self.scoreboard.leaderboard_position_id(
-                    pid
-                )
+                self.potential_players[pid] = curr_pos
 
-        for entry in self.potential_players:
+        for pid, highest_score in list(self.potential_players.items()):
             try:
                 player_in_bottom_percentile = (
-                    self.scoreboard.player_in_bottom_k_percentile(entry["pid"], 20)
+                    self.scoreboard.player_in_bottom_k_percentile(pid, 20)
                 )
             except ValueError:
                 del self.potential_players[pid]
@@ -221,29 +219,29 @@ class EpicFailMonitor(AnalysisMonitor):
 
             if player_in_bottom_percentile:
                 self.transition_players[pid] = {
-                    "best": self.potential_players[pid],
+                    "best": highest_score,
                     "time_in": time.time(),
                 }
                 del self.potential_players[pid]
 
-        for entry in self.transition_players:
+        for pid, entry in list(self.transition_players.items()):
             try:
                 player_in_bottom_percentile = (
-                    self.scoreboard.player_in_bottom_k_percentile(entry["pid"], 20)
+                    self.scoreboard.player_in_bottom_k_percentile(pid, 20)
                 )
             except KeyError:
                 del self.transition_players[pid]
                 continue
 
             if not player_in_bottom_percentile:
-                self.transition_players[pid] = self.potential_players[pid]["best"]
-                del self.potential_players[pid]
-            elif time.time() - self.potential_players[pid]["time_in"] > 5000:
+                self.potential_players[pid] = entry["best"]
+                del self.transition_players[pid]
+            elif time.time() - entry["time_in"] > EpicFailMonitor.DURATION_REQUIRED:
                 self.log_func(
                     AnalysisEvent(
                         "Epic Fail",
                         "player X started his epic fail which was at least 5 seconds long",
-                        self.prev_player,
+                        pid,
                     )
                 )
-                del self.potential_players[pid]
+                del self.transition_players[pid]

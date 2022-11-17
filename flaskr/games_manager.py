@@ -123,7 +123,7 @@ class GamesManager:
 
         finalgraph = scoreboard.running_totals
 
-        stats = {"total"}
+        stats = {}
 
         analysis = []
 

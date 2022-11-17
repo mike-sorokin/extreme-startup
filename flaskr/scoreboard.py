@@ -135,7 +135,7 @@ class Scoreboard:
             (100 - k) * len(self.scores) / 100
         )
 
-    def leaderboard_top_k_precentile_players(self, k):
+    def leaderboard_top_k_percentile_players(self, k):
         end_index = floor(k * len(self.scores) / 100)
         return list(self.leaderboard())[0:end_index]
 
