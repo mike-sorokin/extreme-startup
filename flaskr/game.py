@@ -14,7 +14,7 @@ ADVANCE_RATIO = 0.2
 # 0 -> No server response
 STREAK_CHARS = ["1", "X", "0"]
 
-GAME_ANALYSIS_MONITOR = [NewLeaderMonitor, NewLastPlayerMonitor]
+GAME_ANALYSIS_MONITOR = [NewLeaderMonitor, NewLastPlayerMonitor, EpicComebackMonitor]
 
 # Most fundamental object in application -- stores information of players, scoreboard, questions gen., etc.
 class Game:
