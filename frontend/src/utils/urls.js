@@ -82,6 +82,6 @@ export function reviewAPIs (gameId) {
     finalgraph: urlFor('finalgraph'),
     finalboard: urlFor('finalboard'),
     stats: urlFor('stats'),
-    analysis: urlFor('analysis'),
+    analysis: urlFor('analysis')
   }
 }
