@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { Table, Title, Card, Grid, Space } from '@mantine/core'
 import FinalChart from './FinalChart'
 import FinalBoard from './FinalBoard'
+import FinalStats from './FinalStats'
 import { fetchFinalLeaderboard } from '../utils/requests'
 
 function GameReview () {
@@ -74,6 +75,14 @@ function GameReview () {
               <Title order={1} color="white" weight={1000}>Final leaderboard</Title>
               <Space h='lg' />
               <FinalBoard finalBoard={asMappable(finalLeaderboard)} />
+            </Card>
+        </Grid.Col>
+
+        <Grid.Col lg={6} md={12}>
+            <Card sx={{ height: '100%' }}>
+              <Title order={1} color="white" weight={1000}>Stats</Title>
+              <Space h='lg' />
+              <FinalStats/>
             </Card>
         </Grid.Col>
       </Grid>

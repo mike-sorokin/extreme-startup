@@ -32,7 +32,6 @@ function FinalBoard ({ finalBoard }) {
                 <th>Score</th>
                 <th>Success Rate</th>
                 <th>Longest Streak</th>
-                <th></th>
               </tr>
             </thead>
             <tbody>
