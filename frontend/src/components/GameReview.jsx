@@ -3,25 +3,15 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Table, Title, Card, Grid } from '@mantine/core'
 import FinalChart from './FinalChart'
 import FinalBoard from './FinalBoard'
-import { fetchFinalLeaderboard } from '../utils/requests'
+import { fetchFinalLeaderboard, fetchFinalStats, fetchFinalAnalysis } from '../utils/requests'
 
-function GameReview () {
+function GameReview() {
   const params = useParams()
   // const navigate = useNavigate()
 
   const [finalLeaderboard, setFinalLeaderboard] = useState([])
-  // const [stats, setStats] = useState({})
-  // const [keyPoints, setKeyPoints] = useState([])
-
-  const mockKeyPoints = [
-    {
-      title: 'key point 1',
-      description: 'player X beat previous leader and maintained that position for more than 15 seconds',
-      occurence_time: 30000,
-      achieved_by_team: 'team 2'
-    }
-  ]
-
+  const [stats, setStats] = useState({})
+  const [keyPoints, setKeyPoints] = useState([])
   useEffect(() => {
     const getReviewData = async () => {
       try {
@@ -30,15 +20,21 @@ function GameReview () {
           fetchFinalLeaderboard(params.gameId)
         ])
 
+        const [analysisResponse] = await Promise.all([
+          fetchFinalAnalysis(params.gameId)
+        ])
+
         setFinalLeaderboard(leaderboardResponse)
-        // setStats(mockStats)
-        // setKeyPoints(mockKeyPoints)
+        setStats(await fetchFinalStats(params.gameId))
+        setKeyPoints(analysisResponse)
+
       } catch (error) {
         console.error(error)
       }
     }
 
     getReviewData()
+    console.log(stats)
   }, [])
 
   const asMappable = (leaderboard) => {
@@ -70,10 +66,10 @@ function GameReview () {
         </Grid.Col>
 
         <Grid.Col span={4} md={3} lg={4}>
-            <Card sx={{ height: '100%', overflow: 'auto' }}>
-              <Title order={1} color="white" weight={1000}>Final leaderboard</Title>
-              <FinalBoard finalBoard={asMappable(finalLeaderboard)} />
-            </Card>
+          <Card sx={{ height: '100%', overflow: 'auto' }}>
+            <Title order={1} color="white" weight={1000}>Final leaderboard</Title>
+            <FinalBoard finalBoard={asMappable(finalLeaderboard)} />
+          </Card>
         </Grid.Col>
       </Grid>
 
@@ -92,7 +88,7 @@ function GameReview () {
         </thead>
         <tbody>
           {
-            mockKeyPoints.map((keyPoint) => (
+            asMappable(keyPoints).map((keyPoint) => (
               <tr key={keyPoint.id}>
                 <td>{keyPoint.title}</td>
                 <td style={{ width: '300px' }}>{keyPoint.description}</td>
