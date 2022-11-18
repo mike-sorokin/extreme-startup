@@ -2,8 +2,10 @@ from uuid import uuid4
 from flaskr.question_factory import QuestionFactory
 from flaskr.scoreboard import Scoreboard
 from flaskr.quiz_master import QuizMaster
+from flaskr.game_analysis import *
 import threading
 import time
+
 
 ADVANCE_RATIO = 0.2
 
@@ -11,6 +13,13 @@ ADVANCE_RATIO = 0.2
 # X -> Wrong/Incorrect
 # 0 -> No server response
 STREAK_CHARS = ["1", "X", "0"]
+
+GAME_ANALYSIS_MONITOR = [
+    NewLeaderMonitor,
+    NewLastPlayerMonitor,
+    EpicComebackMonitor,
+    EpicFailMonitor,
+]
 
 # Most fundamental object in application -- stores information of players, scoreboard, questions gen., etc.
 class Game:
@@ -33,6 +42,12 @@ class Game:
 
         self.players_to_assist = { "needs_assistance": [], "being_assisted": [] }
         self.auto_mode = False
+
+        self.analysis_monitors = [
+            monitor(self.log_analysis_events, self.scoreboard)
+            for monitor in GAME_ANALYSIS_MONITOR
+        ]
+        self.analysis_events = []
 
     def compare_password(self, password):
         return password == self.admin_password
@@ -75,6 +90,7 @@ class Game:
                 if self.auto_mode and self.round != 0:
                     self.__auto_increment_round()
                 self.__update_players_to_assist()
+                self.__monitor_analysis_events()
 
             time.sleep(2)
 
@@ -134,6 +150,14 @@ class Game:
 
     def get_player_events(self, player_id):
         return self.players[player_id].events
+
+    def log_analysis_events(self, analysis_event):
+        print(analysis_event.get_description())
+        self.analysis_events.append(analysis_event)
+
+    def __monitor_analysis_events(self):
+        for monitor in self.analysis_monitors:
+            monitor.check()
 
     def __update_players_to_assist(self):
         needs_assistance = self.players_to_assist["needs_assistance"]

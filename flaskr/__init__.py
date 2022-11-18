@@ -30,10 +30,10 @@ ERROR_405 = 405
 DELETE_SUCCESS = 204
 UNAUTHORIZED_CODE = 401
 
-DELETE_SUCCESSFUL = ("Successfully deleted", 204)
-NOT_ACCEPTABLE = ("Unacceptable request - Requested resource not found", 406)
-UNAUTHORIZED = ("Unauthenticated request", 401)
-METHOD_NOT_ALLOWED = ("HTTP Method not allowed", 405)
+DELETE_SUCCESSFUL = ("Successfully deleted", DELETE_SUCCESS)
+NOT_ACCEPTABLE = ("Unacceptable request - Requested resource not found", NOT_ACCEPTED)
+UNAUTHORIZED = ("Unauthenticated request", UNAUTHORIZED_CODE)
+METHOD_NOT_ALLOWED = ("HTTP Method not allowed", ERROR_405)
 
 
 def create_app():
@@ -100,10 +100,10 @@ def create_app():
             return NOT_ACCEPTABLE
 
         if request.method == "GET":
-            res = {"authorized": is_admin(game_id, session), "player" : ""}
+            res = {"authorized": is_admin(game_id, session), "player": ""}
 
             if get_player(session)[0]:
-                res["player"] =  get_player(session)[1]
+                res["player"] = get_player(session)[1]
 
             return res
 
@@ -164,9 +164,9 @@ def create_app():
                 ended_games.append(game_id)           # <-------------------- TODO REMOVE LATER AND ASAP(AP)
                 return ("GAME_ENDED", 200)
 
-            elif "assisting" in r: # r["assisting"] is player_name 
+            elif "assisting" in r: # r["assisting"] is player_name
                 games_manager.assist_player(game_id, r["assisting"])
-                return ("ASSISTING {}".format(r["assisting"].upper()), 200) 
+                return ("ASSISTING {}".format(r["assisting"].upper()), 200)
 
             return NOT_ACCEPTABLE
 
@@ -314,24 +314,35 @@ def create_app():
 
     @app.get("/api/<game_id>/review/existed")
     def game_existed(game_id):
-        pass
+        return {"existed": f"{game_id}_players" in db_client.xs.list_collection_names()}
 
     @app.get("/api/<game_id>/review/finalboard")
     def total_player_scores(game_id):
-        pass
+        if not f"{game_id}_players" in db_client.xs.list_collection_names():
+            return ("Game id not found", NOT_FOUND)
+        return db_client.xs[f"{game_id}_review"].find_one({"item": "finalboard"})[
+            "stats"
+        ]
 
     @app.get("/api/<game_id>/review/finalgraph")
     def final_game_graph(game_id):
-        pass
+        if not f"{game_id}_players" in db_client.xs.list_collection_names():
+            return ("Game id not found", NOT_FOUND)
+        return db_client.xs[f"{game_id}_review"].find_one({"item": "finalgraph"})[
+            "stats"
+        ]
 
     @app.get("/api/<game_id>/review/stats")
     def review_stats(game_id):
-        pass
+        if not f"{game_id}_players" in db_client.xs.list_collection_names():
+            return ("Game id not found", NOT_FOUND)
+        return db_client.xs[f"{game_id}_review"].find_one({"item": "stats"})["stats"]
 
     @app.get("/api/<game_id>/review/analysis")
     def review_analysis(game_id):
-        pass 
-
+        if not f"{game_id}_players" in db_client.xs.list_collection_names():
+            return ("Game id not found", NOT_FOUND)
+        return db_client.xs[f"{game_id}_review"].find_one({"item": "analysis"})["stats"]
 
     # FORGIVE ME
     bot_responses = {n: [f"Bot{n}", 0] for n in range(100)}

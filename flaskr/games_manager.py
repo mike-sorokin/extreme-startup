@@ -63,6 +63,9 @@ class GamesManager:
     def get_game_players(self, game_id, *player_id):
         return self.games[game_id].get_players(*player_id)
 
+    def get_score_for_player(self, game_id, player_id):
+        return self.games[game_id].scoreboard.scores[player_id]
+
     def remove_game_players(self, game_id, *player_id):
         self.games[game_id].remove_players(*player_id)
 
@@ -86,20 +89,20 @@ class GamesManager:
         # Delete all game in game_id; if game_id is not provided, delete all games
         gids = game_id if game_id else self.games.keys()
 
-        for gid in list(gids): 
-            # Copy player/scoreboard data for game review. 
+        for gid in list(gids):
+            # Copy player/scoreboard data for game review.
             player_data = self.games[gid].get_players()
             scoreboard_data = self.games[gid].scoreboard
+            analysis_event_data = self.games[gid].analysis_events
 
             self.end_game(gid)  # ensures monitor threads are killed
-            self.remove_game_players(gid) # kills administering question threads 
+            self.remove_game_players(gid)  # kills administering question threads
             self.unpause_game(gid)  # removes dangling administering question threads
             del self.games[gid]
 
-            self.analyse_game(gid, player_data, scoreboard_data) 
-    
+            self.analyse_game(gid, player_data, scoreboard_data, analysis_event_data)
 
-    def analyse_game(self, game_id, player_data, scoreboard_data):
+    def analyse_game(self, game_id, player_data, scoreboard, analysis_events):
         """
         Args:
         player_data :: { player_id -> Player }
@@ -107,15 +110,43 @@ class GamesManager:
         """
 
         encoded_players = [
-            JSONEncoder().default(player)
-            for player in player_data.values()
+            JSONEncoder().default(player) for player in player_data.values()
         ]
 
-        # Upload basic-game data 
+        finalboard = [
+            {
+                "player_id": id,
+                "name": player.name,
+                "score": player.score,
+                "longest_streak": player.longest_streak,
+                "success_ratio": scoreboard.current_total_correct(player)
+                / scoreboard.total_requests_for(player),
+            }
+            for id, player in player_data.items()
+        ]
+        finalboard.sort(key=lambda x: -x["score"])
+
+        finalgraph = scoreboard.running_totals
+
+        analysis = [JSONEncoder().default(event) for event in analysis_events]
+
+        stats = {}
+
+        # Upload basic-game data
         # data :: List[Player BSON]
-        self.upload_data(game_id, encoded_players)
+        self.upload_data(
+            game_id,
+            encoded_players,
+            finalboard=finalboard,
+            finalgraph=finalgraph,
+            stats=stats,
+            analysis=analysis,
+        )
 
-
-    def upload_data(self, game_id, data):
-        if len(data) > 0:
-            self.db_client.xs[game_id].insert_many(data)
+    def upload_data(self, game_id, players_data, **reviews_items):
+        if len(players_data) > 0:
+            print("Writing to database")
+            self.db_client.xs[f"{game_id}_players"].insert_many(players_data)
+            self.db_client.xs[f"{game_id}_review"].insert_many(
+                [{"item": k, "stats": v} for k, v in reviews_items.items()]
+            )
