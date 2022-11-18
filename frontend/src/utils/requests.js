@@ -224,7 +224,7 @@ export async function createModerator (gameId, data) {
  * @return {Promise<Array<obj(time:timestamp, player1: player1score, ..., playerN: playerNscores)>>}
  * List of all score records corresponding to a timestamp
  */
-export async function fetchGameScores (gameId, loadOldGame=false) {
+export async function fetchGameScores (gameId, loadOldGame = false) {
   try {
     const apiEndPoint = loadOldGame ? reviewAPIs(gameId).finalgraph : scoresAPI(gameId)
     const response = await instance.get(apiEndPoint)
@@ -498,17 +498,17 @@ export async function fetchFinalLeaderboard (gameId) {
   }
 }
 
-export async function fetchFinalStats (gameId) {
+export async function fetchFinalAnalysis (gameId) {
   try {
-    const response = await instance.get(reviewAPIs(gameId).stats)
+    const response = await instance.get(reviewAPIs(gameId).analysis)
     return response.data
   } catch (error) {
     alertError(error)
   }
 }
-export async function fetchFinalAnalysis (gameId) {
+export async function fetchFinalStats (gameId) {
   try {
-    const response = await instance.get(reviewAPIs(gameId).analysis)
+    const response = await instance.get(reviewAPIs(gameId).stats)
     return response.data
   } catch (error) {
     alertError(error)
