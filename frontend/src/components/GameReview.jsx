@@ -11,37 +11,37 @@ const sampleKeyPoints =
     "title": "Lorem Ipsum",
     "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
     "occurrence_time": 12345,
-    "acheived_by_team": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
+    "player_id": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
   },
   {
     "title": "Lorem Ipsum",
     "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
     "occurrence_time": 12345,
-    "acheived_by_team": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
+    "player_id": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
   },
   {
     "title": "Lorem Ipsum",
     "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
     "occurrence_time": 12345,
-    "acheived_by_team": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
+    "player_id": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
   },
   {
     "title": "Lorem Ipsum",
     "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
     "occurrence_time": 12345,
-    "acheived_by_team": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
+    "player_id": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
   },
   {
     "title": "Lorem Ipsum",
     "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
     "occurrence_time": 12345,
-    "acheived_by_team": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
+    "player_id": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
   },
   {
     "title": "Lorem Ipsum",
     "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
     "occurrence_time": 12345,
-    "acheived_by_team": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
+    "player_id": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
   },
 ]
 
@@ -148,7 +148,6 @@ function GameReview() {
                       <td>{keyPoint.title}</td>
                       <td style={{width: desc_percentage}}>{keyPoint.description}</td>
                       <td>{keyPoint.occurrence_time}</td>
-                      <td>{keyPoint.acheived_by_team}</td>
                     </tr>
                   ))
                 }
