@@ -13,6 +13,7 @@ import ConfirmationModal from '../utils/ConfirmationModal'
 function Admin () {
   const [playerNo, setPlayerNo] = useState(0)
   const [round, setRound] = useState(0)
+  const [maxRound, setMaxRound] = useState(0)
   const [gamePaused, setGamePaused] = useState(false)
   const [openedEndGame, setOpenedEndGame] = useState(false)
   const [teamsNeedingHelp, setTeamsNeedingHelp] = useState([])
@@ -33,6 +34,7 @@ function Admin () {
           showInfoNotification('Current Round: ' + response.round, 'The round has been automatically advanced')
         }
         setRound(response.round)
+        setMaxRound(7)
         setGamePaused(response.paused)
         setPlayerNo(response.players.length)
         setTeamsNeedingHelp(response.players_to_assist.needs_assistance)
@@ -186,7 +188,7 @@ function Admin () {
               style={{ marginLeft: '10%' }}
               color="indigo"
               radius="md" size="md"
-              disabled={autoAdvance}
+              disabled={autoAdvance || round >= maxRound}
               onClick={() => advanceRound()}
               data-cy='advance-round-button'>
               Advance Round
