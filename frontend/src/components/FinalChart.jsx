@@ -5,7 +5,7 @@ import { MD5 } from 'crypto-js'
 import { fetchGameScores } from '../utils/requests'
 import { useEffect } from 'react'
 
-function FinalChart({ gameId, players }) {
+function FinalChart ({ gameId, players }) {
   const [chartData, setChartData] = useState([])
 
   
@@ -42,9 +42,9 @@ function FinalChart({ gameId, players }) {
   return (
     <div>
       {
-        /* 
-          TODO: This is a copypast from Chart. A good idea would be 
-          to extract comon code to a separate component 
+        /*
+          TODO: This is a copypast from Chart. A good idea would be
+          to extract comon code to a separate component
         */
       }
       <LineChart width={750} height={450} data={chartData}>

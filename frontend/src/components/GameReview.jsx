@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Table } from '@mantine/core'
+import { Table, Title, Card } from '@mantine/core'
 import FinalChart from './FinalChart'
 import FinalBoard from './FinalBoard'
 import { fetchFinalLeaderboard } from '../utils/requests'
 
-function GameReview() {
+function GameReview () {
   const params = useParams()
   const navigate = useNavigate()
 
@@ -39,7 +39,7 @@ function GameReview() {
     average_on_fire_duration: 0,
     longest_on_fire_duration: {
       achieved_by_team: 0,
-      'value': 0
+      value: 0
     },
     longest_streak: {
       correct_answers_in_a_row: 0,
@@ -81,7 +81,7 @@ function GameReview() {
       try {
         // Fetch game data here
         const [leaderboardResponse] = await Promise.all([
-          fetchFinalLeaderboard(params.gameId),
+          fetchFinalLeaderboard(params.gameId)
         ])
 
         setFinalLeaderboard(leaderboardResponse)
@@ -160,32 +160,10 @@ function GameReview() {
         )} */}
       </div>
 
-      <h3>Final leaderboard</h3>
-      <FinalBoard finalBoard={asMappable(finalLeaderboard)} />
-      <Table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Player Name</th>
-            <th>Score</th>
-            <th>Longest Streak</th>
-            <th>Success %</th>
-          </tr>
-        </thead>
-        <tbody>
-          {/* {
-            finalLeaderboard.map((player) => (
-              <tr key={player.player_id}>
-                <td>{player.player_id}</td>
-                <td>{player.name}</td>
-                <td>{player.score}</td>
-                <td>{player.longest_streak}</td>
-                <td>{player.success_ratio * 100}%</td>
-              </tr>
-            ))
-          } */}
-        </tbody>
-      </Table>
+      <Card sx={{ maxHeight: '200px', overflow: 'auto' }}>
+        <Title order={1} color="white" weight={1000}>Final leaderboard</Title>
+        <FinalBoard finalBoard={asMappable(finalLeaderboard)} />
+      </Card>
 
       <h3>Key points</h3>
       <Table>
