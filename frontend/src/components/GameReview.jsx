@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Table, Title, Card, Grid } from '@mantine/core'
+import { Table, Title, Card, Grid, Text } from '@mantine/core'
 import FinalChart from './FinalChart'
 import FinalBoard from './FinalBoard'
 import { fetchFinalLeaderboard, fetchFinalStats, fetchFinalAnalysis } from '../utils/requests'
@@ -35,6 +35,8 @@ function GameReview() {
 
     getReviewData()
     console.log(stats)
+    console.log(keyPoints)
+
   }, [])
 
   const asMappable = (leaderboard) => {
@@ -58,6 +60,9 @@ function GameReview() {
     <>
       <h1>Game Review: {params.gameId}</h1>
       <Grid style={{ maxWidth: '100%' }}>
+        <Text>
+          {JSON.stringify(stats)}
+        </Text>
         <Grid.Col span={8} md={6} lg={8}>
           <Card>
             <Title order={1} color="white" weight={1000}>Final Chart</Title>
@@ -92,8 +97,8 @@ function GameReview() {
               <tr key={keyPoint.id}>
                 <td>{keyPoint.title}</td>
                 <td style={{ width: '300px' }}>{keyPoint.description}</td>
-                <td>{keyPoint.occurence_time}</td>
-                <td>{keyPoint.acheived_by_team}</td>
+                <td>{keyPoint.time}</td>
+                <td>{keyPoint.player_id}</td>
               </tr>
             ))
           }
