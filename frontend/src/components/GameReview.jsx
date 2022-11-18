@@ -46,7 +46,7 @@ import { fetchFinalLeaderboard, fetchFinalStats, fetchFinalAnalysis } from '../u
 //     }
 //   ]
 
-function GameReview () {
+function GameReview() {
   const params = useParams()
 
   const [finalLeaderboard, setFinalLeaderboard] = useState([])
@@ -147,7 +147,8 @@ function GameReview () {
                     <tr key={keyPoint.id}>
                       <td>{keyPoint.title}</td>
                       <td style={{ width: descPercentage }}>{keyPoint.description}</td>
-                      <td>{keyPoint.occurrence_time}</td>
+                      <td>{keyPoint.time}</td>
+                      <td>{keyPoint.player_id}</td>
                     </tr>
                   ))
                 }
