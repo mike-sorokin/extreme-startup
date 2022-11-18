@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Container, Space, Table } from '@mantine/core'
+import { Container, Table } from '@mantine/core'
 
 // finalBoard prop should be an array of objects, one for each player
 function FinalBoard ({ finalBoard }) {
@@ -19,8 +19,6 @@ function FinalBoard ({ finalBoard }) {
 
   return (
       <Container size="xl" px="sm">
-        {/* <Title order={1} color="white" weight={1000}>Leaderboard</Title> */}
-        <Space h='xl' /> <br />
         {
           <Table>
             <thead>
@@ -37,7 +35,8 @@ function FinalBoard ({ finalBoard }) {
               {
                 sortedBoard?.map((player, index) => (
                   <tr key={player.player_id} style={{ color: 'black', backgroundColor: background(index + 1) }}>
-                    <td>{(index + 1) + '.'}</td>
+                    {/* <td>{(index + 1) + '.'}</td> */}
+                    <td><img src='../assets/gold_medal_icon.svg'></img></td>
                     <td>{player.name}</td>
                     <td>{player.score}</td>
                     <td>{player.success_ratio}</td>
