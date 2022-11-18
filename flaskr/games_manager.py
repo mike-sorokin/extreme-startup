@@ -113,10 +113,8 @@ class GamesManager:
 
         finalgraph = scoreboard.running_totals
         encoded_players, finalboard, stats = self.generate_player_stats(player_data, scoreboard)
-        analysis = []
-
-        # Log game analysis
-
+        finalboard.sort(key=lambda x: -x["score"])
+        analysis = [JSONEncoder().default(event) for event in analysis_events]
 
         # Upload game data + review/analysis
         self.upload_data(
@@ -130,7 +128,7 @@ class GamesManager:
 
     def generate_player_stats(self, player_data, scoreboard):
         encoded_players = []
-        finalboard = {}
+        finalboard = []
         stats = {}
 
         # Basic variable/accumulation-variable definition
@@ -142,7 +140,7 @@ class GamesManager:
 
         # ...for average_streak
         total_player_avg_streak = 0
-
+        
         # ...for average_on_fire_duration
         total_on_fire_duration = 0
         total_num_of_on_fires = 0
@@ -169,14 +167,14 @@ class GamesManager:
 
             encoded_players.append(JSONEncoder().default(player))
 
-            finalboard[id] = {
+            finalboard.append({
                 "player_id": id,
                 "name": player.name,
                 "score": player.score,
                 "longest_streak": player.longest_streak,
                 "success_ratio": scoreboard.current_total_correct(player)
                 / (scoreboard.total_requests_for(player) if scoreboard.total_requests_for(player) > 0 else 1),
-            }
+            })
 
             total_requests += scoreboard.total_requests_for(player)
 
