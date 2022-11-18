@@ -70,19 +70,13 @@ export function eventAPI (gameId, playerId, eventId) {
   return `${API_PREFIX}/${gameId}/players/${playerId}/events/${eventId}`
 }
 
-// Management of a specific event for a player
-export function gameoverAPI (gameId) {
-  return `${API_PREFIX}/${gameId}/gameover`
-}
-
 export function reviewAPIs (gameId) {
   const urlFor = (suffix) => `${API_PREFIX}/${gameId}/review/` + suffix
   return {
     existed: urlFor('existed'),
-    players: urlFor('players'),
     finalgraph: urlFor('finalgraph'),
     finalboard: urlFor('finalboard'),
     stats: urlFor('stats'),
-    analysis: urlFor('analysis'),
+    analysis: urlFor('analysis')
   }
 }

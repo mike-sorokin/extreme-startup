@@ -2,8 +2,7 @@ import axios from 'axios'
 
 import {
   homeAPI, gameAPI, authAPI, playersAPI, playerAPI,
-  playerEventsAPI, eventAPI, scoresAPI, gameoverAPI,
-  reviewAPIs
+  playerEventsAPI, eventAPI, scoresAPI, reviewAPIs
 } from './urls'
 import { alertError, showFailureNotification, showErrorNotification, playersAsArray, HTTPError } from './utils'
 
@@ -225,7 +224,7 @@ export async function createModerator (gameId, data) {
  * @return {Promise<Array<obj(time:timestamp, player1: player1score, ..., playerN: playerNscores)>>}
  * List of all score records corresponding to a timestamp
  */
-export async function fetchGameScores (gameId, loadOldGame) {
+export async function fetchGameScores (gameId, loadOldGame=false) {
   try {
     const apiEndPoint = loadOldGame ? reviewAPIs(gameId).finalgraph : scoresAPI(gameId)
     const response = await instance.get(apiEndPoint)
@@ -245,12 +244,11 @@ export async function fetchGameScores (gameId, loadOldGame) {
  * Fetches all players in a given game
  * @async
  * @param  {string} gameId
- * @param  {boolean} loadOldGame Flag indicating that the game was completed
  * @return {Promise<Player[]>} List of all player JSON objects
  */
-export async function fetchAllPlayers (gameId, loadOldGame) {
+export async function fetchAllPlayers (gameId) {
   try {
-    const apiEndPoint = loadOldGame ? reviewAPIs(gameId).players : playersAPI(gameId)
+    const apiEndPoint = playersAPI(gameId)
     const response = await instance.get(apiEndPoint)
     return playersAsArray(response.data.players)
   } catch (error) {
@@ -491,6 +489,15 @@ export async function deleteEvent (gameId, playerId, eventId) {
   }
 }
 
+export async function fetchFinalLeaderboard (gameId) {
+  try {
+    const response = await instance.get(reviewAPIs(gameId).finalboard)
+    return response.data
+  } catch (error) {
+    alertError(error)
+  }
+}
+
 // Helper functions
 
 /**
@@ -532,8 +539,8 @@ export async function checkValidPlayer (gameId, playerId) {
  */
 export async function checkGameEnded (gameId) {
   try {
-    const response = await instance.get(gameoverAPI(gameId))
-    return response.data.game_over
+    const response = await instance.get(reviewAPIs(gameId).existed)
+    return response.data.existed
   } catch (error) {
     alertError(error)
   }

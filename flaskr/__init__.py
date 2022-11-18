@@ -100,7 +100,7 @@ def create_app():
             return NOT_ACCEPTABLE
 
         if request.method == "GET":
-            res = {"authorized": is_admin(game_id, session), "player": ""}
+            res = {"authorized": is_admin(game_id, session), "player" : ""}
 
             if get_player(session)[0]:
                 res["player"] = get_player(session)[1]
@@ -310,7 +310,13 @@ def create_app():
 
     @app.get("/api/<game_id>/review/players")
     def game_existed_players(game_id):
-        pass
+        # Make sure game exists
+        if not f"{game_id}_players" in db_client.xs.list_collection_names():
+            return NOT_ACCEPTABLE
+
+        curs = db_client.xs[f"{game_id}_players"].find({}, {"id": 1})
+        player_list = [doc["id"] for doc in curs]
+        return encoder.encode(player_list)
 
     @app.get("/api/<game_id>/review/existed")
     def game_existed(game_id):
@@ -328,9 +334,8 @@ def create_app():
     def final_game_graph(game_id):
         if not f"{game_id}_players" in db_client.xs.list_collection_names():
             return ("Game id not found", NOT_FOUND)
-        return db_client.xs[f"{game_id}_review"].find_one({"item": "finalgraph"})[
-            "stats"
-        ]
+        out = db_client.xs[f"{game_id}_review"].find_one({"item": "finalgraph"})
+        return encoder.encode(out["stats"])
 
     @app.get("/api/<game_id>/review/stats")
     def review_stats(game_id):

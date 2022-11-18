@@ -2,37 +2,36 @@ import React, { useState } from 'react'
 import { Line, LineChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import { MD5 } from 'crypto-js'
 
-import { fetchAllPlayers, fetchGameScores } from '../utils/requests'
+import { fetchGameScores } from '../utils/requests'
+import { useEffect } from 'react'
 
-function FinalChart({ gameId }) {
+function FinalChart ({ gameId, players }) {
   const [chartData, setChartData] = useState([])
-  const [playerIds, setPlayerIds] = useState([])
 
-  // Update chartData to up-to-date scorelist by refetching it from Flask backend
-  // Also refetch the entire player list, just in case
-  const getChartData = async () => {
-    try {
-      const loadOldGame = true
-      const pResponse = await fetchAllPlayers(gameId, loadOldGame)
-      setPlayerIds(pResponse.map((p) => ({ id: p.id, name: p.name })))
+  
+  useEffect(() => {
+    const getChartData = async () => {
+      try {
+        const loadOldGame = true
+        const response = await fetchGameScores(gameId, loadOldGame)
 
-      const response = await fetchGameScores(gameId, loadOldGame)
-      const startTime = response[0].time
+        const startTime = response[0].time
 
-      response.forEach((pt) => {
-        pt.time -= startTime
-        pt.time /= 1000
-      })
-      setChartData(response)
-    } catch (error) {
-      console.error(error)
-      if (error.response && error.response.status === 406) {
-        console.error('invalid game id')
+        response.forEach((pt) => {
+          pt.time -= startTime
+          pt.time /= 1000
+        })
+
+        setChartData(response)
+      } catch (error) {
+        console.error(error)
+        if (error.response && error.response.status === 406) {
+          console.error('invalid game id')
+        }
       }
     }
-  }
-  getChartData()
-
+    getChartData()
+  }, [])
 
   const stringToColour = (str) => {
     const colour = '#'
@@ -43,9 +42,9 @@ function FinalChart({ gameId }) {
   return (
     <div>
       {
-        /* 
-          TODO: This is a copypast from Chart. A good idea would be 
-          to extract comon code to a separate component 
+        /*
+          TODO: This is a copypast from Chart. A good idea would be
+          to extract comon code to a separate component
         */
       }
       <LineChart width={750} height={450} data={chartData}>
@@ -53,7 +52,7 @@ function FinalChart({ gameId }) {
         <YAxis type="number" yAxisId={1} />
         <CartesianGrid stroke="#111" strokeDasharray="5 5" />
 
-        {playerIds.map((p) => {
+        {players?.map((p) => {
           return <Line
             key={p.id}
             connectNulls
