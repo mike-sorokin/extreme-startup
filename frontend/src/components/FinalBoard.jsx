@@ -14,11 +14,11 @@ function FinalBoard ({ finalBoard }) {
     setSortedBoard(sorted)
   }, [finalBoard])
 
-  const background = (i) => {
-    // if (i === 1) return '#e0c56e' // gold
-    // if (i === 2) return '#d5d5d7' // silver
-    // if (i === 3) return '#c5ab84' // bronze
-    return ''
+  const position = (i) => {
+    if (i === 1) return <Gold /> // gold
+    if (i === 2) return <Silver /> // silver
+    if (i === 3) return <Bronze /> // bronze
+    return i + '.'
   }
 
   return (
@@ -38,14 +38,8 @@ function FinalBoard ({ finalBoard }) {
             <tbody>
               {
                 sortedBoard?.map((player, index) => (
-                  <tr key={player.player_id} style={{ backgroundColor: background(index + 1) }}>
-                    {/* <td>{(index + 1) + '.'}</td> */}
-                    <td>
-                      { index === 0 && <Gold /> }
-                      { index === 1 && <Silver /> }
-                      { index === 2 && <Bronze /> }
-                      { index >= 3 && (index + 1) + '.'}
-                    </td>
+                  <tr key={player.player_id}>
+                    <td>{position(index + 1)}</td>
                     <td>{player.name}</td>
                     <td>{player.score}</td>
                     <td>{player.success_ratio}</td>
