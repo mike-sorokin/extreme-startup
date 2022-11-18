@@ -34,7 +34,7 @@ function Admin () {
           showInfoNotification('Current Round: ' + response.round, 'The round has been automatically advanced')
         }
         setRound(response.round)
-        setMaxRound(7)
+        setMaxRound(response.max_round)
         setGamePaused(response.paused)
         setPlayerNo(response.players.length)
         setTeamsNeedingHelp(response.players_to_assist.needs_assistance)
