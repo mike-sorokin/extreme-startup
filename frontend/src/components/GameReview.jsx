@@ -73,32 +73,42 @@ function GameReview() {
         </Grid.Col>
       </Grid>
 
-      <div>
-        <h3>Analysis</h3>
-      </div>
-      <h3>Key points</h3>
-      <Table>
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Occurrence Time</th>
-            <th>Player</th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            asMappable(keyPoints).map((keyPoint) => (
-              <tr key={keyPoint.id}>
-                <td>{keyPoint.title}</td>
-                <td style={{ width: '300px' }}>{keyPoint.description}</td>
-                <td>{keyPoint.occurence_time}</td>
-                <td>{keyPoint.acheived_by_team}</td>
-              </tr>
-            ))
-          }
-        </tbody>
-      </Table>
+      <Grid style={{ maxWidth: '100%' }}>
+        <Grid.Col span={8} md={6} lg={8}>
+          <Card>
+            <Title order={1} color="white" weight={1000}>Analysis</Title>
+
+          </Card>
+        </Grid.Col>
+
+        <Grid.Col span={4} md={3} lg={4}>
+          <Card sx={{ height: '100%', overflow: 'auto' }}>
+            <Title order={1} color="white" weight={1000}>Key Points</Title>
+            <Table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Description</th>
+                  <th>Occurrence Time</th>
+                  <th>Player</th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  asMappable(keyPoints).map((keyPoint) => (
+                    <tr key={keyPoint.id}>
+                      <td>{keyPoint.title}</td>
+                      <td>{keyPoint.description}</td>
+                      <td>{keyPoint.occurence_time}</td>
+                      <td>{keyPoint.acheived_by_team}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </Table>
+          </Card>
+        </Grid.Col>
+      </Grid>
     </>
   )
 }
