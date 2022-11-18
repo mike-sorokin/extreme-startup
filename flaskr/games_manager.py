@@ -101,7 +101,7 @@ class GamesManager:
             del self.games[gid]
 
             if len(player_data) > 0:
-                self.analyse_game(gid, player_data, scoreboard_data)
+                self.analyse_game(gid, player_data, scoreboard_data, analysis_events_data)
 
     def analyse_game(self, game_id, player_data, scoreboard, analysis_events):
         """
