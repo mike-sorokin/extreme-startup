@@ -60,7 +60,7 @@ def destructive_start_localhost_mongo():
 
     # Remove and remake flaskr/db
     db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "_db")
-    shutil.rmtree(db_path)
+    shutil.rmtree(db_path, ignore_errors=True)
     os.mkdir(db_path)
 
     subprocess.Popen(["mongod", "--dbpath", db_path], stdout=subprocess.DEVNULL)
