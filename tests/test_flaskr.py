@@ -539,8 +539,8 @@ def test_player_can_delete_itself(extras, cli):
 
 
 @with_setup(create_a_single_game)
-def test_index_put_throws_an_error(extras, cli):
+def test_get_assist_returns_a_dict_object(extras, cli):
     resp = cli.get(f"/api/{extras[0]['id']}/assist")
 
     assert resp.status_code == ALL_GOOD
-    assert type(resp.json) is list
+    assert type(resp.json) is dict

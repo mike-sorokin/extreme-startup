@@ -92,7 +92,7 @@ function Home () {
       <Modal centered
         opened={openedReview}
         onClose={() => setOpenedReview(false)}
-        title="Enter Game ID"
+        title="Review a Game"
         withCloseButton={false}>
         <div>
           <form onSubmit={handleGameReview}>
@@ -155,13 +155,16 @@ function Home () {
       <Card shadow="sm" p="lg" radius="md" withBorder sx={cardStyle}>
         <Stack align="center" spacing="xl">
           <Title order={1} color="white" weight={1000}>🔥 Extreme Startup 🔥</Title>
-          <Button variant="outline" color="green" radius="md" size="lg" onClick={() => setOpenedChoosePwd(true)}>Create a Game!</Button>
-          <Button variant="outline" color="orange" radius="md" size="lg" onClick={() => setOpenedAddPlayer(true)}>Join a Game!</Button>
-          <Button variant="outline" radius="md" size="lg" onClick={() => setOpenedReview(true)}>Review a Game</Button>
-          <Button variant="outline" color="pink" radius="xl" onClick={() => setOpenedInfo(true)}>
+          <Button variant="outline" color="green" radius="md" size="xl" onClick={() => setOpenedAddPlayer(true)}>Join a Game!</Button>
+          <Button variant="outline" color="orange" radius="md" size="md" onClick={() => setOpenedChoosePwd(true)}>Create a Game!</Button>
+        </Stack>
+        <Space h="xl" />
+        <div style={{ flexDirection: 'row' }}>
+          <Button variant="outline" radius="md" size="xs" onClick={() => setOpenedReview(true)} style={{ marginLeft: '10%' }}>Review a Game!</Button>
+          <Button variant="outline" color="pink" radius="xl" size="xs" onClick={() => setOpenedInfo(true)} style={{ marginLeft: '8%' }}>
             About Extreme Startup
           </Button>
-        </Stack>
+        </div>
       </Card>
     </div>
 

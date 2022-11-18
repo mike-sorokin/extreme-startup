@@ -2,7 +2,7 @@ import React from 'react'
 import { Outlet, useParams, useNavigate } from 'react-router-dom'
 import { Menu, Button, Burger } from '@mantine/core'
 
-import useSessionData from '../utils/useSessionData'
+import useSessionData from '../utils/hooks/useSessionData'
 
 function Game () {
   const params = useParams()

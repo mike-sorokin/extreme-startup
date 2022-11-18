@@ -2,8 +2,7 @@ import axios from 'axios'
 
 import {
   homeAPI, gameAPI, authAPI, playersAPI, playerAPI,
-  playerEventsAPI, eventAPI, scoresAPI, gameoverAPI,
-  reviewAPIs
+  playerEventsAPI, eventAPI, scoresAPI, reviewAPIs
 } from './urls'
 import { alertError, showFailureNotification, showErrorNotification, playersAsArray, HTTPError } from './utils'
 
@@ -129,6 +128,24 @@ export async function fetchGame (gameId) {
  * @return {Promise<string>} "ROUND_INCREMENTED" or "GAME_PAUSED" or "GAME_UNPAUSED"
  */
 export async function updateGame (gameId, data) {
+  try {
+    const response = await instance.put(gameAPI(gameId), data)
+    return response.data
+  } catch (error) {
+    alertError(error)
+  }
+}
+
+/**
+ * (PUT, "/api/(gameId)")
+ * Toggles automatic round advacement
+ *
+ * @async
+ * @param  {string} gameId
+ * @param  {{"auto": boolean}} data Object containing boolean for whether auto round advancement should be enabled/disabled
+ * @return {Promise<string>} "GAME_AUTO_ON" or "GAME_AUTO_OFF"
+ */
+export async function updateAutoRoundAdvance (gameId, data) {
   try {
     const response = await instance.put(gameAPI(gameId), data)
     return response.data

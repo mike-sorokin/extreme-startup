@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Badge, Button, Card, Container, Space, Title } from '@mantine/core'
+import { Badge, Button, Card, Container, Group, Space, Stack, Switch, Text, Title } from '@mantine/core'
 import { useClipboard } from '@mantine/hooks'
 
-import { fetchGame, updateGame } from '../utils/requests'
+import { fetchGame, updateAutoRoundAdvance, updateGame } from '../utils/requests'
+import { showInfoNotification } from '../utils/utils'
+import usePrevious from '../utils/hooks/usePrevious'
+
 import ConfirmationModal from '../utils/ConfirmationModal'
 
 function Admin () {
@@ -11,6 +14,10 @@ function Admin () {
   const [round, setRound] = useState(0)
   const [gamePaused, setGamePaused] = useState(false)
   const [openedEndGame, setOpenedEndGame] = useState(false)
+  const [teamsNeedingHelp, setTeamsNeedingHelp] = useState([])
+  const [teamsBeingHelped, setTeamsBeingHelped] = useState([])
+  const prevList = usePrevious(teamsNeedingHelp)
+  const [autoAdvance, setAutoAdvance] = useState(false)
 
   const params = useParams()
   const clipboard = useClipboard({ timeout: 500 })
@@ -20,9 +27,15 @@ function Admin () {
     const getGameData = async () => {
       try {
         const response = await fetchGame(params.gameId)
+        if (autoAdvance && response.round > round) {
+          showInfoNotification('Current Round: ' + response.round, 'The round has been automatically advanced')
+        }
         setRound(response.round)
         setGamePaused(response.paused)
         setPlayerNo(response.players.length)
+        setTeamsNeedingHelp(response.players_to_assist.needs_assistance)
+        setTeamsBeingHelped(response.players_to_assist.being_assisted)
+        setAutoAdvance(response.auto_mode)
       } catch (error) {
         console.error(error)
       }
@@ -35,6 +48,14 @@ function Admin () {
       clearInterval(timer)
     }
   }, [params.gameId])
+
+  useEffect(() => {
+    for (const team of teamsNeedingHelp) {
+      if (!prevList.includes(team)) {
+        showInfoNotification('Notification', 'There are teams needing assistance!')
+      }
+    }
+  }, [teamsNeedingHelp])
 
   // Increments round
   const advanceRound = async () => {
@@ -51,6 +72,32 @@ function Admin () {
     }
   }
 
+  // Toggle automatic round advancement
+  const toggleAutoAdvance = async (e) => {
+    const isAuto = e.currentTarget.checked
+    try {
+      const response = await updateAutoRoundAdvance(params.gameId, { auto: isAuto })
+      setAutoAdvance(response === 'GAME_AUTO_ON')
+    } catch (error) {
+      console.error(error)
+      if (error.response && error.response.status === 401) {
+        alert('401 - Unauthenticated request')
+      }
+    }
+  }
+
+  // Send a {"stop": ""} request to stop the game
+  const sendGameEnd = async () => {
+    try {
+      await updateGame(params.gameId, { end: '' })
+    } catch (error) {
+      // TODO
+    } finally {
+      setOpenedEndGame(false)
+      window.location.reload()
+    }
+  }
+
   // Send a {"pause": ""} request to unpause, {"pause": "p"} to pause
   const togglePauseRound = async () => {
     try {
@@ -64,19 +111,18 @@ function Admin () {
     }
   }
 
-  // Send a {"stop": ""} request to stop the game
-  const sendGameEnd = async () => {
+  // Send a put request to update which teams are being helped
+  const setHelping = async (team) => {
     try {
-      const response = await updateGame(params.gameId, { end: '' })
-      console.log(response)
+      await updateGame(params.gameId, { assisting: team })
+      setTeamsNeedingHelp(teamsNeedingHelp.filter((value) => { return value !== team }))
+      setTeamsBeingHelped([...teamsBeingHelped, team])
     } catch (error) {
-      // TODO
-    } finally {
-      setOpenedEndGame(false)
-      window.location.reload()
+      console.error(error)
     }
   }
 
+  // Template helper functions below
   function togglePauseButton (color, text) {
     return <Button compact variant="outline"
       color={color}
@@ -98,7 +144,7 @@ function Admin () {
   }
 
   return (
-    <div>
+    <>
       <ConfirmationModal opened={openedEndGame} setOpened={setOpenedEndGame}
         title='End Game' body='Are you sure you want to end the game?' func={sendGameEnd} />
       <Container size="xl" px="xs">
@@ -137,8 +183,8 @@ function Admin () {
             <Button compact variant="outline"
               style={{ marginLeft: '10%' }}
               color="indigo"
-              radius="md"
-              size="md"
+              radius="md" size="md"
+              disabled={autoAdvance}
               onClick={() => advanceRound()}
               data-cy='advance-round-button'>
               Advance Round
@@ -148,9 +194,43 @@ function Admin () {
               : togglePauseButton('yellow', 'Pause')
             }
           </div>
+          {round > 0
+            ? <Switch
+                label="Automatic Round Advancement"
+                size="md"
+                checked={autoAdvance} onChange={(e) => toggleAutoAdvance(e)}
+              />
+            : <></>}
         </Card>
       </Container>
-    </div>
+      <Space h="lg" />
+      {(teamsNeedingHelp.length >= 1 || teamsBeingHelped.length >= 1) &&
+        <Container size="xl" px="xs">
+        <Title order={2} color="dimmed"> Teams needing assistance </Title>
+        <Space h="md" />
+        <Card>
+          <Stack>
+            {teamsNeedingHelp?.map((team) => (
+              <Card shadow="sm" p="xs" sx={ (theme) => ({ '&:hover': { backgroundColor: theme.colors.dark[5] } })} key={team}>
+                <Group position="apart">
+                    <Text sx={{ paddingLeft: '1rem' }}>{team}</Text>
+                    <Button variant="light" onClick={() => { setHelping(team) }}>I am helping</Button>
+                  </Group>
+              </Card>
+            ))}
+            {teamsBeingHelped?.map((team) => (
+              <Card shadow="sm" p="xs" sx={ (theme) => ({ '&:hover': { backgroundColor: theme.colors.dark[5] } })} key={team}>
+                <Group position="apart">
+                  <Text sx={{ paddingLeft: '1rem' }}>{team}</Text>
+                  <Button variant="light" color="green" >Being helped!</Button>
+                  </Group>
+              </Card>
+            ))}
+          </Stack>
+        </Card>
+      </Container>
+      }
+    </>
   )
 }
 

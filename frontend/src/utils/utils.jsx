@@ -1,6 +1,6 @@
+import React from 'react'
 import { showNotification } from '@mantine/notifications'
-import { IconCheck, IconX, IconAlertTriangle } from '@tabler/icons'
-import { React } from 'react'
+import { IconCheck, IconX, IconAlertTriangle, IconInfoCircle } from '@tabler/icons'
 
 export function str (obj) {
   return JSON.stringify(obj)
@@ -38,6 +38,15 @@ export function showErrorNotification (header, msg) {
   })
 }
 
+export function showInfoNotification (header, msg) {
+  showNotification({
+    title: header,
+    message: msg,
+    icon: <IconInfoCircle size={18} />,
+    color: 'blue'
+  })
+}
+
 export function playersAsArray (playersDict) {
   const arr = []
   for (const playerId in playersDict) {
@@ -48,15 +57,13 @@ export function playersAsArray (playersDict) {
 
 /**
  * Creates array where the current player is lifted on top.
+ * If playerID is empty, (i.e. when player is a spectator) this function does nothing
  * Note that the sort is not inplace. The array is copied and returned new.
  * @return {Player[]} Object containing all players objects of a game, ordered by
  * inital order, but the current player in a session is on top of a list
  */
 export function withCurrentPlayerLiftedIfPresent (playerID, players) {
-  console.log('playerID')
-  console.log(playerID)
   if (playerID === '') {
-    console.log('playerID is empty ')
     return players
   }
   return players.sort((p1, p2) => p1.id === playerID ? -1 : p2.id === playerID ? 1 : 0)
