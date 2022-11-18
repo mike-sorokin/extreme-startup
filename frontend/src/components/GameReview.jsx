@@ -106,7 +106,7 @@ function GameReview() {
   const chartPlayersOfLeaderBoard = (leaderboard) => {
     return asMappable(leaderboard).map(p => {
       return {
-        id: p.id,
+        id: p.player_id,
         name: p.name
       }
     })

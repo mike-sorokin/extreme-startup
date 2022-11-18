@@ -14,6 +14,14 @@ function FinalChart({ gameId, players }) {
       try {
         const loadOldGame = true
         const response = await fetchGameScores(gameId, loadOldGame)
+
+        const startTime = response[0].time
+
+        response.forEach((pt) => {
+          pt.time -= startTime
+          pt.time /= 1000
+        })
+
         setChartData(response)
       } catch (error) {
         console.error(error)
