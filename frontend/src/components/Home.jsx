@@ -2,9 +2,9 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Card, Center, Modal, PasswordInput, Space, Stack, Text, TextInput, Title } from '@mantine/core'
 
-import { createNewGame } from '../utils/requests'
+import { checkGameEnded, createNewGame } from '../utils/requests'
 import { gameReviewUrl } from '../utils/urls'
-import { showSuccessNotification } from '../utils/utils'
+import { showFailureNotification, showSuccessNotification } from '../utils/utils'
 
 import AddPlayer from './AddPlayer'
 import GoToGame from './GoToGame'
@@ -48,9 +48,14 @@ function Home () {
       console.log(event)
       console.log(gameReviewId)
       // Check game id existed, if so redirect them to a new page with the GameReview component
-      navigate(gameReviewUrl(gameReviewId))
+      const valid = await checkGameEnded(gameReviewId)
+      if (valid) {
+        navigate(gameReviewUrl(gameReviewId))
+      } else {
+        showFailureNotification('Error reviewing game', 'You entered an invalid game id!')
+      }
     } catch (error) {
-
+      showFailureNotification('Error reviewing game', 'You entered an invalid game id!')
     }
   }
 
@@ -98,7 +103,7 @@ function Home () {
           <form onSubmit={handleGameReview}>
             <TextInput value={gameReviewId} onChange={(e) => setGameReviewId(e.target.value)}
               placeholder="Game ID" label="Enter game ID:" required data-cy="game-review-id-input" />
-              <Space h="md" />
+            <Space h="md" />
             <Button variant="outline" color="green" type="submit">Review Game!</Button>
           </form>
         </div>
