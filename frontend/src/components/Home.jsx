@@ -160,10 +160,14 @@ function Home () {
         </Stack>
         <Space h="xl" />
         <div style={{ flexDirection: 'row' }}>
-          <Button variant="outline" radius="md" size="xs" onClick={() => setOpenedReview(true)} style={{ marginLeft: '10%' }}>Review a Game!</Button>
-          <Button variant="outline" color="pink" radius="xl" size="xs" onClick={() => setOpenedInfo(true)} style={{ marginLeft: '8%' }}>
-            About Extreme Startup
-          </Button>
+        <Button variant="outline" radius="md" size="xs"
+          onClick={() => setOpenedReview(true)} style={{ marginLeft: '12%', width: '125px' }}>
+            Review a Game!
+        </Button>
+        <Button variant="outline" color="pink" radius="xl" size="xs"
+          onClick={() => setOpenedInfo(true)} style={{ marginLeft: '8%', width: '125px' }}>
+            Learn more
+        </Button>
         </div>
       </Card>
     </div>
