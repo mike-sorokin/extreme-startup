@@ -40,8 +40,8 @@ function FinalBoard ({ finalBoard }) {
                   <tr key={player.player_id}>
                     <td>{position(index + 1)}</td>
                     <td>{player.name}</td>
-                    <td>{player.score}</td>
-                    <td>{player.success_ratio}</td>
+                    <td>{Math.round(player.score)}</td>
+                    <td>{Math.round(player.success_ratio * 100) + '%'}</td>
                     <td>{player.longest_streak}</td>
                   </tr>
                 ))
