@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Table } from '@mantine/core'
 import FinalChart from './FinalChart'
+import FinalBoard from './FinalBoard'
+import { fetchFinalLeaderboard } from '../utils/requests'
 
-function GameReview () {
+function GameReview() {
   const params = useParams()
   const navigate = useNavigate()
 
   const [finalLeaderboard, setFinalLeaderboard] = useState([])
-  const [finalChart, setFinalChart] = useState({})
-  // const [stats, setStats] = useState({})
+  const [stats, setStats] = useState({})
   const [keyPoints, setKeyPoints] = useState([])
 
   // Mock responses
@@ -32,13 +33,13 @@ function GameReview () {
 
   const mockChart = {}
 
-  const stats = {
+  const mockStats = {
     total_requests: 0,
     average_streak: 0, // for streaks at least two correct answers in a row,
     average_on_fire_duration: 0,
     longest_on_fire_duration: {
       achieved_by_team: 0,
-      value: 0
+      'value': 0
     },
     longest_streak: {
       correct_answers_in_a_row: 0,
@@ -79,10 +80,13 @@ function GameReview () {
     const getReviewData = async () => {
       try {
         // Fetch game data here
-        setFinalLeaderboard(mockLeaderboard)
-        setFinalChart(mockChart)
-        setStats(mockStats)
-        setKeyPoints(mockKeyPoints)
+        const [leaderboardResponse] = await Promise.all([
+          fetchFinalLeaderboard(params.gameId),
+        ])
+
+        setFinalLeaderboard(leaderboardResponse)
+        // setStats(mockStats)
+        // setKeyPoints(mockKeyPoints)
       } catch (error) {
         console.error(error)
       }
@@ -91,53 +95,73 @@ function GameReview () {
     getReviewData()
   }, [])
 
+  const asMappable = (leaderboard) => {
+    if (Array.isArray(leaderboard)) {
+      return leaderboard
+    } else {
+      return Object.keys(leaderboard).map(key => leaderboard[key])
+    }
+  }
+
+  const chartPlayersOfLeaderBoard = (leaderboard) => {
+    return asMappable(leaderboard).map(p => {
+      return {
+        id: p.id,
+        name: p.name
+      }
+    })
+  }
+
   return (
     <>
       <h1>Game Review: {params.gameId}</h1>
       <div>
         <h3>Final Chart</h3>
-        <FinalChart gameId={params.gameId} />
+        <FinalChart gameId={params.gameId} players={chartPlayersOfLeaderBoard(finalLeaderboard)} />
       </div>
       <div>
         <h3>Analysis</h3>
-        <ul>
-          <li>Total Requests is {stats.total_requests}</li>
-          <li>Average Streak is {stats.average_streak}</li>
-          <li>Average on Fire Duration {stats.average_on_fire_duration}</li>
-          <li>
-            Longest on Fire Duration is {stats.longest_on_fire_duration.value}
-            and achieved by {stats.longest_on_fire_duration.achieved_by_team}
-          </li>
-          <li>
-            Longest Streak is {stats.longest_streak.correct_answers_in_a_row},
-            which lasted for {stats.longest_streak.duration} milliseconds
-            and achieved by {stats.longest_streak.achieved_by_team}
-          </li>
-          <li>Average Success Rate is {stats.average_success_rate}</li>
-          <li>
-            Best success rate is {stats.best_success_rate.value}
-            and achieved by {stats.best_success_rate.achieved_by_team}
-          </li>
-          <li>
-            Most epic comeback was achieved by {stats.most_epic_comeback.achieved_by_team}.
-            He or they gained {stats.most_epic_comeback.points_gained_during_that_streak}
-            and that bonkers lasted for {stats.most_epic_comeback.duration}.
-            {stats.most_epic_comeback.final_achieved_position - stats.most_epic_comeback.start_position}
-            was passed, starting from {stats.most_epic_comeback.start_position}
-            to {stats.most_epic_comeback.final_achieved_position}
-          </li>
-          <li>
-            Most epic fail was achieved by {stats.most_epic_comeback.achieved_by_team}.
-            He or they lost {stats.most_epic_comeback.points_gained_during_that_streak}
-            and that bollocks lasted for {stats.most_epic_comeback.duration}.
-            {stats.most_epic_comeback.final_achieved_position - stats.most_epic_comeback.start_position}
-            was passed, starting from {stats.most_epic_comeback.start_position}
-            to {stats.most_epic_comeback.final_achieved_position}
-          </li>
-        </ul>
+        {/* { (Object.entries(stats).length == 0) ? <></> : (
+          <ul>
+            <li>Total Requests is {stats.total_requests}</li>
+            <li>Average Streak is {stats.average_streak}</li>
+            <li>Average on Fire Duration {stats.average_on_fire_duration}</li>
+            <li>
+              Longest on Fire Duration is {stats.longest_on_fire_duration.value}
+              and achieved by {stats.longest_on_fire_duration.achieved_by_team}
+            </li>
+            <li>
+              Longest Streak is {stats.longest_streak.correct_answers_in_a_row},
+              which lasted for {stats.longest_streak.duration} milliseconds
+              and achieved by {stats.longest_streak.achieved_by_team}
+            </li>
+            <li>Average Success Rate is {stats.average_success_rate}</li>
+            <li>
+              Best success rate is {stats.best_success_rate.value}
+              and achieved by {stats.best_success_rate.achieved_by_team}
+            </li>
+            <li>
+              Most epic comeback was achieved by {stats.most_epic_comeback.achieved_by_team}.
+              He or they gained {stats.most_epic_comeback.points_gained_during_that_streak}
+              and that bonkers lasted for {stats.most_epic_comeback.duration}.
+              {stats.most_epic_comeback.final_achieved_position - stats.most_epic_comeback.start_position}
+              was passed, starting from {stats.most_epic_comeback.start_position}
+              to {stats.most_epic_comeback.final_achieved_position}
+            </li>
+            <li>
+              Most epic fail was achieved by {stats.most_epic_comeback.achieved_by_team}.
+              He or they lost {stats.most_epic_comeback.points_gained_during_that_streak}
+              and that bollocks lasted for {stats.most_epic_comeback.duration}.
+              {stats.most_epic_comeback.final_achieved_position - stats.most_epic_comeback.start_position}
+              was passed, starting from {stats.most_epic_comeback.start_position}
+              to {stats.most_epic_comeback.final_achieved_position}
+            </li>
+          </ul>
+        )} */}
       </div>
 
       <h3>Final leaderboard</h3>
+      <FinalBoard finalBoard={asMappable(finalLeaderboard)} />
       <Table>
         <thead>
           <tr>
@@ -149,7 +173,7 @@ function GameReview () {
           </tr>
         </thead>
         <tbody>
-          {
+          {/* {
             finalLeaderboard.map((player) => (
               <tr key={player.player_id}>
                 <td>{player.player_id}</td>
@@ -159,7 +183,7 @@ function GameReview () {
                 <td>{player.success_ratio * 100}%</td>
               </tr>
             ))
-          }
+          } */}
         </tbody>
       </Table>
 
@@ -175,7 +199,7 @@ function GameReview () {
         </thead>
         <tbody>
           {
-            keyPoints.map((keyPoint) => (
+            mockKeyPoints.map((keyPoint) => (
               <tr key={keyPoint.id}>
                 <td>{keyPoint.title}</td>
                 <td style={{ width: '300px' }}>{keyPoint.description}</td>
