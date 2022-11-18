@@ -35,6 +35,7 @@ function Admin () {
         setPlayerNo(response.players.length)
         setTeamsNeedingHelp(response.players_to_assist.needs_assistance)
         setTeamsBeingHelped(response.players_to_assist.being_assisted)
+        setAutoAdvance(response.auto_mode)
       } catch (error) {
         console.error(error)
       }
@@ -182,8 +183,8 @@ function Admin () {
             <Button compact variant="outline"
               style={{ marginLeft: '10%' }}
               color="indigo"
-              radius="md"
-              size="md"
+              radius="md" size="md"
+              disabled={autoAdvance}
               onClick={() => advanceRound()}
               data-cy='advance-round-button'>
               Advance Round
