@@ -100,7 +100,7 @@ def create_app():
             return NOT_ACCEPTABLE
 
         if request.method == "GET":
-            res = {"authorized": is_admin(game_id, session), "player": ""}
+            res = {"authorized": is_admin(game_id, session), "player" : ""}
 
             if get_player(session)[0]:
                 res["player"] = get_player(session)[1]
