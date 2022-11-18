@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Table, Title, Card, Grid } from '@mantine/core'
+import { Table, Title, Card, Grid, Space } from '@mantine/core'
 import FinalChart from './FinalChart'
 import FinalBoard from './FinalBoard'
 import { fetchFinalLeaderboard } from '../utils/requests'
 
 function GameReview () {
   const params = useParams()
-  // const navigate = useNavigate()
+  const navigate = useNavigate()
 
   const [finalLeaderboard, setFinalLeaderboard] = useState([])
   // const [stats, setStats] = useState({})
@@ -65,6 +65,7 @@ function GameReview () {
         <Grid.Col span={8} md={6} lg={8}>
           <Card>
             <Title order={1} color="white" weight={1000}>Final Chart</Title>
+            <Space h='lg' />
             <FinalChart gameId={params.gameId} players={chartPlayersOfLeaderBoard(finalLeaderboard)} />
           </Card>
         </Grid.Col>
@@ -72,6 +73,7 @@ function GameReview () {
         <Grid.Col span={4} md={3} lg={4}>
             <Card sx={{ height: '100%', overflow: 'auto' }}>
               <Title order={1} color="white" weight={1000}>Final leaderboard</Title>
+              <Space h='lg' />
               <FinalBoard finalBoard={asMappable(finalLeaderboard)} />
             </Card>
         </Grid.Col>

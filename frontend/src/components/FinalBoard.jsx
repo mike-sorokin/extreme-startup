@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Container, Space, Table } from '@mantine/core'
+import { Container, Table } from '@mantine/core'
 
 // finalBoard prop should be an array of objects, one for each player
 function FinalBoard ({ finalBoard }) {
@@ -19,8 +19,6 @@ function FinalBoard ({ finalBoard }) {
 
   return (
       <Container size="xl" px="sm">
-        {/* <Title order={1} color="white" weight={1000}>Leaderboard</Title> */}
-        <Space h='xl' /> <br />
         {
           <Table>
             <thead>
