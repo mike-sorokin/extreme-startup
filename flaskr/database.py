@@ -9,12 +9,18 @@ def get_mongo_client(local=False):
     """
 
     if "USE_LOCAL_MONGO_DB" in os.environ:
-        return pymongo.MongoClient("mongodb://localhost:27017")
-
+        try:
+            cli = pymongo.MongoClient("mongodb://localhost:27017")
+        except pymongo.errors.ConnectionFailure:
+            cli = pymongo.MongoClient("mongodb://mongo:27017")
+        return cli
 
     if local:
         destructive_start_localhost_mongo()
-        return pymongo.MongoClient("mongodb://localhost:27017")
+        try:
+            cli = pymongo.MongoClient("mongodb://localhost:27017")
+        except pymongo.errors.ConnectionFailure:
+            cli = pymongo.MongoClient("mongodb://mongo:27017")
 
     config_path = os.path.join(os.path.dirname(__file__), "mongo_config.json")
 
