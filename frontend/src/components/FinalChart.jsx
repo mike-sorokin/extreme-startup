@@ -3,25 +3,27 @@ import { Line, LineChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import { MD5 } from 'crypto-js'
 
 import { fetchGameScores } from '../utils/requests'
+import { useEffect } from 'react'
 
 function FinalChart({ gameId, players }) {
   const [chartData, setChartData] = useState([])
 
-  // Update chartData to up-to-date scorelist by refetching it from Flask backend
-  // Also refetch the entire player list, just in case
-  const getChartData = async () => {
-    try {
-      const loadOldGame = true
-      const response = await fetchGameScores(gameId, loadOldGame)
-      setChartData(response)
-    } catch (error) {
-      console.error(error)
-      if (error.response && error.response.status === 406) {
-        console.error('invalid game id')
+  
+  useEffect(() => {
+    const getChartData = async () => {
+      try {
+        const loadOldGame = true
+        const response = await fetchGameScores(gameId, loadOldGame)
+        setChartData(response)
+      } catch (error) {
+        console.error(error)
+        if (error.response && error.response.status === 406) {
+          console.error('invalid game id')
+        }
       }
     }
-  }
-  getChartData()
+    getChartData()
+  }, [])
 
   const stringToColour = (str) => {
     const colour = '#'
@@ -46,6 +48,8 @@ function FinalChart({ gameId, players }) {
         <CartesianGrid stroke="#111" strokeDasharray="5 5" />
 
         {players?.map((p) => {
+          console.log("line p")
+          console.log(p)
           return <Line
             key={p.id}
             connectNulls
