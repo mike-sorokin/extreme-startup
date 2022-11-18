@@ -310,7 +310,13 @@ def create_app():
 
     @app.get("/api/<game_id>/review/players")
     def game_existed_players(game_id):
-        pass
+        # Make sure game exists
+        if not f"{game_id}_players" in db_client.xs.list_collection_names():
+            return NOT_ACCEPTABLE
+
+        curs = db_client.xs[f"{game_id}_players"].find({}, {"id": 1})
+        player_list = [doc["id"] for doc in curs]
+        return encoder.encode(player_list)
 
     @app.get("/api/<game_id>/review/existed")
     def game_existed(game_id):
