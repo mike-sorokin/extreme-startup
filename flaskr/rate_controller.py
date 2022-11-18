@@ -3,8 +3,7 @@ import time
 # Constants below in seconds
 MIN_REQUEST_INTERVAL_SECS = 1
 MAX_REQUEST_INTERVAL_SECS = 20
-AVG_REQUEST_INTERVAL = 10
-DEFAULT_DELAY = 5
+AVG_REQUEST_INTERVAL = DEFAULT_DELAY = 5
 REQUEST_DELTA = 0.1
 
 SLASHDOT_THRESHOLD_SCORE = 2000
@@ -20,16 +19,19 @@ class RateController:
         correct_answer = question.answered_correctly()
 
         if error_problem:
+
             if self.delay < AVG_REQUEST_INTERVAL:
                 self.delay = AVG_REQUEST_INTERVAL
+
             return MAX_REQUEST_INTERVAL_SECS
-        elif correct_answer and self.delay >= MIN_REQUEST_INTERVAL_SECS:
-            self.delay -= REQUEST_DELTA
-            self.delay = max(self.delay, MIN_REQUEST_INTERVAL_SECS)
-        elif not correct_answer and self.delay <= MAX_REQUEST_INTERVAL_SECS:
-            self.delay += REQUEST_DELTA
-            self.delay = min(self.delay, MAX_REQUEST_INTERVAL_SECS)
-        else:  # Error case
+
+        elif correct_answer:
+            self.delay = max(self.delay - REQUEST_DELTA, MIN_REQUEST_INTERVAL_SECS)
+
+        elif not correct_answer:
+            self.delay = min(self.delay + REQUEST_DELTA, MAX_REQUEST_INTERVAL_SECS)
+
+        else:  # Error case -- SHOULD NOT ENTER 
             print(
                 f"!!!!! unrecognized result '#{question.result}' from #{repr(question)} in Scoreboard#score"
             )

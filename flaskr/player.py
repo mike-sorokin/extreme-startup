@@ -23,5 +23,8 @@ class Player:
     def log_event(self, event):
         self.events.append(event)
 
+    def get_events(self):
+        return self.events
+
     def __str__(self):
         return f"{self.name} ({self.api})"

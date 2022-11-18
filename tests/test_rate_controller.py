@@ -6,8 +6,7 @@ from flaskr.rate_controller import RateController
 from unittest.mock import Mock, patch
 import pytest
 
-DEFAULT_DELAY = 5
-AVG_DELAY = 10
+DEFAULT_DELAY = AVG_DELAY = 5
 DELTA = 0.1
 
 
@@ -64,6 +63,3 @@ def test_resets_delay_to_default_delay():
 
     assert warmed_up_controller.delay == DEFAULT_DELAY
 
-
-# TODO: Updates algorithm based on score
-# TODO: Advanced/specialised RateController(s) tests
