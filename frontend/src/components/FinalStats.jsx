@@ -53,6 +53,22 @@ function FinalStats () {
             </Card>
             <Card shadow="sm" p="xs">
               <Group>
+                <Text>Average On Fire duration:</Text>
+                <Text>{stats.average_on_fire_duration}</Text>
+              </Group>
+            </Card>
+            <Card shadow="sm" p="xs">
+              <Group>
+                <Text>Longest On Fire duration:</Text>
+                <Text>{Math.round(stats.longest_on_fire_duration.duration) + 's'}</Text>
+                <Text>by</Text>
+                <Text>{stats.longest_on_fire_duration.achieved_by_team}</Text>
+                <Text>with a streak of</Text>
+                <Text>{stats.longest_on_fire_duration.streak_len}</Text>
+              </Group>
+            </Card>
+            <Card shadow="sm" p="xs">
+              <Group>
                 <Text>Total Requests:</Text>
                 <Text>{stats.total_requests}</Text>
               </Group>
