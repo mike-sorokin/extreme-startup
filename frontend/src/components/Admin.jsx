@@ -28,7 +28,7 @@ function Admin () {
       try {
         const response = await fetchGame(params.gameId)
         if (autoAdvance && response.round > round) {
-          showInfoNotification('Round Advancement', 'The round has been automatically advanced')
+          showInfoNotification('Current Round: ' + response.round, 'The round has been automatically advanced')
         }
         setRound(response.round)
         setGamePaused(response.paused)
@@ -229,7 +229,6 @@ function Admin () {
         </Card>
       </Container>
       }
-
     </>
   )
 }

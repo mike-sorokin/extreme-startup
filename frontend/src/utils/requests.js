@@ -533,7 +533,7 @@ export async function checkValidPlayer (gameId, playerId) {
 export async function checkGameEnded (gameId) {
   try {
     const response = await instance.get(reviewAPIs(gameId).existed)
-    return response.data.game_over
+    return response.data.existed
   } catch (error) {
     alertError(error)
   }
