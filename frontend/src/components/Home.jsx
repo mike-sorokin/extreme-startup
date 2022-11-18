@@ -4,7 +4,7 @@ import { Button, Card, Center, Modal, PasswordInput, Space, Stack, Text, TextInp
 
 import { checkGameEnded, createNewGame } from '../utils/requests'
 import { gameReviewUrl } from '../utils/urls'
-import { showFailureNotification, showSuccessNotification } from '../utils/utils'
+import { showErrorNotification, showFailureNotification, showSuccessNotification } from '../utils/utils'
 
 import AddPlayer from './AddPlayer'
 import GoToGame from './GoToGame'
@@ -55,7 +55,7 @@ function Home () {
         showFailureNotification('Error reviewing game', 'You entered an invalid game id!')
       }
     } catch (error) {
-      showFailureNotification('Error reviewing game', 'You entered an invalid game id!')
+      showErrorNotification('Error reviewing game', 'Error searching for game, please try again')
     }
   }
 
