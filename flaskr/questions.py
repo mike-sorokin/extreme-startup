@@ -40,7 +40,7 @@ class Question:
         if self.answer is None:
             self.result = self.problem
 
-        elif ALLOW_CHEATING and self.answer == "CHEAT":
+        elif ALLOW_CHEATING and self.answer == "cheat":
             self.result = "CORRECT"
 
         elif self.answered_correctly():
