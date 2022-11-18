@@ -34,7 +34,8 @@ class JSONEncoder(json.JSONEncoder):
                 round=obj.round,
                 players=list(obj.players.keys()),
                 paused=not obj.running.is_set(),
-                players_to_assist=obj.players_to_assist
+                players_to_assist=obj.players_to_assist,
+                auto_mode=obj.auto_mode
             )
         elif isinstance(obj, datetime.datetime):
             return obj.isoformat()
