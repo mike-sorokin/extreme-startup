@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Outlet, useParams, useNavigate } from 'react-router-dom'
-import { Loader } from '@mantine/core'
+import { Button, Center, Loader, Modal, Space, Text } from '@mantine/core'
 
 import { checkValidGame, checkValidPlayer, checkGameEnded } from '../requests'
 import { gameReviewUrl } from '../urls'
@@ -10,6 +10,7 @@ import NotFound from '../../components/NotFound'
 function ValidRoute () {
   const [loading, setLoading] = useState(true)
   const [valid, setValid] = useState(null)
+  const [openedGameOver, setOpenedGameOver] = useState(false)
 
   const navigate = useNavigate()
 
@@ -19,7 +20,7 @@ function ValidRoute () {
     const checkGameOver = async () => {
       const gameDeletedResponse = await checkGameEnded(params.gameId)
       if (gameDeletedResponse) {
-        navigate(gameReviewUrl(params.gameId))
+        setOpenedGameOver(true)
       }
     }
 
@@ -59,6 +60,26 @@ function ValidRoute () {
       transform: 'translate(-50%, -50%)'
     }}/>
   }
+
+  <Modal centered
+      opened={openedGameOver}
+      onClose={() => setOpenedGameOver(false)}
+      title={'Game Over'} withCloseButton={false}
+      closeOnEscape={false} closeOnClickOutside={false}>
+      <div>
+        <Text>The game has now ended. You can now proceed to the game review page.</Text>
+        <Space h="md" />
+        <Center>
+          <Button variant="filled"
+              color="orange"
+              radius="md"
+              size="md"
+              onClick={() => navigate(gameReviewUrl(params.gameId))}>
+              Go to Review!
+          </Button>
+        </Center>
+      </div>
+  </Modal>
 
   // If valid is true, show any child component through Outlet, else show NotFound component
   return (
