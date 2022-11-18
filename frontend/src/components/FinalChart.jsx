@@ -39,9 +39,6 @@ function FinalChart({ gameId, players }) {
     return colour.concat(hash)
   }
 
-  console.log("lmao")
-  console.log(players)
-
   return (
     <div>
       {
@@ -56,8 +53,6 @@ function FinalChart({ gameId, players }) {
         <CartesianGrid stroke="#111" strokeDasharray="5 5" />
 
         {players?.map((p) => {
-          console.log("line p")
-          console.log(p)
           return <Line
             key={p.id}
             connectNulls

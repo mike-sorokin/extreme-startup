@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build --mode development",
+    "build": "vite build",
     "preview": "vite preview",
     "cypress": "cypress run --browser chrome",
     "cy:open": "cypress open",
