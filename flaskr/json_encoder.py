@@ -4,6 +4,7 @@ from flaskr.player import Player
 from flaskr.event import Event
 from flaskr.game import Game
 from flaskr.game_analysis import AnalysisEvent
+from flaskr.question_factory import MAX_ROUND
 
 # Encode application objects to JSON format to support REST api
 class JSONEncoder(json.JSONEncoder):
@@ -32,10 +33,11 @@ class JSONEncoder(json.JSONEncoder):
             return dict(
                 id=obj.id,
                 round=obj.round,
+                max_round=MAX_ROUND,
                 players=list(obj.players.keys()),
                 paused=not obj.running.is_set(),
                 players_to_assist=obj.players_to_assist,
-                auto_mode=obj.auto_mode
+                auto_mode=obj.auto_mode,
             )
         elif isinstance(obj, datetime.datetime):
             return obj.isoformat()
