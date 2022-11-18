@@ -124,7 +124,7 @@ class GamesManager:
             encoded_players,
             finalboard=finalboard,
             finalgraph=finalgraph,
-            stats=stats,
+            finalstats=stats,
             analysis=analysis,
         )
 
@@ -254,6 +254,4 @@ class GamesManager:
 
     def upload_data(self, game_id, players_data, **reviews_items):
         self.db_client.xs[f"{game_id}_players"].insert_many(players_data)
-        self.db_client.xs[f"{game_id}_review"].insert_many(
-            [{"item": k, "stats": v} for k, v in reviews_items.items()]
-        )
+        self.db_client.xs[f"{game_id}_review"].insert_many([{"item": k, "stats": v} for k, v in reviews_items.items()])
