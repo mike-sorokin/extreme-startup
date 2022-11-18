@@ -35,7 +35,8 @@ function FinalBoard ({ finalBoard }) {
               {
                 sortedBoard?.map((player, index) => (
                   <tr key={player.player_id} style={{ color: 'black', backgroundColor: background(index + 1) }}>
-                    <td>{(index + 1) + '.'}</td>
+                    {/* <td>{(index + 1) + '.'}</td> */}
+                    <td><img src='../assets/gold_medal_icon.svg'></img></td>
                     <td>{player.name}</td>
                     <td>{player.score}</td>
                     <td>{player.success_ratio}</td>
