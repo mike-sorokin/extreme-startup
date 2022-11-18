@@ -200,7 +200,8 @@ function Admin () {
                 size="md"
                 checked={autoAdvance} onChange={(e) => toggleAutoAdvance(e)}
               />
-            : <></>}
+            : <></>
+          }
         </Card>
       </Container>
       <Space h="lg" />
@@ -213,9 +214,9 @@ function Admin () {
             {teamsNeedingHelp?.map((team) => (
               <Card shadow="sm" p="xs" sx={ (theme) => ({ '&:hover': { backgroundColor: theme.colors.dark[5] } })} key={team}>
                 <Group position="apart">
-                    <Text sx={{ paddingLeft: '1rem' }}>{team}</Text>
-                    <Button variant="light" onClick={() => { setHelping(team) }}>I am helping</Button>
-                  </Group>
+                  <Text sx={{ paddingLeft: '1rem' }}>{team}</Text>
+                  <Button variant="light" onClick={() => { setHelping(team) }}>I am helping</Button>
+                </Group>
               </Card>
             ))}
             {teamsBeingHelped?.map((team) => (
@@ -223,7 +224,7 @@ function Admin () {
                 <Group position="apart">
                   <Text sx={{ paddingLeft: '1rem' }}>{team}</Text>
                   <Button variant="light" color="green" >Being helped!</Button>
-                  </Group>
+                </Group>
               </Card>
             ))}
           </Stack>

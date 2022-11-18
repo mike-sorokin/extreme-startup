@@ -62,23 +62,23 @@ function ValidRoute () {
   }
 
   <Modal centered
-      opened={openedGameOver}
-      onClose={() => setOpenedGameOver(false)}
-      title={'Game Over'} withCloseButton={false}
-      closeOnEscape={false} closeOnClickOutside={false}>
-      <div>
-        <Text>The game has now ended. You can now proceed to the game review page.</Text>
-        <Space h="md" />
-        <Center>
-          <Button variant="filled"
-              color="orange"
-              radius="md"
-              size="md"
-              onClick={() => navigate(gameReviewUrl(params.gameId))}>
-              Go to Review!
-          </Button>
-        </Center>
-      </div>
+    opened={openedGameOver}
+    onClose={() => setOpenedGameOver(false)}
+    title={'Game Over'} withCloseButton={false}
+    closeOnEscape={false} closeOnClickOutside={false}>
+    <div>
+      <Text>The game has now ended. You can now proceed to the game review page.</Text>
+      <Space h="md" />
+      <Center>
+        <Button variant="filled"
+            color="orange"
+            radius="md"
+            size="md"
+            onClick={() => navigate(gameReviewUrl(params.gameId))}>
+            Go to Review!
+        </Button>
+      </Center>
+    </div>
   </Modal>
 
   // If valid is true, show any child component through Outlet, else show NotFound component
