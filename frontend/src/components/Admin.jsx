@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Badge, Button, Card, Container, Group, Space, Stack, Switch, Text, Title } from '@mantine/core'
 import { useClipboard } from '@mantine/hooks'
 
 import { fetchGame, updateAutoRoundAdvance, updateGame } from '../utils/requests'
 import { showInfoNotification } from '../utils/utils'
+import { gameReviewUrl } from '../utils/urls'
 import usePrevious from '../utils/hooks/usePrevious'
 
 import ConfirmationModal from '../utils/ConfirmationModal'
@@ -20,6 +21,7 @@ function Admin () {
   const [autoAdvance, setAutoAdvance] = useState(false)
 
   const params = useParams()
+  const navigate = useNavigate()
   const clipboard = useClipboard({ timeout: 500 })
 
   // Fetches game data every 2 seconds (current round and number of players)
@@ -94,7 +96,7 @@ function Admin () {
       // TODO
     } finally {
       setOpenedEndGame(false)
-      window.location.reload()
+      navigate(gameReviewUrl(params.gameId))
     }
   }
 
@@ -200,7 +202,8 @@ function Admin () {
                 size="md"
                 checked={autoAdvance} onChange={(e) => toggleAutoAdvance(e)}
               />
-            : <></>}
+            : <></>
+          }
         </Card>
       </Container>
       <Space h="lg" />
@@ -213,9 +216,9 @@ function Admin () {
             {teamsNeedingHelp?.map((team) => (
               <Card shadow="sm" p="xs" sx={ (theme) => ({ '&:hover': { backgroundColor: theme.colors.dark[5] } })} key={team}>
                 <Group position="apart">
-                    <Text sx={{ paddingLeft: '1rem' }}>{team}</Text>
-                    <Button variant="light" onClick={() => { setHelping(team) }}>I am helping</Button>
-                  </Group>
+                  <Text sx={{ paddingLeft: '1rem' }}>{team}</Text>
+                  <Button variant="light" onClick={() => { setHelping(team) }}>I am helping</Button>
+                </Group>
               </Card>
             ))}
             {teamsBeingHelped?.map((team) => (
@@ -223,7 +226,7 @@ function Admin () {
                 <Group position="apart">
                   <Text sx={{ paddingLeft: '1rem' }}>{team}</Text>
                   <Button variant="light" color="green" >Being helped!</Button>
-                  </Group>
+                </Group>
               </Card>
             ))}
           </Stack>
