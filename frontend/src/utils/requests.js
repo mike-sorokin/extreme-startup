@@ -2,8 +2,7 @@ import axios from 'axios'
 
 import {
   homeAPI, gameAPI, authAPI, playersAPI, playerAPI,
-  playerEventsAPI, eventAPI, scoresAPI, gameoverAPI,
-  reviewAPIs
+  playerEventsAPI, eventAPI, scoresAPI, reviewAPIs
 } from './urls'
 import { alertError, showFailureNotification, showErrorNotification, playersAsArray, HTTPError } from './utils'
 
