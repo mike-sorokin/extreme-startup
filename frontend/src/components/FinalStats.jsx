@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { Container, Table } from '@mantine/core'
+import { Container, Card, Group, Text, Stack } from '@mantine/core'
 
 import { fetchFinalStats } from '../utils/requests'
 
 function FinalStats () {
   const params = useParams()
-  const [stats, setStats] = useState({})
+  const [stats, setStats] = useState()
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -24,19 +24,40 @@ function FinalStats () {
 
   return (
       <Container size="xl" px="sm">
-        {
-          <Table>
-            <thead>
-              <tr>
-                <th></th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-
-            </tbody>
-          </Table>
-        }
+        { stats && <Stack>
+            <Card shadow="sm" p="xs">
+              <Group>
+                <Text>Average Streak:</Text>
+                <Text>{Math.round(stats.average_streak)}</Text>
+              </Group>
+            </Card>
+            <Card shadow="sm" p="xs">
+              <Group>
+                <Text>Longest Streak:</Text>
+                <Text>{stats.longest_streak}</Text>
+              </Group>
+            </Card>
+            <Card shadow="sm" p="xs">
+              <Group>
+                <Text>Average Success Rate:</Text>
+                <Text>{Math.round(stats.average_success_rate * 100) + '%'}</Text>
+              </Group>
+            </Card>
+            <Card shadow="sm" p="xs">
+              <Group>
+                <Text>Best Success Rate:</Text>
+                <Text>{Math.round(stats.best_success_rate.value * 100) + '%'}</Text>
+                <Text>by</Text>
+                <Text>{stats.best_success_rate.team}</Text>
+              </Group>
+            </Card>
+            <Card shadow="sm" p="xs">
+              <Group>
+                <Text>Total Requests:</Text>
+                <Text>{stats.total_requests}</Text>
+              </Group>
+            </Card>
+          </Stack>}
       </Container>
   )
 }
