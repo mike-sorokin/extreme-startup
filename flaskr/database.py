@@ -21,6 +21,7 @@ def get_mongo_client(local=False):
             cli = pymongo.MongoClient("mongodb://localhost:27017")
         except pymongo.errors.ConnectionFailure:
             cli = pymongo.MongoClient("mongodb://mongo:27017")
+        return cli
 
     config_path = os.path.join(os.path.dirname(__file__), "mongo_config.json")
 
