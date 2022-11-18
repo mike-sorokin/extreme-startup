@@ -5,6 +5,46 @@ import FinalChart from './FinalChart'
 import FinalBoard from './FinalBoard'
 import { fetchFinalLeaderboard, fetchFinalStats, fetchFinalAnalysis } from '../utils/requests'
 
+const sampleKeyPoints = 
+[
+  {
+    "title": "Lorem Ipsum",
+    "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
+    "occurrence_time": 12345,
+    "acheived_by_team": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
+  },
+  {
+    "title": "Lorem Ipsum",
+    "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
+    "occurrence_time": 12345,
+    "acheived_by_team": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
+  },
+  {
+    "title": "Lorem Ipsum",
+    "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
+    "occurrence_time": 12345,
+    "acheived_by_team": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
+  },
+  {
+    "title": "Lorem Ipsum",
+    "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
+    "occurrence_time": 12345,
+    "acheived_by_team": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
+  },
+  {
+    "title": "Lorem Ipsum",
+    "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
+    "occurrence_time": 12345,
+    "acheived_by_team": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
+  },
+  {
+    "title": "Lorem Ipsum",
+    "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
+    "occurrence_time": 12345,
+    "acheived_by_team": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
+  },
+]
+
 function GameReview() {
   const params = useParams()
 
@@ -23,8 +63,12 @@ function GameReview() {
           fetchFinalAnalysis(params.gameId)
         ])
 
+        const [statsResponse] = await Promise.all([
+          fetchFinalStats(params.gameId)
+        ])
+
         setFinalLeaderboard(leaderboardResponse)
-        setStats(await fetchFinalStats(params.gameId))
+        setStats(statsResponse)
         setKeyPoints(analysisResponse)
 
       } catch (error) {
@@ -53,6 +97,8 @@ function GameReview() {
     })
   }
 
+  const desc_percentage = '40%'
+
   return (
     <>
       <h1>Game Review: {params.gameId}</h1>
@@ -75,15 +121,14 @@ function GameReview() {
       </Grid>
 
       <Grid style={{ maxWidth: '100%' }}>
-        <Grid.Col lg={8} md={12}>
+        <Grid.Col lg={4} md={12}>
           <Card>
             <Title order={1} color="white" weight={1000}>Analysis</Title>
             <Space h='lg' />
-            <FinalChart gameId={params.gameId} players={chartPlayersOfLeaderBoard(finalLeaderboard)} />
           </Card>
         </Grid.Col>
 
-        <Grid.Col lg={4} md={12}>
+        <Grid.Col lg={8} md={12}>
           <Card sx={{ height: '100%', overflow: 'auto' }}>
             <Title order={1} color="white" weight={1000}>Key Points</Title>
             <Space h='lg' />
@@ -98,11 +143,11 @@ function GameReview() {
               </thead>
               <tbody>
                 {
-                  asMappable(keyPoints).map((keyPoint) => (
+                  asMappable(sampleKeyPoints).map((keyPoint) => (
                     <tr key={keyPoint.id}>
                       <td>{keyPoint.title}</td>
-                      <td>{keyPoint.description}</td>
-                      <td>{keyPoint.occurence_time}</td>
+                      <td style={{width: desc_percentage}}>{keyPoint.description}</td>
+                      <td>{keyPoint.occurrence_time}</td>
                       <td>{keyPoint.acheived_by_team}</td>
                     </tr>
                   ))
