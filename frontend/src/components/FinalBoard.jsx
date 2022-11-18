@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { Card, Container, Space, Table, Title } from '@mantine/core'
+import { Container, Space, Table } from '@mantine/core'
 
+// finalBoard prop should be an array of objects, one for each player
 function FinalBoard ({ finalBoard }) {
   const [sortedBoard, setSortedBoard] = useState([])
 
@@ -9,17 +10,22 @@ function FinalBoard ({ finalBoard }) {
     setSortedBoard(sorted)
   }, [finalBoard])
 
+  const background = (i) => {
+    if (i === 1) return '#e0c56e' // gold
+    if (i === 2) return '#d5d5d7' // silver
+    if (i === 3) return '#c5ab84' // bronze
+    return ''
+  }
+
   return (
-    <Card sx={{ maxHeight: '200px', overflow: 'auto' }}>
       <Container size="xl" px="sm">
-        <Title order={1} color="white" weight={1000}>Leaderboard</Title>
-        <br />
+        {/* <Title order={1} color="white" weight={1000}>Leaderboard</Title> */}
         <Space h='xl' /> <br />
         {
           <Table>
             <thead>
               <tr>
-                <th>ID</th>
+                <th>Position</th>
                 <th>Name</th>
                 <th>Score</th>
                 <th>Success Rate</th>
@@ -28,37 +34,10 @@ function FinalBoard ({ finalBoard }) {
               </tr>
             </thead>
             <tbody>
-              { sortedBoard && sortedBoard.length >= 1 &&
-                <tr style={{ backgroundColor: 'gold' }}>
-                  <td>{sortedBoard[0].player_id}</td>
-                  <td>{sortedBoard[0].name}</td>
-                  <td>{sortedBoard[0].score}</td>
-                  <td>{sortedBoard[0].success_ratio}</td>
-                  <td>{sortedBoard[0].longest_streak}</td>
-                </tr>
-              }
-              { sortedBoard && sortedBoard.length >= 2 &&
-                <tr style={{ backgroundColor: 'silver' }}>
-                  <td>{sortedBoard[1].player_id}</td>
-                  <td>{sortedBoard[1].name}</td>
-                  <td>{sortedBoard[1].score}</td>
-                  <td>{sortedBoard[1].success_ratio}</td>
-                  <td>{sortedBoard[1].longest_streak}</td>
-                </tr>
-              }
-              { sortedBoard && sortedBoard.length >= 3 &&
-                <tr style={{ backgroundColor: 'brown' }}>
-                  <td>{sortedBoard[2].player_id}</td>
-                  <td>{sortedBoard[2].name}</td>
-                  <td>{sortedBoard[2].score}</td>
-                  <td>{sortedBoard[2].success_ratio}</td>
-                  <td>{sortedBoard[2].longest_streak}</td>
-                </tr>
-              }
               {
-                sortedBoard?.slice(3).map((player) => (
-                  <tr key={player.player_id}>
-                    <td>{player.player_id}</td>
+                sortedBoard?.map((player, index) => (
+                  <tr key={player.player_id} style={{ color: 'black', backgroundColor: background(index + 1) }}>
+                    <td>{(index + 1) + '.'}</td>
                     <td>{player.name}</td>
                     <td>{player.score}</td>
                     <td>{player.success_ratio}</td>
@@ -70,7 +49,6 @@ function FinalBoard ({ finalBoard }) {
           </Table>
         }
       </Container>
-    </Card>
   )
 }
 

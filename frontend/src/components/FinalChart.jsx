@@ -4,7 +4,7 @@ import { MD5 } from 'crypto-js'
 
 import { fetchGameScores } from '../utils/requests'
 
-function FinalChart({ gameId, players }) {
+function FinalChart ({ gameId, players }) {
   const [chartData, setChartData] = useState([])
 
   // Update chartData to up-to-date scorelist by refetching it from Flask backend
@@ -29,15 +29,15 @@ function FinalChart({ gameId, players }) {
     return colour.concat(hash)
   }
 
-  console.log("lmao")
+  console.log('lmao')
   console.log(players)
 
   return (
     <div>
       {
-        /* 
-          TODO: This is a copypast from Chart. A good idea would be 
-          to extract comon code to a separate component 
+        /*
+          TODO: This is a copypast from Chart. A good idea would be
+          to extract comon code to a separate component
         */
       }
       <LineChart width={750} height={450} data={chartData}>
