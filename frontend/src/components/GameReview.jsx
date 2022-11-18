@@ -6,54 +6,53 @@ import FinalBoard from './FinalBoard'
 import FinalStats from './FinalStats'
 import { fetchFinalLeaderboard, fetchFinalStats, fetchFinalAnalysis } from '../utils/requests'
 
-const sampleKeyPoints =
-  [
-    {
-      "title": "Lorem Ipsum",
-      "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
-      "occurrence_time": 12345,
-      "player_id": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
-    },
-    {
-      "title": "Lorem Ipsum",
-      "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
-      "occurrence_time": 12345,
-      "player_id": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
-    },
-    {
-      "title": "Lorem Ipsum",
-      "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
-      "occurrence_time": 12345,
-      "player_id": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
-    },
-    {
-      "title": "Lorem Ipsum",
-      "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
-      "occurrence_time": 12345,
-      "player_id": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
-    },
-    {
-      "title": "Lorem Ipsum",
-      "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
-      "occurrence_time": 12345,
-      "player_id": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
-    },
-    {
-      "title": "Lorem Ipsum",
-      "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
-      "occurrence_time": 12345,
-      "player_id": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
-    },
-  ]
+// const sampleKeyPoints =
+//   [
+//     {
+//       title: 'Lorem Ipsum',
+//       description: '(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds',
+//       occurrence_time: 12345,
+//       player_id: 'mumbo jumbo' // possibly redundant, because is menrtioned in description
+//     },
+//     {
+//       title: 'Lorem Ipsum',
+//       description: '(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds',
+//       occurrence_time: 12345,
+//       player_id: 'mumbo jumbo' // possibly redundant, because is menrtioned in description
+//     },
+//     {
+//       title: 'Lorem Ipsum',
+//       description: '(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds',
+//       occurrence_time: 12345,
+//       player_id: 'mumbo jumbo' // possibly redundant, because is menrtioned in description
+//     },
+//     {
+//       title: 'Lorem Ipsum',
+//       description: '(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds',
+//       occurrence_time: 12345,
+//       player_id: 'mumbo jumbo' // possibly redundant, because is menrtioned in description
+//     },
+//     {
+//       title: 'Lorem Ipsum',
+//       description: '(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds',
+//       occurrence_time: 12345,
+//       player_id: 'mumbo jumbo' // possibly redundant, because is menrtioned in description
+//     },
+//     {
+//       title: 'Lorem Ipsum',
+//       description: '(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds',
+//       occurrence_time: 12345,
+//       player_id: 'mumbo jumbo' // possibly redundant, because is menrtioned in description
+//     }
+//   ]
 
-
-
-function GameReview() {
+function GameReview () {
   const params = useParams()
 
   const [finalLeaderboard, setFinalLeaderboard] = useState([])
   const [stats, setStats] = useState({})
   const [keyPoints, setKeyPoints] = useState([])
+
   useEffect(() => {
     const getReviewData = async () => {
       try {
@@ -73,14 +72,13 @@ function GameReview() {
         setFinalLeaderboard(leaderboardResponse)
         setStats(statsResponse)
         setKeyPoints(analysisResponse)
-
+        console.log({ analysisResponse })
       } catch (error) {
         console.error(error)
       }
     }
 
     getReviewData()
-    console.log(stats)
   }, [])
 
   const asMappable = (leaderboard) => {
@@ -100,7 +98,7 @@ function GameReview() {
     })
   }
 
-  const desc_percentage = '40%'
+  const descPercentage = '40%'
 
   return (
     <>
@@ -115,7 +113,7 @@ function GameReview() {
         </Grid.Col>
 
         <Grid.Col lg={4} md={12}>
-          <Card sx={{ height: '100%', overflow: 'auto' }}>
+          <Card sx={{ maxHeight: '545px', overflow: 'auto' }}>
             <Title order={1} color="white" weight={1000}>Final leaderboard</Title>
             <Space h='lg' />
             <FinalBoard finalBoard={asMappable(finalLeaderboard)} />
@@ -130,7 +128,7 @@ function GameReview() {
           </Card>
         </Grid.Col>
 
-        <Grid.Col lg={8} md={12}>
+        <Grid.Col lg={6} md={12}>
           <Card sx={{ height: '100%', overflow: 'auto' }}>
             <Title order={1} color="white" weight={1000}>Key Points</Title>
             <Space h='lg' />
@@ -145,10 +143,10 @@ function GameReview() {
               </thead>
               <tbody>
                 {
-                  asMappable(sampleKeyPoints).map((keyPoint) => (
+                  asMappable(keyPoints).map((keyPoint) => (
                     <tr key={keyPoint.id}>
                       <td>{keyPoint.title}</td>
-                      <td style={{ width: desc_percentage }}>{keyPoint.description}</td>
+                      <td style={{ width: descPercentage }}>{keyPoint.description}</td>
                       <td>{keyPoint.occurrence_time}</td>
                     </tr>
                   ))
