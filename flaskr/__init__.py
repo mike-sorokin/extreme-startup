@@ -347,7 +347,8 @@ def create_app():
     def review_analysis(game_id):
         if not f"{game_id}_players" in db_client.xs.list_collection_names():
             return ("Game id not found", NOT_FOUND)
-        return db_client.xs[f"{game_id}_review"].find_one({"item": "analysis"})["stats"]
+        out = db_client.xs[f"{game_id}_review"].find_one({"item": "analysis"})
+        return encoder.encode(out["stats"])
 
     # FORGIVE ME
     bot_responses = {n: [f"Bot{n}", 0] for n in range(100)}

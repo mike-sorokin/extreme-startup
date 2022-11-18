@@ -4,24 +4,56 @@ import { Table, Title, Card, Grid, Space } from '@mantine/core'
 import FinalChart from './FinalChart'
 import FinalBoard from './FinalBoard'
 import FinalStats from './FinalStats'
-import { fetchFinalLeaderboard } from '../utils/requests'
+import { fetchFinalLeaderboard, fetchFinalStats, fetchFinalAnalysis } from '../utils/requests'
 
-function GameReview () {
+const sampleKeyPoints =
+  [
+    {
+      "title": "Lorem Ipsum",
+      "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
+      "occurrence_time": 12345,
+      "player_id": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
+    },
+    {
+      "title": "Lorem Ipsum",
+      "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
+      "occurrence_time": 12345,
+      "player_id": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
+    },
+    {
+      "title": "Lorem Ipsum",
+      "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
+      "occurrence_time": 12345,
+      "player_id": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
+    },
+    {
+      "title": "Lorem Ipsum",
+      "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
+      "occurrence_time": 12345,
+      "player_id": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
+    },
+    {
+      "title": "Lorem Ipsum",
+      "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
+      "occurrence_time": 12345,
+      "player_id": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
+    },
+    {
+      "title": "Lorem Ipsum",
+      "description": "(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds",
+      "occurrence_time": 12345,
+      "player_id": "mumbo jumbo",   // possibly redundant, because is menrtioned in description
+    },
+  ]
+
+
+
+function GameReview() {
   const params = useParams()
 
   const [finalLeaderboard, setFinalLeaderboard] = useState([])
-  // const [stats, setStats] = useState({})
-  // const [keyPoints, setKeyPoints] = useState([])
-
-  const mockKeyPoints = [
-    {
-      title: 'key point 1',
-      description: 'player X beat previous leader and maintained that position for more than 15 seconds',
-      occurence_time: 30000,
-      achieved_by_team: 'team 2'
-    }
-  ]
-
+  const [stats, setStats] = useState({})
+  const [keyPoints, setKeyPoints] = useState([])
   useEffect(() => {
     const getReviewData = async () => {
       try {
@@ -30,15 +62,25 @@ function GameReview () {
           fetchFinalLeaderboard(params.gameId)
         ])
 
+        const [analysisResponse] = await Promise.all([
+          fetchFinalAnalysis(params.gameId)
+        ])
+
+        const [statsResponse] = await Promise.all([
+          fetchFinalStats(params.gameId)
+        ])
+
         setFinalLeaderboard(leaderboardResponse)
-        // setStats(mockStats)
-        // setKeyPoints(mockKeyPoints)
+        setStats(statsResponse)
+        setKeyPoints(analysisResponse)
+
       } catch (error) {
         console.error(error)
       }
     }
 
     getReviewData()
+    console.log(stats)
   }, [])
 
   const asMappable = (leaderboard) => {
@@ -58,6 +100,8 @@ function GameReview () {
     })
   }
 
+  const desc_percentage = '40%'
+
   return (
     <>
       <h1>Game Review: {params.gameId}</h1>
@@ -71,48 +115,51 @@ function GameReview () {
         </Grid.Col>
 
         <Grid.Col lg={4} md={12}>
-            <Card sx={{ height: '100%', overflow: 'auto' }}>
-              <Title order={1} color="white" weight={1000}>Final leaderboard</Title>
-              <Space h='lg' />
-              <FinalBoard finalBoard={asMappable(finalLeaderboard)} />
-            </Card>
+          <Card sx={{ height: '100%', overflow: 'auto' }}>
+            <Title order={1} color="white" weight={1000}>Final leaderboard</Title>
+            <Space h='lg' />
+            <FinalBoard finalBoard={asMappable(finalLeaderboard)} />
+          </Card>
         </Grid.Col>
 
         <Grid.Col lg={6} md={12}>
-            <Card sx={{ height: '100%' }}>
-              <Title order={1} color="white" weight={1000}>Stats</Title>
-              <Space h='lg' />
-              <FinalStats/>
-            </Card>
+          <Card sx={{ height: '100%' }}>
+            <Title order={1} color="white" weight={1000}>Stats</Title>
+            <Space h='lg' />
+            <FinalStats />
+          </Card>
         </Grid.Col>
-      </Grid>
 
-      <div>
-        <h3>Analysis</h3>
-      </div>
-      <h3>Key points</h3>
-      <Table>
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Occurrence Time</th>
-            <th>Player</th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            mockKeyPoints.map((keyPoint) => (
-              <tr key={keyPoint.id}>
-                <td>{keyPoint.title}</td>
-                <td style={{ width: '300px' }}>{keyPoint.description}</td>
-                <td>{keyPoint.occurence_time}</td>
-                <td>{keyPoint.acheived_by_team}</td>
-              </tr>
-            ))
-          }
-        </tbody>
-      </Table>
+        <Grid.Col lg={8} md={12}>
+          <Card sx={{ height: '100%', overflow: 'auto' }}>
+            <Title order={1} color="white" weight={1000}>Key Points</Title>
+            <Space h='lg' />
+            <Table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Description</th>
+                  <th>Occurrence Time</th>
+                  <th>Player</th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  asMappable(sampleKeyPoints).map((keyPoint) => (
+                    <tr key={keyPoint.id}>
+                      <td>{keyPoint.title}</td>
+                      <td style={{ width: desc_percentage }}>{keyPoint.description}</td>
+                      <td>{keyPoint.occurrence_time}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </Table>
+
+          </Card>
+        </Grid.Col>
+
+      </Grid>
     </>
   )
 }

@@ -498,6 +498,14 @@ export async function fetchFinalLeaderboard (gameId) {
   }
 }
 
+export async function fetchFinalAnalysis (gameId) {
+  try {
+    const response = await instance.get(reviewAPIs(gameId).analysis)
+    return response.data
+  } catch (error) {
+    alertError(error)
+  }
+}
 export async function fetchFinalStats (gameId) {
   try {
     const response = await instance.get(reviewAPIs(gameId).stats)
@@ -506,7 +514,6 @@ export async function fetchFinalStats (gameId) {
     alertError(error)
   }
 }
-
 // Helper functions
 
 /**
