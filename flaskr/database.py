@@ -9,6 +9,7 @@ def get_mongo_client(local=False):
     """
 
     if "USE_LOCAL_MONGO_DB" in os.environ:
+        destructive_start_localhost_mongo()
         try:
             cli = pymongo.MongoClient("mongodb://localhost:27017")
         except pymongo.errors.ConnectionFailure:
@@ -58,8 +59,8 @@ def destructive_start_localhost_mongo():
         )
 
     # Remove and remake flaskr/db
-    db_path = os.path.join(os.path.dirname(__file__), "_db")
-    shutil.rmtree(db_path, ignore_errors=True)
+    db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "_db")
+    shutil.rmtree(db_path)
     os.mkdir(db_path)
 
     subprocess.Popen(["mongod", "--dbpath", db_path], stdout=subprocess.DEVNULL)
