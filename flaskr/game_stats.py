@@ -92,7 +92,7 @@ class GameStats:
                             self.longest_on_fire_duration = strk_duration
                             self.longest_on_fire_team = player.name
 
-                    self.longest_streak_length = max(longest_streak_length, curr_streak_length)
+                    self.longest_streak_length = max(self.longest_streak_length, curr_streak_length)
 
                     # reset accum vars
                     curr_streak_length = 0

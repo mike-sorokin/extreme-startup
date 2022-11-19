@@ -4,6 +4,8 @@ from flaskr.player import Player
 from flaskr.game_stats import GameStats
 
 
+# Manages all active game instances -- instructing what games should modify when live and also in charge
+# of uploading relevant game information to the DB upon game termination 
 class GamesManager:
 
     def __init__(self, db_client):
@@ -111,14 +113,12 @@ class GamesManager:
         game_id :: uuid4() [8 chars]
         player_data :: { player_id -> Player }
         scoreboard :: Scoreboard
-        """
-
-        finalgraph = scoreboard.running_totals
-
-        stats_factory = GameStats(player_data, scoreboard)
-        encoded_players, finalboard, stats = stats_factory.generate_game_stats()
-        finalboard.sort(key=lambda x: -x["score"])
+        """ 
+        encoded_players, finalboard, stats = GameStats(player_data, scoreboard).generate_game_stats()
         
+        finalgraph = scoreboard.running_totals
+        finalboard.sort(key=lambda x: -x["score"])
+
         analysis = [JSONEncoder().default(event) for event in analysis_events]
 
         # Upload game data + review/analysis
