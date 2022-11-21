@@ -57,7 +57,8 @@ function Admin () {
   useEffect(() => {
     for (const team of teamsNeedingHelp) {
       if (!prevList.includes(team)) {
-        showInfoNotification('Assist Teams', 'There are teams needing assistance!')
+        showInfoNotification('Notification', 'There are teams needing assistance!')
+        break
       }
     }
   }, [teamsNeedingHelp])

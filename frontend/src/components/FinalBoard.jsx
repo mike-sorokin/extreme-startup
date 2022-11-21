@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { Container, Space, Table } from '@mantine/core'
+import { Container, Table } from '@mantine/core'
+
+import { ReactComponent as Gold } from '../assets/gold_medal_icon.svg'
+import { ReactComponent as Silver } from '../assets/silver_medal_icon.svg'
+import { ReactComponent as Bronze } from '../assets/bronze_medal_icon.svg'
 
 // finalBoard prop should be an array of objects, one for each player
 function FinalBoard ({ finalBoard }) {
@@ -10,17 +14,15 @@ function FinalBoard ({ finalBoard }) {
     setSortedBoard(sorted)
   }, [finalBoard])
 
-  const background = (i) => {
-    if (i === 1) return '#e0c56e' // gold
-    if (i === 2) return '#d5d5d7' // silver
-    if (i === 3) return '#c5ab84' // bronze
-    return ''
+  const position = (i) => {
+    if (i === 1) return <Gold /> // gold
+    if (i === 2) return <Silver /> // silver
+    if (i === 3) return <Bronze /> // bronze
+    return i + '.'
   }
 
   return (
       <Container size="xl" px="sm">
-        {/* <Title order={1} color="white" weight={1000}>Leaderboard</Title> */}
-        <Space h='xl' /> <br />
         {
           <Table>
             <thead>
@@ -30,17 +32,16 @@ function FinalBoard ({ finalBoard }) {
                 <th>Score</th>
                 <th>Success Rate</th>
                 <th>Longest Streak</th>
-                <th></th>
               </tr>
             </thead>
             <tbody>
               {
                 sortedBoard?.map((player, index) => (
-                  <tr key={player.player_id} style={{ color: 'black', backgroundColor: background(index + 1) }}>
-                    <td>{(index + 1) + '.'}</td>
+                  <tr key={player.player_id}>
+                    <td>{position(index + 1)}</td>
                     <td>{player.name}</td>
-                    <td>{player.score}</td>
-                    <td>{player.success_ratio}</td>
+                    <td>{Math.round(player.score)}</td>
+                    <td>{Math.round(player.success_ratio * 100) + '%'}</td>
                     <td>{player.longest_streak}</td>
                   </tr>
                 ))

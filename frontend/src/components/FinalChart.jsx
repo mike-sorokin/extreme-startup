@@ -1,14 +1,12 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Line, LineChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import { MD5 } from 'crypto-js'
 
 import { fetchGameScores } from '../utils/requests'
-import { useEffect } from 'react'
 
 function FinalChart ({ gameId, players }) {
   const [chartData, setChartData] = useState([])
 
-  
   useEffect(() => {
     const getChartData = async () => {
       try {

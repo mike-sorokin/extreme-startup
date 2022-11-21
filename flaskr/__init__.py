@@ -341,8 +341,7 @@ def create_app():
     def review_stats(game_id):
         if not f"{game_id}_players" in db_client.xs.list_collection_names():
             return ("Game id not found", NOT_FOUND)
-        out = db_client.xs[f"{game_id}_review"].find_one({"item": "finalstats"})
-        return encoder.encode(out["stats"])
+        return db_client.xs[f"{game_id}_review"].find_one({"item": "finalstats"})["stats"]
 
     @app.get("/api/<game_id>/review/analysis")
     def review_analysis(game_id):
