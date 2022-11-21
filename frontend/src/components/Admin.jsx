@@ -30,7 +30,8 @@ function Admin () {
     const getGameData = async () => {
       try {
         const response = await fetchGame(params.gameId)
-        if (autoAdvance && response.round > round) {
+        const notifyAdvance = autoAdvance && response.round > round
+        if (notifyAdvance) {
           showInfoNotification('Current Round: ' + response.round, 'The round has been automatically advanced')
         }
         setRound(response.round)
@@ -57,6 +58,7 @@ function Admin () {
     for (const team of teamsNeedingHelp) {
       if (!prevList.includes(team)) {
         showInfoNotification('Notification', 'There are teams needing assistance!')
+        break
       }
     }
   }, [teamsNeedingHelp])

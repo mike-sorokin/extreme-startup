@@ -347,7 +347,8 @@ def create_app():
     def review_analysis(game_id):
         if not f"{game_id}_players" in db_client.xs.list_collection_names():
             return ("Game id not found", NOT_FOUND)
-        return db_client.xs[f"{game_id}_review"].find_one({"item": "analysis"})["stats"]
+        out = db_client.xs[f"{game_id}_review"].find_one({"item": "analysis"})
+        return encoder.encode(out["stats"])
 
     # FORGIVE ME
     bot_responses = {n: [f"Bot{n}", 0] for n in range(100)}
@@ -362,6 +363,8 @@ def create_app():
     # Get a response
     @app.route("/api/bot/<int:bot_id>", methods=["GET"])
     def _api_response(bot_id):
+        if bot_responses[bot_id][0] == "cheat":
+            return "cheat"
         if randint(0, max(bot_id - 5, 0)) == 0:
             return bot_responses[bot_id][0]
         else:
