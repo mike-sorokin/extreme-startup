@@ -1,7 +1,7 @@
 import React from 'react'
 import { Card, Stack, Title } from '@mantine/core'
 
-import { HomeButton } from '../utils/utils'
+import HomeButton from '../utils/utils'
 
 function NotFound () {
   return (

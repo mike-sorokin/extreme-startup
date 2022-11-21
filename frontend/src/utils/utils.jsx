@@ -14,7 +14,7 @@ export function alertError (error) {
   throw error
 }
 
-export function homeButton (size) {
+export default function homeButton (size = 'md') {
   const navigate = useNavigate()
   return (
     <Button variant="outline" color="yellow" radius="md" size={size}

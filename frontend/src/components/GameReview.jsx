@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { Button, Card, Grid, Table, Text, Title } from '@mantine/core'
+import { useParams } from 'react-router-dom'
+import { Card, Grid, Table, Text, Title } from '@mantine/core'
+
 import FinalChart from './FinalChart'
 import FinalBoard from './FinalBoard'
 import { fetchFinalLeaderboard, fetchFinalStats, fetchFinalAnalysis } from '../utils/requests'
+import HomeButton from '../utils/utils'
 
 function GameReview () {
   const params = useParams()
-  
 
   const [finalLeaderboard, setFinalLeaderboard] = useState([])
   const [stats, setStats] = useState({})
@@ -57,7 +58,7 @@ function GameReview () {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        
+        <HomeButton />
       </div>
       <h1>Game Review: {params.gameId}</h1>
       <Grid style={{ maxWidth: '100%' }}>
