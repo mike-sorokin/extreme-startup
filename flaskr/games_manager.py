@@ -1,9 +1,13 @@
 from flaskr.json_encoder import JSONEncoder
 from flaskr.game import Game
 from flaskr.player import Player
+from flaskr.game_stats import GameStats
 
 
+# Manages all active game instances -- instructing what games should modify when live and also in charge
+# of uploading relevant game information to the DB upon game termination 
 class GamesManager:
+
     def __init__(self, db_client):
         self.games = {}
         self.db_client = db_client
@@ -109,11 +113,12 @@ class GamesManager:
         game_id :: uuid4() [8 chars]
         player_data :: { player_id -> Player }
         scoreboard :: Scoreboard
-        """
-
+        """ 
+        encoded_players, finalboard, stats = GameStats(player_data, scoreboard).generate_game_stats()
+        
         finalgraph = scoreboard.running_totals
-        encoded_players, finalboard, stats = self.generate_player_stats(player_data, scoreboard)
         finalboard.sort(key=lambda x: -x["score"])
+
         analysis = [JSONEncoder().default(event) for event in analysis_events]
 
         # Upload game data + review/analysis
@@ -125,130 +130,6 @@ class GamesManager:
             finalstats=stats,
             analysis=analysis,
         )
-
-    def generate_player_stats(self, player_data, scoreboard):
-        encoded_players = []
-        finalboard = []
-        stats = {}
-
-        # Basic variable/accumulation-variable definition
-        num_players = len(player_data)
-        assert num_players > 0
-
-        #  ...for total requests statistics
-        total_requests = 0
-
-        # ...for average_streak
-        total_player_avg_streak = 0
-        
-        # ...for average_on_fire_duration
-        total_on_fire_duration = 0
-        total_num_of_on_fires = 0
-
-        # ...for longest_on_fire_duration
-        longest_streak_length = 0
-        longest_on_fire_duration = 0
-        longest_on_fire_team = None
-
-        # ...for average_success_rate
-        total_player_success_rate = 0.0
-
-        # ...for best_success_rate
-        best_success_rate = { "team": None, "value": 0.0 }
-
-        # ...for most_epic_fail
-        most_epic_fail = {}
-
-        # ...for most_epic_comeback
-        most_epic_comeback = {}
-
-        for (id, player) in player_data.items():
-            player_events = player.get_events()
-
-            encoded_players.append(JSONEncoder().default(player))
-
-            finalboard.append({
-                "player_id": id,
-                "name": player.name,
-                "score": player.score,
-                "longest_streak": player.longest_streak,
-                "success_ratio": scoreboard.current_total_correct(player)
-                / (scoreboard.total_requests_for(player) if scoreboard.total_requests_for(player) > 0 else 1),
-            })
-
-            total_requests += scoreboard.total_requests_for(player)
-
-            # for curr player's avg streak
-            total_streak_length = 0
-            total_num_of_streaks = 0
-            is_on_streak = False
-            curr_streak_length = 0
-
-            # for curr player's success rate
-            player_success_rate = scoreboard.current_total_correct(player) / (scoreboard.total_requests_for(player) if scoreboard.total_requests_for(player) > 0 else 1)
-            total_player_success_rate += player_success_rate
-
-            if player_success_rate >= best_success_rate["value"]:
-                best_success_rate["team"] = player.name
-                best_success_rate["value"] = player_success_rate
-
-            for (i, event) in enumerate(player_events):
-                if is_on_streak and (i + 1 == len(player_events) or event.points_gained < 0):  # qustion response wrong or error response
-                    # curr_streak has ended!
-                    # account for this and reset is_on_streak to false
-                    curr_streak_length += int(i + 1 == len(player_events))
-                    total_streak_length += curr_streak_length
-                    total_num_of_streaks += 1
-
-                    if curr_streak_length > 6: # player was on fire
-                        strk_duration  = (event.timestamp - player_events[i - curr_streak_length + 1].timestamp).total_seconds()
-                        total_on_fire_duration += strk_duration
-                        total_num_of_on_fires += 1
-
-                        if curr_streak_length > longest_streak_length:
-                            longest_on_fire_duration = strk_duration
-                            longest_on_fire_team = player.name
-
-                    longest_streak_length = max(longest_streak_length, curr_streak_length)
-
-                    # reset accum vars
-                    curr_streak_length = 0
-                    is_on_streak = False
-
-                elif event.points_gained > 0: # player gets question correct
-                    curr_streak_length += 1
-
-                    if not is_on_streak and curr_streak_length >= 2:
-                        is_on_streak = True
-
-            if total_num_of_streaks > 0: # => total_streak_length > 0
-                total_player_avg_streak += total_streak_length / total_num_of_streaks
-
-        if total_requests == 0:
-            return encoded_players, finalboard, { "total_requests" : 0 }
-
-        # LOG global game stats
-        stats["num_players"] = num_players
-        stats["total_requests"] = total_requests
-        stats["average_streak"] = total_player_avg_streak / num_players
-
-        if total_num_of_on_fires > 0:
-            stats["average_on_fire_duration"] = total_on_fire_duration / total_num_of_on_fires
-
-        if longest_on_fire_team:
-            stats["longest_on_fire_duration"] = {
-                "achieved_by_team" : longest_on_fire_team,
-                "duration" : longest_on_fire_duration,
-                "streak_len": longest_streak_length
-            }
-
-        stats["longest_streak"] = longest_streak_length
-        stats["average_success_rate"] = total_player_success_rate / num_players
-
-        if best_success_rate["team"]:
-            stats["best_success_rate"] = best_success_rate
-
-        return encoded_players, finalboard, stats
 
     def upload_data(self, game_id, players_data, **reviews_items):
         self.db_client.xs[f"{game_id}_players"].insert_many(players_data)

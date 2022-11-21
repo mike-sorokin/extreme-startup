@@ -152,7 +152,6 @@ class Game:
         return self.players[player_id].events
 
     def log_analysis_events(self, analysis_event):
-        print(analysis_event.get_description())
         self.analysis_events.append(analysis_event)
 
     def __monitor_analysis_events(self):
