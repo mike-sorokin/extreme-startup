@@ -65,7 +65,7 @@ function GameReview () {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <HomeButton />
+        <HomeButton size='md' />
       </div>
       <h1>Game Review: {params.gameId}</h1>
       <Grid style={{ maxWidth: '100%' }}>

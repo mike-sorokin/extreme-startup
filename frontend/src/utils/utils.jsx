@@ -14,11 +14,11 @@ export function alertError (error) {
   throw error
 }
 
-export default function homeButton (size = 'md') {
+export default function HomeButton ({ size }) {
   const navigate = useNavigate()
   return (
     <Button variant="outline" color="yellow" radius="md" size={size}
-      leftIcon={<IconHome />} onClick={() => navigate(homeUrl)}>
+      leftIcon={<IconHome />} onClick={() => navigate(homeUrl())}>
       Go to Home Page
     </Button>
   )
