@@ -188,7 +188,7 @@ class GamesManager:
             player_success_rate = scoreboard.current_total_correct(player) / (scoreboard.total_requests_for(player) if scoreboard.total_requests_for(player) > 0 else 1)
             total_player_success_rate += player_success_rate
 
-            if player_success_rate > best_success_rate["value"]:
+            if player_success_rate >= best_success_rate["value"]:
                 best_success_rate["team"] = player.name
                 best_success_rate["value"] = player_success_rate
 
