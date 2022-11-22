@@ -64,10 +64,10 @@ function GameReview () {
 
   return (
     <>
+      <h1>Game Review: {params.gameId}</h1>
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <HomeButton size='md' />
       </div>
-      <h1>Game Review: {params.gameId}</h1>
       <Grid style={{ maxWidth: '100%' }}>
         <Grid.Col lg={8} md={12}>
           <Card>
@@ -79,7 +79,7 @@ function GameReview () {
 
         <Grid.Col lg={4} md={12}>
           <Card sx={{ maxHeight: '545px', overflow: 'auto' }}>
-            <Title order={1} color="white" weight={1000}>Final leaderboard</Title>
+            <Title order={1} color="white" weight={1000}>Final Leaderboard</Title>
             <Space h='lg' />
             <FinalBoard finalBoard={asMappable(finalLeaderboard)} />
           </Card>
