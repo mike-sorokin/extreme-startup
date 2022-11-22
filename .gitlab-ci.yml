@@ -175,5 +175,5 @@ deploy-lambda:
     entrypoint: [""]
   script:
     - aws configure set region eu-west-2
-    - aws lambda update-function-code --function-name BubbleLambda --zip-file fileb://aws/aws_deplomeny_package.zip
+    - aws lambda update-function-code --function-name BubbleLambda --zip-file fileb://aws/aws_deployment_package.zip
 
