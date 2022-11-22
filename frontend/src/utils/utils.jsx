@@ -1,6 +1,9 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Button } from '@mantine/core'
 import { showNotification } from '@mantine/notifications'
-import { IconCheck, IconX, IconAlertTriangle, IconInfoCircle } from '@tabler/icons'
+import { IconCheck, IconHome, IconX, IconAlertTriangle, IconInfoCircle } from '@tabler/icons'
+import { homeUrl } from './urls'
 
 export function str (obj) {
   return JSON.stringify(obj)
@@ -9,6 +12,16 @@ export function str (obj) {
 export function alertError (error) {
   console.error(error)
   throw error
+}
+
+export default function HomeButton ({ size }) {
+  const navigate = useNavigate()
+  return (
+    <Button variant="outline" color="yellow" radius="md" size={size}
+      leftIcon={<IconHome />} onClick={() => navigate(homeUrl())}>
+      Go to Home Page
+    </Button>
+  )
 }
 
 export function showSuccessNotification (msg) {

@@ -1,52 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { Table, Title, Card, Grid, Space } from '@mantine/core'
+import { Card, Grid, Space, Table, Title } from '@mantine/core'
+
 import FinalChart from './FinalChart'
 import FinalBoard from './FinalBoard'
 import FinalStats from './FinalStats'
 import { fetchFinalLeaderboard, fetchFinalStats, fetchFinalAnalysis } from '../utils/requests'
+import HomeButton from '../utils/utils'
 
-// const sampleKeyPoints =
-//   [
-//     {
-//       title: 'Lorem Ipsum',
-//       description: '(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds',
-//       occurrence_time: 12345,
-//       player_id: 'mumbo jumbo' // possibly redundant, because is menrtioned in description
-//     },
-//     {
-//       title: 'Lorem Ipsum',
-//       description: '(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds',
-//       occurrence_time: 12345,
-//       player_id: 'mumbo jumbo' // possibly redundant, because is menrtioned in description
-//     },
-//     {
-//       title: 'Lorem Ipsum',
-//       description: '(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds',
-//       occurrence_time: 12345,
-//       player_id: 'mumbo jumbo' // possibly redundant, because is menrtioned in description
-//     },
-//     {
-//       title: 'Lorem Ipsum',
-//       description: '(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds',
-//       occurrence_time: 12345,
-//       player_id: 'mumbo jumbo' // possibly redundant, because is menrtioned in description
-//     },
-//     {
-//       title: 'Lorem Ipsum',
-//       description: '(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds',
-//       occurrence_time: 12345,
-//       player_id: 'mumbo jumbo' // possibly redundant, because is menrtioned in description
-//     },
-//     {
-//       title: 'Lorem Ipsum',
-//       description: '(SAMPLE) player X beat previous leader and maintained that position for more than 15 seconds',
-//       occurrence_time: 12345,
-//       player_id: 'mumbo jumbo' // possibly redundant, because is menrtioned in description
-//     }
-//   ]
-
-function GameReview() {
+function GameReview () {
   const params = useParams()
 
   const [finalLeaderboard, setFinalLeaderboard] = useState([])
@@ -103,6 +65,9 @@ function GameReview() {
   return (
     <>
       <h1>Game Review: {params.gameId}</h1>
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <HomeButton size='md' />
+      </div>
       <Grid style={{ maxWidth: '100%' }}>
         <Grid.Col lg={8} md={12}>
           <Card>
@@ -114,7 +79,7 @@ function GameReview() {
 
         <Grid.Col lg={4} md={12}>
           <Card sx={{ maxHeight: '545px', overflow: 'auto' }}>
-            <Title order={1} color="white" weight={1000}>Final leaderboard</Title>
+            <Title order={1} color="white" weight={1000}>Final Leaderboard</Title>
             <Space h='lg' />
             <FinalBoard finalBoard={asMappable(finalLeaderboard)} />
           </Card>
