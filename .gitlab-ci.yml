@@ -6,9 +6,9 @@ stages:
 - aws_archiving
 - aws_deploy
 
-variables:
-  AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-  AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+# variables:
+#   AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+#   AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
 
 .preamble: &preamble
   - python3 -m venv venv
