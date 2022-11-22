@@ -174,6 +174,6 @@ deploy-lambda:
     name: amazon/aws-cli
     entrypoint: [""]
   script:
-    - aws configute set region eu-west-2
+    - aws configure set region eu-west-2
     - aws lambda update-function-code --function-name BubbleLambda --zip-file fileb://aws/aws_deplomeny_package.zip
 
