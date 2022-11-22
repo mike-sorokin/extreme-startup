@@ -153,9 +153,6 @@ archive-lambda:
   when:
     on_success
   before_script:
-    - echo "Installing zip..."
-    - apt-get update
-    - apt-get install zip -y
     - echo "Installing dependencies from requirements.txt..."
     - pip install -r "aws/requirements.txt" -t aws/lib
   script:
