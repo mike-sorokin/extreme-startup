@@ -137,6 +137,7 @@ class GamesManager:
 
 from uuid import uuid4
 from flaskr.shared.dynamo_db import *
+from flaskr.question_factory import (MAX_ROUND)
 
 class AWSGamesManager:
     """ Game manager class for lambda functions and backend server to interface with the DynamoDB """
@@ -179,6 +180,7 @@ class AWSGamesManager:
 
     def player_exists(self, game_id, player_id) -> bool:
         """ Checks if player_id exists in the given game """
+
         return player_id in db_get_player_ids(game_id)
 
     def game_has_password(self, game_id, password):
@@ -187,27 +189,38 @@ class AWSGamesManager:
 
     def game_in_last_round(self, game_id):
         """ Check if game is in its final round """
-        # return self.games[game_id].is_last_round()
-        return db_get_round(game_id) == question_factory.total_rounds()
+        return db_get_round(game_id) == MAX_ROUND
 
     def pause_game(self, game_id):
-        self.games[game_id].pause()
+        """ Pause a game """
+        # self.games[game_id].pause()
+        db_set_paused(game_id, True)
 
     def unpause_game(self, game_id):
-        self.games[game_id].spawn_game_monitor()
-        self.games[game_id].unpause()
+        """ Unpause a game """
+        # self.games[game_id].spawn_game_monitor()
+        # self.games[game_id].unpause()
+        db_set_paused(game_id, False)
 
     def end_game(self, game_id):
-        self.games[game_id].end()
+        """ Ends a game """
+        db_end_game(game_id)
 
     def advance_game_round(self, game_id):
-        self.games[game_id].advance_round()
+        """ Advances game round """
+        # self.games[game_id].advance_round()
+        db_advance_round(game_id)
+        # what is round index and first round event?
 
     def set_auto_mode(self, game_id):
-        self.games[game_id].auto_mode = True
+        """ Turns on auto advance round """
+        # self.games[game_id].auto_mode = True
+        db_set_auto_mode(game_id, True)
 
     def clear_auto_mode(self, game_id):
-        self.games[game_id].auto_mode = False
+        """ Turns off auto advance round """
+        # self.games[game_id].auto_mode = False
+        db_set_auto_mode(game_id, False)
 
     def get_game_running_totals(self, game_id):
         return self.games[game_id].scoreboard.running_totals

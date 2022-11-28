@@ -23,5 +23,30 @@ def db_get_game_ids():
     return
 
 def db_get_player_ids(game_id):
-    """ Returns list of player ids in a game """
+    """ Returns list of player ids in a game """    
+    return
+
+def db_get_round(game_id):
+    """ Returns game round """    
+    return
+
+def db_get_game_password(game_id):
+    """ Returns game password """    
+    return
+
+def db_set_paused(game_id, value: bool):
+    """ Sets paused to given value (true/false) """ 
+    # Need to make sure lambda functions are paused if game is paused
+    return
+
+def db_end_game(game_id):
+    """ Sets ended to true """ 
+    return
+
+def db_advance_round(game_id):
+    """ Increments round """ 
+    return
+
+def db_set_auto_mode(game_id, value: bool):
+    """ Sets auto to given value (true/false) """ 
     return
