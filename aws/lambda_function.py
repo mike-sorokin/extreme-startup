@@ -2,17 +2,18 @@ import json
 import boto3
 import requests
 
-db = boto3.client('dynamodb').Table("Games")
+dynamodb = boto3.client('dynamodb')
 
 def lambda_handler(event, context):
     print(r = requests.get('http://google.com?q=helloworld'))
 
-    db.put_item(
+    dynamodb.put_item(
+        TableName='Games', 
         Item={
-            'game_id':{
+            'fruitName':{
                 'S':'Banana'
             },
-            'players':{
+            'key2':{
                 'N':'value2'
             }
         }
