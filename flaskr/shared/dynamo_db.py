@@ -50,3 +50,11 @@ def db_advance_round(game_id):
 def db_set_auto_mode(game_id, value: bool):
     """ Sets auto to given value (true/false) """ 
     return
+
+def db_get_scores(game_id):
+    """ Returns game scores as a list of objects in the form {"time": timestamp, "pid": score} """ 
+    return
+
+def db_get_all_players(game_id):
+    """ Returns players as a dict in the form {player_id: Player, player_id: Player, ...} """ 
+    return

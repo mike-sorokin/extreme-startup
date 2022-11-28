@@ -223,10 +223,18 @@ class AWSGamesManager:
         db_set_auto_mode(game_id, False)
 
     def get_game_running_totals(self, game_id):
-        return self.games[game_id].scoreboard.running_totals
+        """ Gets list of objects in the form {"time": timestamp, "pid": score} """
+        # return self.games[game_id].scoreboard.running_totals
+        return db_get_scores(game_id)
 
     def get_game_players(self, game_id, *player_id):
-        return self.games[game_id].get_players(*player_id)
+        """ If player_id given, returns individual player object, else returns """
+        # return self.games[game_id].get_players(*player_id)
+        players = db_get_all_players(game_id)
+        if player_id:
+            return players[player_id]
+        
+        return players
 
     def get_score_for_player(self, game_id, player_id):
         return self.games[game_id].scoreboard.scores[player_id]
