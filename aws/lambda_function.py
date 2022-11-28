@@ -5,16 +5,22 @@ import requests
 dynamodb = boto3.client('dynamodb')
 
 def lambda_handler(event, context):
-    print(r = requests.get('http://google.com?q=helloworld'))
+    print(requests.get('http://google.com?q=helloworld'))
 
     dynamodb.put_item(
         TableName='Games', 
         Item={
+            'game_id': {
+                'S': 'alkdfjbasldfjn'
+            },
             'fruitName':{
                 'S':'Banana'
             },
-            'key2':{
-                'N':'value2'
+            'vegetableName':{
+                'S':'Potato'
+            },
+            'exampleNumber':{
+                'N':'123'
             }
         }
     )
@@ -23,3 +29,7 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': json.dumps('Hello from Lambda!')
     }
+
+
+if __name__ == "__main__":
+    lambda_handler(None, None)
