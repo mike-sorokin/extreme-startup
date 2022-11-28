@@ -71,7 +71,7 @@ class GameStats:
             player_success_rate = self.scoreboard.current_total_correct(player) / (self.scoreboard.total_requests_for(player) if self.scoreboard.total_requests_for(player) > 0 else 1)
             self.total_player_success_rate += player_success_rate
 
-            if player_success_rate > self.best_success_rate["value"]:
+            if player_success_rate >= self.best_success_rate["value"]:
                 self.best_success_rate["team"] = player.name
                 self.best_success_rate["value"] = player_success_rate
 
