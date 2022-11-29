@@ -145,18 +145,18 @@ class AWSGamesManager:
     def __init__(self, db_client):
         self.db_client = db_client
 
-    def get_all_games(self):
-        """ Returns list of all game objects in the database """
+    def get_all_games(self) -> dict:
+        """ Returns dict containing all games in the database """
 
         return db_get_all_games()
 
-    def get_game(self, game_id):
-        """ Returns corresponding game object for given game_id """
+    def get_game(self, game_id) -> dict:
+        """ Returns corresponding game for given game_id """
 
         return db_get_game(game_id)
 
-    def new_game(self, password):
-        """ Creates a new game in the database """
+    def new_game(self, password) -> dict:
+        """ Creates a new game in the database and returns newly created game """
 
         assert password.strip() != ""
 
@@ -183,23 +183,25 @@ class AWSGamesManager:
 
         return player_id in db_get_player_ids(game_id)
 
-    def game_has_password(self, game_id, password):
+    def game_has_password(self, game_id, password) -> bool:
         """ Checks that game password equals given password """
+        
         return db_get_game_password(game_id) == password
 
-    def game_in_last_round(self, game_id):
+    def game_in_last_round(self, game_id) -> bool:
         """ Check if game is in its final round """
+
         return db_get_round(game_id) == MAX_ROUND
 
     def pause_game(self, game_id):
         """ Pause a game """
-        # self.games[game_id].pause()
+
         db_set_paused(game_id, True)
 
     def unpause_game(self, game_id):
         """ Unpause a game """
-        # self.games[game_id].spawn_game_monitor()
-        # self.games[game_id].unpause()
+
+        # need to initialise game monitor
         db_set_paused(game_id, False)
 
     def end_game(self, game_id):
@@ -208,74 +210,104 @@ class AWSGamesManager:
 
     def advance_game_round(self, game_id):
         """ Advances game round """
-        # self.games[game_id].advance_round()
+
         db_advance_round(game_id)
         # what is round index and first round event?
 
     def set_auto_mode(self, game_id):
         """ Turns on auto advance round """
-        # self.games[game_id].auto_mode = True
+
         db_set_auto_mode(game_id, True)
 
     def clear_auto_mode(self, game_id):
         """ Turns off auto advance round """
-        # self.games[game_id].auto_mode = False
+
         db_set_auto_mode(game_id, False)
 
-    def get_game_running_totals(self, game_id):
+    def get_game_running_totals(self, game_id) -> list:
         """ Gets list of objects in the form {"time": timestamp, "pid": score} """
-        # return self.games[game_id].scoreboard.running_totals
+
         return db_get_scores(game_id)
 
-    def get_game_players(self, game_id, *player_id):
-        """ If player_id given, returns individual player object, else returns """
-        # return self.games[game_id].get_players(*player_id)
-        players = db_get_all_players(game_id)
-        if player_id:
-            return players[player_id]
-        
-        return players
+    def get_game_players(self, game_id, *player_id) -> dict:
+        """ If player_id(s) given, returns Player objects for only those players, else returns all Player objects """
 
-    def get_score_for_player(self, game_id, player_id):
-        return self.games[game_id].scoreboard.scores[player_id]
+        if player_id:
+            return {pid: db_get_player(game_id, player_id) for pid in list(player_id)}
+        else:
+            return db_get_all_players(game_id)
+
+    def get_score_for_player(self, game_id, player_id) -> int:
+        # This function is unused as far as I can see
+        """ Returns a player's score """
+
+        return db_get_player_score(game_id, player_id)
 
     def remove_game_players(self, game_id, *player_id):
-        self.games[game_id].remove_players(*player_id)
+        """ If player_id(s) provded, deletes corresponding players, else deletes all players for a given game """
+        
+        if player_id:
+            for pid in list(player_id):
+                db_delete_player(game_id, pid)
+        else:
+            db_delete_all_players(game_id)
 
-    def add_player_to_game(self, game_id, name, api):
-        player = Player(game_id, name, api)
-        return self.games[game_id].add_player(player)
+    def add_player_to_game(self, game_id, name, api) -> dict:
+        """ Adds a player to a game and returns newly added player """
 
-    def get_players_to_assist(self, game_id):
-        return self.games[game_id].players_to_assist
+        return db_add_player(game_id, name, api)
 
-    def update_player(self, game_id, player_id, name=None, api=None):
-        self.games[game_id].update_player(player_id, name, api)
+    def get_players_to_assist(self, game_id) -> dict:
+        """ Returns names of players to assist in the form { "needs_assistance": [], "being_assisted": [] } """
 
-    def get_player_events(self, game_id, player_id):
-        return self.games[game_id].get_events(player_id)
+        return db_get_players_to_assist(game_id)
 
     def assist_player(self, game_id, player_name):
-        self.games[game_id].assist_player(player_name)
+        """ Updates a player's state from 'needing assistance' to 'being assisted' """
+
+        db_assist_player(game_id, player_name)
+
+    def update_player(self, game_id, player_id, name=None, api=None):
+        """ Updates name and api of player """
+
+        db_update_player(game_id, player_id, name, api)
+
+    def get_player_events(self, game_id, player_id) -> list:
+        """ Returns list of event objects for a player """
+
+        return db_get_events(game_id, player_id)
 
     def delete_games(self, *game_id):
-        # Delete all game in game_id; if game_id is not provided, delete all games
-        gids = game_id if game_id else self.games.keys()
+        """ If game_id(s) provided, deletes those games, else deletes all games """
+
+        # gids = game_id if game_id else self.games.keys()
+
+        # for gid in list(gids):
+        #     # Copy player/scoreboard data for game review.
+        #     player_data = self.games[gid].get_players()
+        #     scoreboard_data = self.games[gid].scoreboard
+        #     analysis_event_data = self.games[gid].analysis_events
+
+        #     self.end_game(gid)  # ensures monitor threads are killed
+        #     self.remove_game_players(gid)  # kills administering question threads
+        #     self.unpause_game(gid)  # removes dangling administering question threads
+        #     del self.games[gid]
+
+        #     if len(player_data) > 0:
+        #         self.analyse_game(gid, player_data, scoreboard_data, analysis_event_data)
+
+        gids = game_id if game_id else db_get_game_ids()
 
         for gid in list(gids):
-            # Copy player/scoreboard data for game review.
-            player_data = self.games[gid].get_players()
-            scoreboard_data = self.games[gid].scoreboard
-            analysis_event_data = self.games[gid].analysis_events
+            player_data = db_get_all_players(gid)
+            scoreboard_data = db_get_scoreboard(gid)
+            analysis_event_data = db_get_analysis_events(gid)
 
-            self.end_game(gid)  # ensures monitor threads are killed
-            self.remove_game_players(gid)  # kills administering question threads
-            self.unpause_game(gid)  # removes dangling administering question threads
-            del self.games[gid]
-
+            db_end_game(gid)
+            # Need to make sure to stop/kill all threads by deleting sqs queue or stopping aws lambda idk
             if len(player_data) > 0:
                 self.analyse_game(gid, player_data, scoreboard_data, analysis_event_data)
-
+                
     def analyse_game(self, game_id, player_data, scoreboard, analysis_events):
         """
         Args:

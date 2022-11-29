@@ -58,3 +58,44 @@ def db_get_scores(game_id):
 def db_get_all_players(game_id):
     """ Returns players as a dict in the form {player_id: Player, player_id: Player, ...} """ 
     return
+
+def db_get_player(game_id, player_id):
+    """ Returns player object """ 
+    return
+
+def db_delete_player(game_id, player_id):
+    """ Deletes player """ 
+    return
+
+def db_delete_all_players(game_id):
+    """ Deletes all players """ 
+    return
+
+def db_add_player(game_id, name, api):
+    """ Add player and return created player object """ 
+    return
+
+def db_get_players_to_assist(game_id):
+    """ Returns names of players to assist in the form { "needs_assistance": [], "being_assisted": [] } """ 
+    return
+
+def db_assist_player(game_id, player_name):
+    """ Updates a player's state from 'needing assistance' to 'being assisted' """ 
+    return
+
+def db_update_player(game_id, player_id, name, api):
+    """ Updates name and api of player """ 
+    # I don't think this is ever used currently
+    return
+
+def db_get_events(game_id, player_id):
+    """ Returns list of event objects for a player """ 
+    return
+
+def db_get_scoreboard(game_id):
+    """ Returns Scoreboard object for a game (or at least a mock version) """ 
+    return
+
+def db_get_analysis_events(game_id):
+    """ Returns analysis events for a game (not sure what this means) """ 
+    return
