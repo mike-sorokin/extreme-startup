@@ -2,4 +2,5 @@ Lambda function tasks:
     # Check if game is paused
     1. send request to player and wait for response (player_api, Question object)
     2. verify response was correct (Question Object)
-    3. Update database to reflect outcome and points change ()
+    3. Update database to reflect outcome and points change (Scoreboard logic to determine points change)
+    4. Schedule the next question (QuestionFactory logic, RateController logic)
