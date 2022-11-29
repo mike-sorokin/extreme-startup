@@ -1,7 +1,8 @@
 import boto3
 from uuid import uuid4
 
-db = boto3.resource('dynamodb').Table('Games')
+dynamo_client = boto3.client('dynamodb')
+dynamo_resource = boto3.resource('dynamodb')
 
 def db_get_all_games():
     return {} # NOT IMPLEMENTED.
@@ -9,9 +10,73 @@ def db_get_all_games():
 def db_get_game(game_id):
     return db.get_item(Key={'game_id': game_id})
 
-def db_add_new_game(password):
+# Returns <game_id> of newly create game 
+def db_add_new_game(password, round=0):
     id = uuid4().hex[:8]
-    return
+
+    # Creates table w/ name <game_id> 
+    try: 
+        game_table = dynamo_resource.create_table(
+            TableName = id, 
+            KeySchema = [
+                {
+                    'AttributeName': 'ComponentId',
+                    'KeyType': 'HASH'
+                }
+            ],
+            AttributeDefinitions = [
+                {
+                    'AttributeName': 'ComponentId',
+                    'AttributeType': 'S'
+                }
+            ],
+            ProvisionedThroughput = { # BillingMode <- decide as group
+                'ReadCapacityUnits': 1,
+                'WriteCapacityUnits': 1
+            }
+        )
+    except dynamo_client.exceptions.ResourceInUseException:
+        print('Game with id: {} already exists'.format(id))
+        raise
+    except dynamo_client.exceptions.LimitExceededException:
+        print('Limit Exceeded Exception -- Update AWS configuration')
+        raise
+    except dynamo_client.exceptions.InternalServerError:
+        print('Internal Server Error')
+        raise
+    
+    game_table.wait_until_exists()
+    
+    # Set default game state
+    game_table.put_item(
+        Item = {
+            'ComponentId': 'State',
+            'AdminPassword': password,
+            'Round': round,
+            'Running': True,
+            'Ended': False,
+            'AutoMode': False
+        }
+    )
+
+    # Default players_to_assist and analysis events
+    game_table.put_item(
+        Item = {
+            'ComponentId': 'PlayersToAssist',
+            'NeedsAssistance': [],
+            'BeingAssisted': []
+        }
+    )
+
+    game_table.put_item(
+        Item = {
+            'ComponentId': 'AnalysisEvents',
+            'Events': []
+        }
+    )
+
+    # Spin up game_monitor in SQS 
+    return id
 
 def db_get_player_score(game_id, player_id):
     game = db_get_game(game_id)

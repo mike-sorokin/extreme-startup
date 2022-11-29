@@ -139,11 +139,26 @@ from uuid import uuid4
 from flaskr.shared.dynamo_db import *
 from flaskr.question_factory import (MAX_ROUND)
 
+sqs_client = boto3.client('sqs')
+sqs_resource = boto3.resource('sqs')
+
 class AWSGamesManager:
     """ Game manager class for lambda functions and backend server to interface with the DynamoDB """
 
     def __init__(self, db_client):
         self.db_client = db_client
+        
+        try: 
+            self.queue = sqs_resource.create_queue(
+                QueueName = 'GameTasks.fifo',
+                Attributes = {
+                    'FifoQueue': 'true' 
+                }
+            )
+        except sqs_client.exceptions.QueueNameExists:
+            self.queue = sqs_resource.get_queue_by_name(QueueName='GameTasks.fifo')
+        except sqs_client.QueueDeletedRecently: 
+            raise 
 
     def get_all_games(self) -> dict:
         """ Returns dict containing all games in the database """
@@ -155,9 +170,8 @@ class AWSGamesManager:
 
         return db_get_game(game_id)
 
-    def new_game(self, password) -> dict:
-        """ Creates a new game in the database and returns newly created game """
-
+    def new_game(self, password, round=0) -> dict:
+        """ Creates a new game in the database and returns newly created <game_id>""" 
         assert password.strip() != ""
 
         # new_game = {
@@ -168,10 +182,20 @@ class AWSGamesManager:
         #     "paused": False,
         #     "auto_mode": False
         # }
-        return db_add_new_game(password)
+        gid = db_add_new_game(password, round=0)
 
-        # Still need game monitors but not sure how this will work
-        # new_game.spawn_game_monitor()
+        # Start game monitor thread 
+        self.queue.send_message(
+            MessageBody = str(gid),
+            MessageAttributes = {
+                'MessageType': {
+                    'StringValue': 'Monitor',
+                    'DataType': 'String'
+                }
+            }
+        )
+
+        return gid
 
     def game_exists(self, game_id) -> bool:
         """ Checks if game_id exists in database """
