@@ -234,7 +234,6 @@ def db_get_all_players(game_id):
 def db_get_player(game_id, player_id):
     """ Returns player object """ 
     player_json = {}
-    print(player_id)
     player_item = dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': player_id})['Item']
 
     player_json['id'] = player_id
@@ -249,10 +248,48 @@ def db_get_player(game_id, player_id):
 
 def db_delete_player(game_id, player_id):
     """ Deletes player """ 
+    dynamo_resource.Table(game_id).update_item(
+        Key={'ComponentId': player_id},
+        UpdateExpression='SET Active = :false',
+        ExpressionAttributeValues={
+            ':false' : False
+        }
+    )
+
+    pids = dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': 'State'})['Item']['PlayerIds']
+    pids.remove(player_id)
+
+    dynamo_resource.Table(game_id).update_item(
+        Key={'ComponentId': 'State'},
+        UpdateExpression='SET PlayerIds = :newPlayerIds',
+        ExpressionAttributeValues={
+            ':newPlayerIds' : pids
+        }
+    )
     return
 
 def db_delete_all_players(game_id):
     """ Deletes all players """ 
+    game_table = dynamo_resource.Table(game_id)
+    pids = game_table.get_item(Key = {'ComponentId': 'State'})['Item']['PlayerIds']
+
+    for pid in pids:
+        dynamo_resource.Table(game_id).update_item(
+            Key={'ComponentId': pid},
+            UpdateExpression='SET Active = :false',
+            ExpressionAttributeValues={
+                ':false' : False
+            }
+        )
+
+    dynamo_resource.Table(game_id).update_item(
+        Key={'ComponentId': 'State'},
+        UpdateExpression='SET PlayerIds = :newPlayerIds',
+        ExpressionAttributeValues={
+            ':newPlayerIds' : []
+        }
+    )
+
     return
 
 def db_add_player(game_id, name, api):
