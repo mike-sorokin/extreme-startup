@@ -13,6 +13,9 @@ def lambda_handler(event, context):
     counter_attribute = message["messageAttributes"].get("Counter")
     if counter_attribute is not None:
         counter = counter_attribute.get("stringValue", 0)
+    else:
+        print("counter property does not exist")
+        return
 
     print("counter", counter)
 
