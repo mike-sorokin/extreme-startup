@@ -111,6 +111,13 @@ def db_add_new_game(password, round=0):
         }
     )
 
+    game_table.put_item(
+        Item = {
+            'ComponentId': 'RunningTotals',
+            'GraphData': [{"time": dt.datetime.now(dt.timezone.utc).isoformat()}]
+        }
+    )
+
     # Spin up game_monitor in SQS 
     return id
 
