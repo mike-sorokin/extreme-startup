@@ -363,11 +363,37 @@ def db_update_player(game_id, player_id, name, api):
             ':newAPI' : api,
         }
     )
-    
+
 
 def db_get_events(game_id, player_id):
     """ Returns list of event objects for a player """ 
-    return
+    return dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': player_id})['Item']['Events']
+
+
+def db_add_events(game_id, player_id, query, difficulty, points_gained, response_type):
+    game_table = dynamo_resource.Table(game_id)
+
+    event = {
+        'event_id' : uuid4().hex[:8],
+        'player_id' : player_id,
+        'game_id' : game_id,
+        'query' : query,
+        'difficulty' : difficulty,
+        'points_gained' : points_gained,
+        'response_type' : response_type,
+        'timestamp' : dt.datetime.now(dt.timezone.utc).isoformat()
+    }
+    events = game_table.get_item(Key = {'ComponentId': player_id})['Item']['Events']
+    events.append(event)
+
+    game_table.update_item(
+        Key={'ComponentId' : player_id},
+        UpdateExpression='SET Events = :newEvent',
+        ExpressionAttributeValues={
+            ':newEvent' : events,
+        }
+    )
+
 
 def db_get_scoreboard(game_id):
     """ Returns Scoreboard object for a game (or at least a mock version) """ 
