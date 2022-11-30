@@ -9,7 +9,6 @@ from flask import (
     session,
 )
 from flaskr.player import Player
-from flaskr.games_manager import GamesManager
 from flaskr.aws_games_manager import AWSGamesManager
 from flaskr.json_encoder import JSONEncoder
 from flaskr.questions import *
