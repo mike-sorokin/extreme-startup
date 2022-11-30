@@ -370,7 +370,7 @@ def db_get_events(game_id, player_id):
     return dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': player_id})['Item']['Events']
 
 
-def db_add_events(game_id, player_id, query, difficulty, points_gained, response_type):
+def db_add_event(game_id, player_id, query, difficulty, points_gained, response_type):
     game_table = dynamo_resource.Table(game_id)
 
     event = {
@@ -399,6 +399,21 @@ def db_get_scoreboard(game_id):
     """ Returns Scoreboard object for a game (or at least a mock version) """ 
     return
 
+def db_add_analysis_event(game_id, event):
+    game_table = dynamo_resource.Table(game_id)
+
+    events = game_table.get_item(Key = {'ComponentId': 'AnalysisEvents'})['Item']['Events']
+    events.append(event)
+
+    game_table.update_item(
+        Key={'ComponentId' : 'AnalysisEvents'},
+        UpdateExpression='SET Events = :newEvent',
+        ExpressionAttributeValues={
+            ':newEvent' : events,
+        }
+    )
+
+
 def db_get_analysis_events(game_id):
     """ Returns analysis events for a game (not sure what this means) """ 
-    return
+    return dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': 'AnalysisEvents'})['Item']['Events']
