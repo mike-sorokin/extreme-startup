@@ -50,7 +50,7 @@ def lambda_handler(event, context):
                 'DataType': 'String'
             },
             'Counter': {
-                'StringValue': str(counter_attribute),
+                'StringValue': str(counter),
                 'DataType': 'Number'
             },
             'MessageType': {
@@ -62,7 +62,7 @@ def lambda_handler(event, context):
     print(res)
     return {
         'statusCode': 200,
-        'body': json.dumps(counter_attribute)
+        'body': json.dumps(counter)
     }
 
 
