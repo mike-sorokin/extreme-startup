@@ -1,6 +1,7 @@
 import json
 import boto3
 import requests
+import random
 
 
 def lambda_handler(event, context):
@@ -18,8 +19,9 @@ def lambda_handler(event, context):
     if counter <= 0:
         return
 
-    queue.send_message(
+    res = queue.send_message(
         MessageBody="Hello",
+        MessageDeduplicationId=str(random.randint(1, 1000))
         DelaySeconds=1,
         MessageAttributes={
             'GameID': {
@@ -36,6 +38,7 @@ def lambda_handler(event, context):
             }
         }
     )
+    print(res)
 
 
 # if db_is_game_paused(event["game_id"]):
