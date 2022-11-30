@@ -163,7 +163,7 @@ def db_set_paused(game_id, value: bool):
 
 def db_end_game(game_id):
     """ Sets ended to true """ 
-    return
+    return 
 
 def db_advance_round(game_id):
     """ Increments round """ 
@@ -207,7 +207,7 @@ def db_set_auto_mode(game_id, value: bool):
 
 def db_get_scores(game_id):
     """ Returns game scores as a list of objects in the form {"time": timestamp, "pid": score} """ 
-    return
+    return dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': 'RunningTotals'})['Item']['GraphData']
 
 def db_get_all_players(game_id):
     """ Returns players as a dict in the form {player_id: Player, player_id: Player, ...} """ 
@@ -339,6 +339,9 @@ def db_assist_player(game_id, player_name):
     needs_assistance = players_to_assist['NeedsAssistance']
     being_assisted = players_to_assist['BeingAssisted']
 
+    if player_name not in needs_assistance:
+        return False
+
     needs_assistance.remove(player_name)
     being_assisted.append(player_name)
 
@@ -350,19 +353,33 @@ def db_assist_player(game_id, player_name):
             ':beingAssisted' : being_assisted,
         }
     )
+    return True
 
 def db_update_player(game_id, player_id, name, api):
     """ Updates name and api of player """ 
     game_table = dynamo_resource.Table(game_id)
 
-    game_table.update_item(
-        Key={'ComponentId' : player_id},
-        UpdateExpression='SET Name = :newName, API = :newAPI',
-        ExpressionAttributeValues={
-            ':newName' : name,
-            ':newAPI' : api,
-        }
-    )
+    if name:
+        game_table.update_item(
+            Key={'ComponentId' : player_id},
+            UpdateExpression='SET #Name = :newName',
+            ExpressionAttributeValues={
+                ':newName' : name,
+            },
+            ExpressionAttributeNames={
+                "#Name": "Name"
+            }
+        )
+
+    if api:
+        game_table.update_item(
+            Key={'ComponentId' : player_id},
+            UpdateExpression='SET API = :newAPI',
+            ExpressionAttributeValues={
+                ':newAPI' : api,
+            }
+        )
+
 
 
 def db_get_events(game_id, player_id):

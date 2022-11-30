@@ -12,7 +12,6 @@ from flaskr.player import Player
 from flaskr.aws_games_manager import AWSGamesManager
 from flaskr.json_encoder import JSONEncoder
 from flaskr.questions import *
-from flaskr.database import get_mongo_client
 import threading
 import secrets
 from random import randint
@@ -41,8 +40,6 @@ def create_app():
     app.url_map.strict_slashes = False
 
     app.config["SECRET_KEY"] = secrets.token_hex()
-
-    db_client = get_mongo_client()
 
     games_manager = AWSGamesManager()
 
@@ -165,8 +162,10 @@ def create_app():
                 return ("GAME_ENDED", 200)
 
             elif "assisting" in r: # r["assisting"] is player_name
-                games_manager.assist_player(game_id, r["assisting"])
-                return ("ASSISTING {}".format(r["assisting"].upper()), 200)
+                if games_manager.assist_player(game_id, r["assisting"]):
+                    return ("ASSISTING {}".format(r["assisting"].upper()), 200)
+                else:
+                    return ("{} not in needs_assistance list".format(r["assisting"]), NOT_ACCEPTED)
 
             return NOT_ACCEPTABLE
 
@@ -183,7 +182,7 @@ def create_app():
             return NOT_ACCEPTABLE
 
         cumulative_sums = games_manager.get_game_running_totals(game_id)
-        r = make_response(encoder.encode(cumulative_sums))
+        r = make_response(cumulative_sums)
         r.mimetype = "application/json"
         return r
 
@@ -227,7 +226,7 @@ def create_app():
 
         return games_manager.get_players_to_assist(game_id)
 
-    @app.get("/api/<game_id>/gameover")
+    @app.get("/api/<game_id>/gameover")                                     # <-------------------- TODO WHY WE NEED THIS
     def gameover(game_id):
         r = make_response(encoder.encode({"game_over": game_id in ended_games}))
         r.mimetype = "application/json"
