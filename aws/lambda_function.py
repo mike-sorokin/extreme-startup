@@ -19,9 +19,29 @@ def lambda_handler(event, context):
     if counter <= 0:
         return
 
-    res = queue.send_message(
-        MessageBody="Hello",
-        DelaySeconds=1,
+    # res = queue.send_message(
+    #     MessageBody="Hello",
+    #     DelaySeconds=1,
+    #     MessageAttributes={
+    #         'GameID': {
+    #             'StringValue': 'test_id',
+    #             'DataType': 'String'
+    #         },
+    #         'Counter': {
+    #             'StringValue': str(counter),
+    #             'DataType': 'Number'
+    #         },
+    #         'MessageType': {
+    #             'StringValue': 'AdministerQuestion',
+    #             'DataType': 'String'
+    #         }
+    #     }
+    # )
+
+    sqs = boto3.client('sqs')
+    res = sqs.send_message(
+        QueueUrl="https://sqs.eu-west-2.amazonaws.com/572990232030/GameTasks",
+        MessageBody="hello",
         MessageAttributes={
             'GameID': {
                 'StringValue': 'test_id',
@@ -38,6 +58,11 @@ def lambda_handler(event, context):
         }
     )
     print(res)
+    return {
+        'statusCode': 200,
+        'body': json.dumps(counter)
+    }
+
 
 
 # if db_is_game_paused(event["game_id"]):
@@ -73,4 +98,22 @@ def lambda_handler(event, context):
 
 
 if __name__ == "__main__":
-    lambda_handler(None, None)
+    sqs = boto3.client('sqs')
+    sqs.send_message(
+        QueueUrl="https://sqs.eu-west-2.amazonaws.com/572990232030/GameTasks",
+        MessageBody="hello",
+        MessageAttributes={
+            'GameID': {
+                'StringValue': 'test_id',
+                'DataType': 'String'
+            },
+            'Counter': {
+                'StringValue': '10',
+                'DataType': 'Number'
+            },
+            'MessageType': {
+                'StringValue': 'AdministerQuestion',
+                'DataType': 'String'
+            }
+        }
+    )
