@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@mantine/core'
-import { showNotification } from '@mantine/notifications'
+import { showNotification, updateNotification } from '@mantine/notifications'
 import { IconCheck, IconHome, IconX, IconAlertTriangle, IconInfoCircle } from '@tabler/icons'
 import { homeUrl } from './urls'
 
@@ -22,6 +22,26 @@ export default function HomeButton ({ size }) {
       Go to Home Page
     </Button>
   )
+}
+
+export function showLoadingNotification (notifId, header, msg) {
+  showNotification({
+    id: notifId,
+    title: header,
+    message: msg,
+    color: 'teal',
+    loading: true
+  })
+}
+
+export function updateLoadingNotification (notifId, header, msg) {
+  updateNotification({
+    id: notifId,
+    title: header,
+    message: msg,
+    icon: <IconCheck size={18} />,
+    color: 'teal'
+  })
 }
 
 export function showSuccessNotification (msg) {

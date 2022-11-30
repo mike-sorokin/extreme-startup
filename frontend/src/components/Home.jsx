@@ -4,7 +4,7 @@ import { Button, Card, Center, Modal, PasswordInput, Space, Stack, Text, TextInp
 
 import { checkGameEnded, createNewGame } from '../utils/requests'
 import { gameReviewUrl } from '../utils/urls'
-import { showErrorNotification, showFailureNotification, showSuccessNotification } from '../utils/utils'
+import { showErrorNotification, showFailureNotification, showLoadingNotification, updateLoadingNotification } from '../utils/utils'
 
 import AddPlayer from './AddPlayer'
 import GoToGame from './GoToGame'
@@ -26,8 +26,9 @@ function Home () {
     event.preventDefault()
 
     try {
+      showLoadingNotification('create-game', 'Game creation in progress', 'Creating game...')
       const response = await createNewGame({ password: pwd })
-      showSuccessNotification('Successfully Created Game!')
+      updateLoadingNotification('create-game', 'Success!', 'Game successfully created!')
       setNewGameId(response.id)
       setOpenedChoosePwd(false)
       setOpenedCreateGame(true)
