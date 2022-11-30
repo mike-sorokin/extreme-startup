@@ -328,7 +328,9 @@ def db_add_player(game_id, name, api):
 
 def db_get_players_to_assist(game_id):
     """ Returns names of players to assist in the form { "needs_assistance": [], "being_assisted": [] } """ 
-    return
+    game_table = dynamo_resource.Table(game_id)
+    players_to_assist = game_table.get_item(Key = {'ComponentId': 'PlayersToAssist'})['Item']
+    return {"needs_assistance": players_to_assist['NeedsAssistance'], "being_assisted": players_to_assist['BeingAssisted']}
 
 def db_assist_player(game_id, player_name):
     """ Updates a player's state from 'needing assistance' to 'being assisted' """ 
