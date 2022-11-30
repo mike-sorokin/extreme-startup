@@ -353,8 +353,17 @@ def db_assist_player(game_id, player_name):
 
 def db_update_player(game_id, player_id, name, api):
     """ Updates name and api of player """ 
-    # I don't think this is ever used currently
-    return
+    game_table = dynamo_resource.Table(game_id)
+
+    game_table.update_item(
+        Key={'ComponentId' : player_id},
+        UpdateExpression='SET Name = :newName, API = :newAPI',
+        ExpressionAttributeValues={
+            ':newName' : name,
+            ':newAPI' : api,
+        }
+    )
+    
 
 def db_get_events(game_id, player_id):
     """ Returns list of event objects for a player """ 
