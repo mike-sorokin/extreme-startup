@@ -223,8 +223,26 @@ def db_delete_all_players(game_id):
     return
 
 def db_add_player(game_id, name, api):
-    """ Add player and return created player object """ 
-    return
+    """ Add player to DB """ 
+    pid = uuid4().hex[:8]
+    modification_hash = uuid4().hex[:16]
+
+    dynamo_resource.Table(game_id).put_item(
+        Item = {
+            'ComponentId': pid,
+            'Name': name,
+            'API': api, 
+            'Score': 0,
+            'Streak': "", 
+            'Events': [],
+            'Active': True,
+            'RoundIndex': 0,
+            'CurrentStreakLength': 0, 
+            'LongestStreak': 0
+            'ModificationHash': modification_hash
+        }
+    )
+    return { 'id': pid, 'game_id': game_id, 'score': 0, 'api': api, 'events': [], 'streak': ""}, modification_hash
 
 def db_get_players_to_assist(game_id):
     """ Returns names of players to assist in the form { "needs_assistance": [], "being_assisted": [] } """ 
@@ -232,7 +250,7 @@ def db_get_players_to_assist(game_id):
 
 def db_assist_player(game_id, player_name):
     """ Updates a player's state from 'needing assistance' to 'being assisted' """ 
-    
+    pass 
 
 def db_update_player(game_id, player_id, name, api):
     """ Updates name and api of player """ 

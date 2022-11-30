@@ -2,8 +2,9 @@ from flaskr.json_encoder import JSONEncoder
 from flaskr.game import Game
 from flaskr.player import Player
 from flaskr.game_stats import GameStats
+from flaskr.question_factory import QuestionFactory
 
-
+DEFAULT_DELAY = 5
 # Manages all active game instances -- instructing what games should modify when live and also in charge
 # of uploading relevant game information to the DB upon game termination 
 class GamesManager:
@@ -147,16 +148,17 @@ class AWSGamesManager:
 
     def __init__(self, db_client):
         self.db_client = db_client
+        self.question_factory = QuestionFactory()
         
         try: 
             self.queue = sqs_resource.create_queue(
-                QueueName = 'GameTasks.fifo',
+                QueueName = 'GameTasks',
                 Attributes = {
-                    'FifoQueue': 'true' 
+                    'FifoQueue': 'false' 
                 }
             )
         except sqs_client.exceptions.QueueNameExists:
-            self.queue = sqs_resource.get_queue_by_name(QueueName='GameTasks.fifo')
+            self.queue = sqs_resource.get_queue_by_name(QueueName='GameTasks')
         except sqs_client.QueueDeletedRecently: 
             raise 
 
@@ -266,8 +268,38 @@ class AWSGamesManager:
 
     def add_player_to_game(self, game_id, name, api) -> dict:
         """ Adds a player to a game and returns newly added player """
+        new_player, modification_hash = db_add_player(game_id, name, api)
+        curr_round = db_get_round(game_id)
 
-        return db_add_player(game_id, name, api)
+        # Start administering questions
+        self.queue.send_message(
+            MessageBody = self.question_factory.next_question(curr_round),
+            DelaySeconds = 0, 
+            MessageAttributes = {
+                'PlayerID': {
+                    'StringValue': new_player['id'],
+                    'DataType': 'String'
+                },
+                'QuestionDelay': {
+                    'NumberValue': DEFAULT_DELAY,
+                    'DataType': 'Number'
+                },
+                'GameID': {
+                    'StringValue': str(gid),
+                    'DataType': 'String'
+                },
+                'ModificationHash': { 
+                    'StringValue': modification_hash,
+                    'DataType': 'String'
+                },
+                'MessageType': {
+                    'StringValue': 'AdministerQuestion',
+                    'DataType': 'String'
+                }
+            }
+        )
+        
+        return new_player
 
     def get_players_to_assist(self, game_id) -> dict:
         """ Returns names of players to assist in the form { "needs_assistance": [], "being_assisted": [] } """
@@ -276,7 +308,6 @@ class AWSGamesManager:
 
     def assist_player(self, game_id, player_name):
         """ Updates a player's state from 'needing assistance' to 'being assisted' """
-
         db_assist_player(game_id, player_name)
 
     def update_player(self, game_id, player_id, name=None, api=None):
