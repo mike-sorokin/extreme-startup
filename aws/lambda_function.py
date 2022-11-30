@@ -9,9 +9,10 @@ def lambda_handler(event, context):
     sqs_resource = boto3.resource('sqs')
     queue = sqs_resource.get_queue_by_name(QueueName='GameTasks')
 
-    print(event)
     message = event.get("Records")[0]
-    counter = message["messageAttributes"].get("Counter", 0)
+    counter_attribute = message["messageAttributes"].get("Counter")
+    if counter_attribute is not None:
+        counter = counter_attribute.get("stringValue", 0)
 
     print("counter", counter)
 
@@ -49,7 +50,7 @@ def lambda_handler(event, context):
                 'DataType': 'String'
             },
             'Counter': {
-                'StringValue': str(counter),
+                'StringValue': str(counter_attribute),
                 'DataType': 'Number'
             },
             'MessageType': {
@@ -61,7 +62,7 @@ def lambda_handler(event, context):
     print(res)
     return {
         'statusCode': 200,
-        'body': json.dumps(counter)
+        'body': json.dumps(counter_attribute)
     }
 
 
