@@ -12,7 +12,7 @@ def lambda_handler(event, context):
     message = event.get("Records")[0]
     counter_attribute = message["messageAttributes"].get("Counter")
     if counter_attribute is not None:
-        counter = counter_attribute.get("stringValue", 0)
+        counter = int(counter_attribute.get("stringValue", 0))
     else:
         print("counter property does not exist")
         return
