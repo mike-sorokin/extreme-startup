@@ -10,6 +10,7 @@ from flask import (
 )
 from flaskr.player import Player
 from flaskr.games_manager import GamesManager
+from flaskr.aws_games_manager import AWSGamesManager
 from flaskr.json_encoder import JSONEncoder
 from flaskr.questions import *
 from flaskr.database import get_mongo_client
@@ -44,7 +45,7 @@ def create_app():
 
     db_client = get_mongo_client()
 
-    games_manager = GamesManager(db_client)
+    games_manager = AWSGamesManager()
 
     # Temporary list of ended game ids
     ended_games = []

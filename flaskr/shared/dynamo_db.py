@@ -7,7 +7,7 @@ dynamo_resource = boto3.resource('dynamodb')
 def db_get_all_games():
     game_tables = list(dynamo_resource.tables.all())
     jsonified_games = {}
-
+    print(len(game_tables))
     for game_table in game_tables:
         game_json = {} 
         game_state = game_table.get_item(Key = {'ComponentId': 'State'})['Item']
@@ -19,7 +19,7 @@ def db_get_all_games():
         game_json['round'] = game_state['Round']
         game_json['paused'] = not bool(game_state['Running'])
         game_json['auto_mode'] = bool(game_state['AutoMode'])
-        game_json['players'] = game_state['Players']
+        game_json['players'] = game_state['PlayerIds']
         game_json['players_to_assist'] = players_to_assist
 
         jsonified_games[game_table.name] = game_json
@@ -40,7 +40,7 @@ def db_get_game(game_id):
     game_json['round'] = game_state['Round']
     game_json['paused'] = not bool(game_state['Running'])
     game_json['auto_mode'] = bool(game_state['AutoMode'])
-    game_json['players'] = game_state['Players']
+    game_json['players'] = game_state['PlayerIds']
     game_json['players_to_assist'] = players_to_assist
 
     return game_json
@@ -238,7 +238,7 @@ def db_add_player(game_id, name, api):
             'Active': True,
             'RoundIndex': 0,
             'CurrentStreakLength': 0, 
-            'LongestStreak': 0
+            'LongestStreak': 0,
             'ModificationHash': modification_hash
         }
     )
