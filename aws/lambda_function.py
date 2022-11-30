@@ -2,12 +2,11 @@ import json
 import boto3
 import requests
 
-dynamodb = boto3.client('dynamodb')
-sqs_resource = boto3.resource('sqs')
-queue = sqs_resource.get_queue_by_name(QueueName='GameTasks')
-
 
 def lambda_handler(event, context):
+    # dynamodb = boto3.client('dynamodb')
+    sqs_resource = boto3.resource('sqs')
+    queue = sqs_resource.get_queue_by_name(QueueName='GameTasks')
 
     print(event)
     counter = int(event['Counter'])
