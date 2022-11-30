@@ -10,7 +10,7 @@ def lambda_handler(event, context):
     queue = sqs_resource.get_queue_by_name(QueueName='GameTasks')
 
     print(event)
-    counter = int(event['Counter'])
+    counter = event.get('Counter', 0)
 
     print("The counter is", counter)
 
@@ -64,7 +64,6 @@ def lambda_handler(event, context):
     }
 
 
-
 # if db_is_game_paused(event["game_id"]):
 #     # put event back on the queue and return?
 #     pass
@@ -95,7 +94,6 @@ def lambda_handler(event, context):
 # if result:
 #     pass
 #     # db_correct_answer(game_id, player_id, question)?
-
 
 if __name__ == "__main__":
     sqs = boto3.client('sqs')
