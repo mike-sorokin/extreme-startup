@@ -178,7 +178,6 @@ class AWSGamesManager:
 
     def update_player(self, game_id, player_id, name=None, api=None):
         """ Updates name and api of player """
-
         db_update_player(game_id, player_id, name, api)
 
     def get_player_events(self, game_id, player_id) -> list:

@@ -334,7 +334,22 @@ def db_get_players_to_assist(game_id):
 
 def db_assist_player(game_id, player_name):
     """ Updates a player's state from 'needing assistance' to 'being assisted' """ 
-    pass 
+    game_table = dynamo_resource.Table(game_id)
+    players_to_assist = game_table.get_item(Key = {'ComponentId': 'PlayersToAssist'})['Item']
+    needs_assistance = players_to_assist['NeedsAssistance']
+    being_assisted = players_to_assist['BeingAssisted']
+
+    needs_assistance.remove(player_name)
+    being_assisted.append(player_name)
+
+    game_table.update_item(
+        Key={'ComponentId' : 'PlayersToAssist'},
+        UpdateExpression='SET NeedsAssistance = :newNeedsAssistance, BeingAssisted = :beingAssisted',
+        ExpressionAttributeValues={
+            ':newNeedsAssistance' : needs_assistance,
+            ':beingAssisted' : being_assisted,
+        }
+    )
 
 def db_update_player(game_id, player_id, name, api):
     """ Updates name and api of player """ 
