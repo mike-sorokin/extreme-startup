@@ -21,7 +21,6 @@ def lambda_handler(event, context):
 
     res = queue.send_message(
         MessageBody="Hello",
-        MessageDeduplicationId=str(random.randint(1, 1000)),
         DelaySeconds=1,
         MessageAttributes={
             'GameID': {
