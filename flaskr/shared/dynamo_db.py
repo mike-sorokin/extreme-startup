@@ -42,9 +42,9 @@ def db_get_game(game_id):
     game_json['paused'] = not bool(game_state['Running'])
     game_json['auto_mode'] = bool(game_state['AutoMode'])
     game_json['players'] = game_state['PlayerIds']
-    game_json['players_to_assist'] = players_to_assist
+    game_json['players_to_assist'] = {"needs_assistance": players_to_assist["NeedsAssistance"], 
+                                     "being_assisted": players_to_assist["BeingAssisted"] }
 
-    print(game_json)
 
     return game_json
 
