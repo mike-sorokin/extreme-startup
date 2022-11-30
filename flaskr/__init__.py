@@ -204,7 +204,7 @@ def create_app():
             new_player = games_manager.add_player_to_game(
                 game_id, request.get_json()["name"], request.get_json()["api"]
             )
-            session["player"] = new_player.uuid
+            session["player"] = new_player["id"]
 
             r = make_response(encoder.encode(new_player))
             r.mimetype = "application/json"

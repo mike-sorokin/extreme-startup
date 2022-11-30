@@ -27,7 +27,7 @@ class QuestionFactory:
 
     # Randomly select question from question window to ask player. Window size <= 4
     def next_question(self, round):
-        window_start, window_end = adjust_window(round) 
+        window_start, window_end = self.adjust_window(round) 
         available_question_types = self.question_types[
             window_start : window_end
         ]

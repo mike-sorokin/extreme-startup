@@ -10,6 +10,8 @@ from flaskr.question_factory import QuestionFactory
 sqs_client = boto3.client('sqs')
 sqs_resource = boto3.resource('sqs')
 
+DEFAULT_DELAY = 5
+
 class AWSGamesManager:
     """ Game manager class for lambda functions and backend server to interface with the DynamoDB """
 
@@ -111,7 +113,7 @@ class AWSGamesManager:
         """ If player_id(s) given, returns Player objects for only those players, else returns all Player objects """
 
         if player_id:
-            return {pid: db_get_player(game_id, player_id) for pid in list(player_id)}
+            return {pid: db_get_player(game_id, pid) for pid in list(player_id)}
         else:
             return db_get_all_players(game_id)
 
@@ -137,7 +139,7 @@ class AWSGamesManager:
 
         # Start administering questions
         self.queue.send_message(
-            MessageBody = self.question_factory.next_question(curr_round),
+            MessageBody = self.question_factory.next_question(curr_round).as_text(),
             DelaySeconds = 0, 
             MessageAttributes = {
                 'PlayerID': {
@@ -145,11 +147,11 @@ class AWSGamesManager:
                     'DataType': 'String'
                 },
                 'QuestionDelay': {
-                    'NumberValue': DEFAULT_DELAY,
+                    'StringValue': str(DEFAULT_DELAY),
                     'DataType': 'Number'
                 },
                 'GameID': {
-                    'StringValue': str(gid),
+                    'StringValue': game_id,
                     'DataType': 'String'
                 },
                 'ModificationHash': { 

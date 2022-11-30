@@ -135,7 +135,7 @@ def db_get_game_ids():
 
 def db_get_player_ids(game_id):
     """ Returns list of player ids in a game """    
-    return
+    return dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': 'State'})['Item']['PlayerIds']
 
 def db_get_round(game_id):
     """ Returns game round """    
@@ -211,11 +211,41 @@ def db_get_scores(game_id):
 
 def db_get_all_players(game_id):
     """ Returns players as a dict in the form {player_id: Player, player_id: Player, ...} """ 
-    return
+    game_table = dynamo_resource.Table(game_id)
+    pids = game_table.get_item(Key = {'ComponentId': 'State'})['Item']['PlayerIds']
+    jsonified_players = {}
+
+    for pid in pids:
+        player_json = {} 
+        player_item = game_table.get_item(Key = {'ComponentId': pid})['Item']
+
+        player_json['id'] = pid
+        player_json['game_id'] = game_id
+        player_json['name'] = player_item['Name']
+        player_json['score'] = int(player_item['Score'])
+        player_json['api'] = player_item['API']
+        player_json['events'] = player_item['Events']
+        player_item['streak'] = player_item['Streak']
+
+        jsonified_players[pid] = player_json
+
+    return jsonified_players
 
 def db_get_player(game_id, player_id):
     """ Returns player object """ 
-    return
+    player_json = {}
+    print(player_id)
+    player_item = dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': player_id})['Item']
+
+    player_json['id'] = player_id
+    player_json['game_id'] = game_id
+    player_json['name'] = player_item['Name']
+    player_json['score'] = int(player_item['Score'])
+    player_json['api'] = player_item['API']
+    player_json['events'] = player_item['Events']
+    player_item['streak'] = player_item['Streak']
+
+    return player_json
 
 def db_delete_player(game_id, player_id):
     """ Deletes player """ 
@@ -245,6 +275,18 @@ def db_add_player(game_id, name, api):
             'ModificationHash': modification_hash
         }
     )
+
+    pids = dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': 'State'})['Item']['PlayerIds']
+    pids.append(pid)
+
+    dynamo_resource.Table(game_id).update_item(
+        Key={'ComponentId': 'State'},
+        UpdateExpression='SET PlayerIds = :newPlayerIds',
+        ExpressionAttributeValues={
+            ':newPlayerIds' : pids
+        }
+    )
+
     return { 'id': pid, 'game_id': game_id, 'score': 0, 'api': api, 'events': [], 'streak': ""}, modification_hash
 
 def db_get_players_to_assist(game_id):
