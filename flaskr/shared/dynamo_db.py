@@ -1,5 +1,6 @@
 import boto3
 from uuid import uuid4
+import datetime as dt
 
 dynamo_client = boto3.client('dynamodb')
 dynamo_resource = boto3.resource('dynamodb')
@@ -16,7 +17,7 @@ def db_get_all_games():
         del players_to_assist['ComponentId']
 
         game_json['id'] = game_table.name
-        game_json['round'] = game_state['Round']
+        game_json['round'] = int(game_state['Round'])
         game_json['paused'] = not bool(game_state['Running'])
         game_json['auto_mode'] = bool(game_state['AutoMode'])
         game_json['players'] = game_state['PlayerIds']
@@ -37,11 +38,13 @@ def db_get_game(game_id):
     del players_to_assist['ComponentId']
 
     game_json['id'] = game_table.name
-    game_json['round'] = game_state['Round']
+    game_json['round'] = int(game_state['Round'])
     game_json['paused'] = not bool(game_state['Running'])
     game_json['auto_mode'] = bool(game_state['AutoMode'])
     game_json['players'] = game_state['PlayerIds']
     game_json['players_to_assist'] = players_to_assist
+
+    print(game_json)
 
     return game_json
 

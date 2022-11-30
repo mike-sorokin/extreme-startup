@@ -27,11 +27,11 @@ class AWSGamesManager:
 
     def get_all_games(self) -> dict:
         """ Returns dict containing all games in the database """
-        return JSONEncoder().encode(db_get_all_games())
+        return db_get_all_games()
 
     def get_game(self, game_id) -> dict:
         """ Returns corresponding game for given game_id """
-        return JSONEncoder().encode(db_get_game(game_id))
+        return db_get_game(game_id)
 
     def new_game(self, password, round=0) -> dict:
         """ Creates a new game in the database and returns newly created <game_id>""" 
