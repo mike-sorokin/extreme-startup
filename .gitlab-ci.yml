@@ -153,6 +153,7 @@ archive-lambda:
   only:
     - master
     - aws_attachment_attempt
+    - lambdaHandler
   image: ubuntu
   when:
     on_success
@@ -174,6 +175,7 @@ deploy-lambda:
   only:
     - master
     - aws_attachment_attempt
+    - lambdaHandler
   image:
     name: amazon/aws-cli
     entrypoint: [""]
