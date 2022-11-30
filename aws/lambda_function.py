@@ -3,13 +3,16 @@ import boto3
 import requests
 import random
 
+# dynamodb = boto3.client('dynamodb')
+sqs_resource = boto3.resource('sqs')
+queue = sqs_resource.get_queue_by_name(QueueName='GameTasks')
+
 
 def lambda_handler(event, context):
-    # dynamodb = boto3.client('dynamodb')
-    sqs_resource = boto3.resource('sqs')
-    queue = sqs_resource.get_queue_by_name(QueueName='GameTasks')
-
+    # Get message object
     message = event.get("Records")[0]
+
+    # Get counter attribute from message object (will return None if "Counter" key does not exist)
     counter_attribute = message["messageAttributes"].get("Counter")
     if counter_attribute is not None:
         counter = int(counter_attribute.get("stringValue", 0))
@@ -43,8 +46,8 @@ def lambda_handler(event, context):
     #     }
     # )
 
-    sqs = boto3.client('sqs')
-    res = sqs.send_message(
+    # sqs = boto3.client('sqs')
+    res = queue.send_message(
         QueueUrl="https://sqs.eu-west-2.amazonaws.com/572990232030/GameTasks",
         MessageBody="hello",
         MessageAttributes={
@@ -63,10 +66,11 @@ def lambda_handler(event, context):
         }
     )
     print(res)
-    return {
-        'statusCode': 200,
-        'body': json.dumps(counter)
-    }
+    return
+    # {
+    #     'statusCode': 200,
+    #     'body': json.dumps(counter)
+    # }
 
 
 # if db_is_game_paused(event["game_id"]):
@@ -101,23 +105,24 @@ def lambda_handler(event, context):
 #     # db_correct_answer(game_id, player_id, question)?
 
 if __name__ == "__main__":
-    sqs = boto3.client('sqs')
-    res = sqs.send_message(
-        QueueUrl="https://sqs.eu-west-2.amazonaws.com/572990232030/GameTasks",
-        MessageBody="hello",
-        MessageAttributes={
-            'GameID': {
-                'StringValue': 'test_id',
-                'DataType': 'String'
-            },
-            'Counter': {
-                'StringValue': '10',
-                'DataType': 'Number'
-            },
-            'MessageType': {
-                'StringValue': 'AdministerQuestion',
-                'DataType': 'String'
-            }
-        }
-    )
-    print(res)
+    pass
+    # sqs = boto3.client('sqs')
+    # res = sqs.send_message(
+    #     QueueUrl="https://sqs.eu-west-2.amazonaws.com/572990232030/GameTasks",
+    #     MessageBody="hello",
+    #     MessageAttributes={
+    #         'GameID': {
+    #             'StringValue': 'test_id',
+    #             'DataType': 'String'
+    #         },
+    #         'Counter': {
+    #             'StringValue': '10',
+    #             'DataType': 'Number'
+    #         },
+    #         'MessageType': {
+    #             'StringValue': 'AdministerQuestion',
+    #             'DataType': 'String'
+    #         }
+    #     }
+    # )
+    # print(res)
