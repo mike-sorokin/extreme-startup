@@ -10,9 +10,10 @@ def lambda_handler(event, context):
     queue = sqs_resource.get_queue_by_name(QueueName='GameTasks')
 
     print(event)
-    counter = event.get('Counter', 0)
+    message = event.get("Records")[0]
+    counter = message["messageAttributes"].get("Counter", 0)
 
-    print("The counter is", counter)
+    print("counter", counter)
 
     counter -= 1
 
