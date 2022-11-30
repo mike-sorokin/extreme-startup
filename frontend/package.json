@@ -27,6 +27,8 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.4.2",
     "recharts": "^2.1.16",
+    "requirejs": "^2.3.6",
+    "tinycolor2": "^1.4.2",
     "vite-plugin-svgr": "^2.2.2"
   },
   "devDependencies": {

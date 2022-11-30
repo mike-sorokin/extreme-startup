@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { Line, LineChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import { MD5 } from 'crypto-js'
+import { require } from 'requirejs'
 
 import { fetchAllPlayers, fetchGameScores } from '../utils/requests'
 
 function Chart ({ gameId }) {
   const [chartData, setChartData] = useState([])
   const [playerIds, setPlayerIds] = useState([])
+  const tinycolor = require('tinycolor2')
 
   // Update chartData to up-to-date scorelist by refetching it from Flask backend
   // Also refetch the entire player list, just in case
@@ -40,9 +42,14 @@ function Chart ({ gameId }) {
   }, [])
 
   const stringToColour = (str) => {
-    const colour = '#'
+    const prefix = '#'
     const hash = MD5(str).toString().substring(0, 6)
-    return colour.concat(hash)
+    const colourStr = prefix.concat(hash)
+    const colour = tinycolor(colourStr)
+    while (colour.getBrightness() < 75) {
+      colour.lighten(20)
+    }
+    return colour.toHexString()
   }
 
   return (
