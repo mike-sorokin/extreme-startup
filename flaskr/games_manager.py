@@ -162,13 +162,11 @@ class AWSGamesManager:
 
     def get_all_games(self) -> dict:
         """ Returns dict containing all games in the database """
-
-        return db_get_all_games()
+        return JSONEncoder().default(db_get_all_games())
 
     def get_game(self, game_id) -> dict:
         """ Returns corresponding game for given game_id """
-
-        return db_get_game(game_id)
+        return JSONEncoder().default(db_get_game(game_id))
 
     def new_game(self, password, round=0) -> dict:
         """ Creates a new game in the database and returns newly created <game_id>""" 
@@ -199,33 +197,26 @@ class AWSGamesManager:
 
     def game_exists(self, game_id) -> bool:
         """ Checks if game_id exists in database """
-
         return game_id in db_get_game_ids()
 
     def player_exists(self, game_id, player_id) -> bool:
         """ Checks if player_id exists in the given game """
-
         return player_id in db_get_player_ids(game_id)
 
     def game_has_password(self, game_id, password) -> bool:
         """ Checks that game password equals given password """
-        
         return db_get_game_password(game_id) == password
 
     def game_in_last_round(self, game_id) -> bool:
         """ Check if game is in its final round """
-
         return db_get_round(game_id) == MAX_ROUND
 
     def pause_game(self, game_id):
         """ Pause a game """
-
         db_set_paused(game_id, True)
 
     def unpause_game(self, game_id):
         """ Unpause a game """
-
-        # need to initialise game monitor
         db_set_paused(game_id, False)
 
     def end_game(self, game_id):
@@ -234,18 +225,15 @@ class AWSGamesManager:
 
     def advance_game_round(self, game_id):
         """ Advances game round """
-
         db_advance_round(game_id)
-        # what is round index and first round event?
+        db_reset_round_indices(game_id)
 
     def set_auto_mode(self, game_id):
         """ Turns on auto advance round """
-
         db_set_auto_mode(game_id, True)
 
     def clear_auto_mode(self, game_id):
         """ Turns off auto advance round """
-
         db_set_auto_mode(game_id, False)
 
     def get_game_running_totals(self, game_id) -> list:

@@ -5,10 +5,45 @@ dynamo_client = boto3.client('dynamodb')
 dynamo_resource = boto3.resource('dynamodb')
 
 def db_get_all_games():
-    return {} # NOT IMPLEMENTED.
+    game_tables = list(dynamo_resource.tables.all())
+    jsonified_games = {}
+
+    for game_table in game_tables:
+        game_json = {} 
+        game_state = game_table.get_item(Key = {'ComponentId': 'State'})['Item']
+        
+        players_to_assist = game_table.get_item(Key = {'ComponentId': 'PlayersToAssist'})['Item']
+        del players_to_assist['ComponentId']
+
+        game_json['id'] = game_table.name
+        game_json['round'] = game_state['Round']
+        game_json['paused'] = not bool(game_state['Running'])
+        game_json['auto_mode'] = bool(game_state['AutoMode'])
+        game_json['players'] = game_state['Players']
+        game_json['players_to_assist'] = players_to_assist
+
+        jsonified_games[game_table.name] = game_json
+
+    return jsonified_games
+
 
 def db_get_game(game_id):
-    return db.get_item(Key={'game_id': game_id})
+    game_table = dynamo_resource.Table(game_id)
+    game_json = {} 
+
+    game_state = game_table.get_item(Key = {'ComponentId': 'State'})['Item']
+    
+    players_to_assist = game_table.get_item(Key = {'ComponentId': 'PlayersToAssist'})['Item']
+    del players_to_assist['ComponentId']
+
+    game_json['id'] = game_table.name
+    game_json['round'] = game_state['Round']
+    game_json['paused'] = not bool(game_state['Running'])
+    game_json['auto_mode'] = bool(game_state['AutoMode'])
+    game_json['players'] = game_state['Players']
+    game_json['players_to_assist'] = players_to_assist
+
+    return game_json
 
 # Returns <game_id> of newly create game 
 def db_add_new_game(password, round=0):
@@ -55,7 +90,8 @@ def db_add_new_game(password, round=0):
             'Round': round,
             'Running': True,
             'Ended': False,
-            'AutoMode': False
+            'AutoMode': False,
+            'PlayerIds': []
         }
     )
 
@@ -85,7 +121,7 @@ def db_get_player_score(game_id, player_id):
 
 def db_get_game_ids():
     """ Returns list of game ids """
-    return
+    return [game_table.name for game_table in list(dynamo_resource.tables.all())]
 
 def db_get_player_ids(game_id):
     """ Returns list of player ids in a game """    
@@ -93,20 +129,27 @@ def db_get_player_ids(game_id):
 
 def db_get_round(game_id):
     """ Returns game round """    
-    return
+    return int(dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': 'State'})['Item']['Round'])
 
 def db_get_game_password(game_id):
     """ Returns game password """    
-    return
+    return dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': 'State'})['Item']['Password']
 
 def db_is_game_paused(game_id):
-    """ Returns true if game is paused false if not """    
+    """ Returns true if game is paused false if not """ 
     return
 
 def db_set_paused(game_id, value: bool):
     """ Sets paused to given value (true/false) """ 
-    # Need to make sure lambda functions are paused if game is paused
-    return
+    dynamo_resource.Table(game_id).update_item(
+        Key = {
+            'ComponentId': 'State'
+        },
+        UpdateExpression = 'SET Running = :pause',
+        ExpressionAttributeValues = {
+            ':pause': not value
+        }
+    )
 
 def db_end_game(game_id):
     """ Sets ended to true """ 
@@ -114,11 +157,43 @@ def db_end_game(game_id):
 
 def db_advance_round(game_id):
     """ Increments round """ 
-    return
+    dynamo_resource.Table(game_id).update_item(
+        Key = {
+            'ComponentId': 'State'
+        },
+        UpdateExpression = 'SET Round = Round + :incr',
+        ExpressionAttributeValues = {
+            ':incr': 1
+        }
+    )
+
+# Potentially batch-update with PartiQL 
+def db_reset_round_indices(game_id):
+    """ Reset each player's round index """
+    pids = dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': 'State'})['Item']['PlayerIds']
+    
+    for pid in pids:
+        dynamo_resource.Table(game_id).update_item(
+            Key = {
+                'ComponentId': pid
+            },
+            UpdateExpression = 'SET RoundIndex = :zero',
+            ExpressionAttributeValues = {
+                ':zero': 0
+            }
+        )
 
 def db_set_auto_mode(game_id, value: bool):
     """ Sets auto to given value (true/false) """ 
-    return
+    dynamo_resource.Table(game_id).update_item(
+        Key = {
+            'ComponentId': 'State'
+        },
+        UpdateExpression = 'SET AutoMode = :auto',
+        ExpressionAttributeValues = {
+            ':auto': value
+        }
+    )
 
 def db_get_scores(game_id):
     """ Returns game scores as a list of objects in the form {"time": timestamp, "pid": score} """ 
@@ -150,7 +225,7 @@ def db_get_players_to_assist(game_id):
 
 def db_assist_player(game_id, player_name):
     """ Updates a player's state from 'needing assistance' to 'being assisted' """ 
-    return
+    
 
 def db_update_player(game_id, player_id, name, api):
     """ Updates name and api of player """ 

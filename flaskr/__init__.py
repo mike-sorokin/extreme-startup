@@ -69,7 +69,7 @@ def create_app():
     @app.route("/api", methods=["GET", "POST", "DELETE"])
     def api_index():
         if request.method == "GET":  # fetch all games
-            return encoder.encode(games_manager.get_all_games())
+            return games_manager.get_all_games()
 
         elif (
             request.method == "POST"
@@ -78,8 +78,8 @@ def create_app():
                 return NOT_ACCEPTABLE
 
             new_game = games_manager.new_game(request.get_json()["password"])
-            add_session_admin(new_game.id, session)
-            return encoder.encode(new_game)
+            add_session_admin(new_game, session)
+            return games_manager.get_game(new_game)
 
         elif (
             request.method == "DELETE"
@@ -126,7 +126,7 @@ def create_app():
             return NOT_ACCEPTABLE
 
         if request.method == "GET":  # fetch game with <game_id>
-            return encoder.encode(games_manager.get_game(game_id))
+            return games_manager.get_game(game_id)
 
         elif request.method == "PUT":  # update game settings --- only admin can do this
             if not is_admin(game_id, session):
