@@ -5,7 +5,7 @@ import { useClipboard } from '@mantine/hooks'
 
 import { fetchGame, updateAutoRoundAdvance, updateGame } from '../utils/requests'
 import { showInfoNotification } from '../utils/utils'
-import { gameReviewUrl } from '../utils/urls'
+import { gameReviewUrl, homeUrl } from '../utils/urls'
 import usePrevious from '../utils/hooks/usePrevious'
 
 import ConfirmationModal from '../utils/ConfirmationModal'
@@ -100,7 +100,12 @@ function Admin () {
       // TODO
     } finally {
       setOpenedEndGame(false)
-      navigate(gameReviewUrl(params.gameId))
+      if (playerNo) {
+        navigate(gameReviewUrl(params.gameId))
+      } else {
+        showInfoNotification('Game Abandoned', 'An admin has ended the game with no players.')
+        navigate(homeUrl())
+      }
     }
   }
 
