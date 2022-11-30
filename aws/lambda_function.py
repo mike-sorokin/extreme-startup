@@ -9,39 +9,19 @@ def lambda_handler(event, context):
     sqs_resource = boto3.resource('sqs')
     queue = sqs_resource.get_queue_by_name(QueueName='GameTasks')
 
-    # print(event)
-    # counter = int(event['Counter'])
+    print(event)
+    counter = int(event['Counter'])
 
-    # print("The counter is", counter)
+    print("The counter is", counter)
 
-    # counter -= 1
+    counter -= 1
 
-    # if counter <= 0:
-    #     return
+    if counter <= 0:
+        return
 
-    # # res = queue.send_message(
-    # #     MessageBody="Hello",
-    # #     DelaySeconds=1,
-    # #     MessageAttributes={
-    # #         'GameID': {
-    # #             'StringValue': 'test_id',
-    # #             'DataType': 'String'
-    # #         },
-    # #         'Counter': {
-    # #             'StringValue': str(counter),
-    # #             'DataType': 'Number'
-    # #         },
-    # #         'MessageType': {
-    # #             'StringValue': 'AdministerQuestion',
-    # #             'DataType': 'String'
-    # #         }
-    # #     }
-    # # )
-
-    # sqs = boto3.client('sqs')
-    # res = sqs.send_message(
-    #     QueueUrl="https://sqs.eu-west-2.amazonaws.com/572990232030/GameTasks",
-    #     MessageBody="hello",
+    # res = queue.send_message(
+    #     MessageBody="Hello",
+    #     DelaySeconds=1,
     #     MessageAttributes={
     #         'GameID': {
     #             'StringValue': 'test_id',
@@ -57,10 +37,30 @@ def lambda_handler(event, context):
     #         }
     #     }
     # )
-    # print(res)
+
+    sqs = boto3.client('sqs')
+    res = sqs.send_message(
+        QueueUrl="https://sqs.eu-west-2.amazonaws.com/572990232030/GameTasks",
+        MessageBody="hello",
+        MessageAttributes={
+            'GameID': {
+                'StringValue': 'test_id',
+                'DataType': 'String'
+            },
+            'Counter': {
+                'StringValue': str(counter),
+                'DataType': 'Number'
+            },
+            'MessageType': {
+                'StringValue': 'AdministerQuestion',
+                'DataType': 'String'
+            }
+        }
+    )
+    print(res)
     return {
         'statusCode': 200,
-        'body': json.dumps(event)
+        'body': json.dumps(counter)
     }
 
 

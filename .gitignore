@@ -1,6 +1,7 @@
 auxiliary/logs
 dontrunme
 vite
+response.json
 
 # cypress
 frontend/cypress/screenshots
