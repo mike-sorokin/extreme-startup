@@ -1,7 +1,6 @@
 import json
 import boto3
 import requests
-from flaskr.shared.dynamo_db import *
 
 dynamodb = boto3.client('dynamodb')
 sqs_resource = boto3.resource('sqs')
@@ -38,7 +37,6 @@ def lambda_handler(event, context):
         }
     )
 
-    return
 
 # if db_is_game_paused(event["game_id"]):
 #     # put event back on the queue and return?
