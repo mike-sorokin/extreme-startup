@@ -99,7 +99,7 @@ def lambda_handler(event, context):
 
 if __name__ == "__main__":
     sqs = boto3.client('sqs')
-    sqs.send_message(
+    res = sqs.send_message(
         QueueUrl="https://sqs.eu-west-2.amazonaws.com/572990232030/GameTasks",
         MessageBody="hello",
         MessageAttributes={
@@ -117,3 +117,4 @@ if __name__ == "__main__":
             }
         }
     )
+    print(res)
