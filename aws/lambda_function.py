@@ -19,6 +19,7 @@ def lambda_handler(event, context):
         return
 
     queue.send_message(
+        MessageBody="Hello",
         DelaySeconds=1,
         MessageAttributes={
             'GameID': {
