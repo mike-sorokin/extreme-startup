@@ -32,7 +32,7 @@ def lambda_handler(event, context):
 def administer_question(sqs_message):
     modification_hash = sqs_message["messageAttributes"].get("ModificationHash", {}).get("stringValue")
 
-    message = json.loads(sqs_message["messageBody"])
+    message = json.loads(sqs_message["body"])
     game_id = message.get("game_id")  # string
     player_id = message.get("player_id")  # string
     question_text = message.get("question_text")  # string
@@ -157,7 +157,7 @@ def calculate_points_gained(player_position, question_points, result, lenient=Tr
 
 
 def monitor_game(message):
-    gid = message["messageBody"] 
+    gid = message["body"] 
     modification_hash = message["messageAttributes"].get("ModificationHash", {}).get("stringValue")
 
     game = db_get_game(gid)

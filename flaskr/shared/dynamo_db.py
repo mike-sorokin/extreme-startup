@@ -45,7 +45,7 @@ def db_get_game(game_id):
     game_json['players_to_assist'] = {"needs_assistance": players_to_assist["NeedsAssistance"],
                                       "being_assisted": players_to_assist["BeingAssisted"]}
     game_json['ended'] = game_state['Ended']
-    game_json['modification_hash'] = game_state['ModifictionHash']
+    game_json['modification_hash'] = game_state['ModificationHash']
 
     return game_json
 
