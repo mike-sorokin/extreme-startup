@@ -3,8 +3,12 @@ import boto3
 import requests
 import random
 from shared.dynamo_db import *
+from shared.question_factory import QuestionFactory
+from shared.rate_controller import RateController
 
 ALLOW_CHEATING = True
+PROBLEM_DECREMENT = 50
+STREAK_LENGTH = 30
 
 sqs_resource = boto3.resource('sqs')
 queue = sqs_resource.get_queue_by_name(QueueName='GameTasks')
@@ -36,10 +40,10 @@ def administer_question(message):
     question_text = message.get("question_text")  # string
     question_answer = message.get("question_answer")  # string
     prev_delay = message.get("prev_delay")  # int
-    question_score = message.get("question_score")  # int
+    question_points = message.get("question_score")  # int
     question_difficulty = message.get("question_difficulty")  # int
 
-    if (game_id is None) or (player_id is None) or (question_text is None) or (question_answer is None) or (prev_delay is None) or (question_score is None) or (question_difficulty is None):
+    if (game_id is None) or (player_id is None) or (question_text is None) or (question_answer is None) or (prev_delay is None) or (question_points is None) or (question_difficulty is None):
         print("Error: Some attributes do not exist")
         return
 
@@ -72,14 +76,14 @@ def administer_question(message):
 
     # 2. Update database based on result
     player_position = db_get_leaderboard_position(game_id, player_id)
-    points_gained = calculate_points_gained(player_position, question_score, result)
-    # This function should add event to a player's list of events, and update their score in the database, based on the result
-    add_event(game_id, player_id, question_text, question_difficulty, points_gained, result)
+    points_gained = calculate_points_gained(player_position, question_points, result)
+    # This function should add event to a player's list of events, and update their score and streak in the database, based on the result
+    db_add_event(game_id, player_id, question_text, question_difficulty, points_gained, result)
 
     # 3. Schedule next question
     game_round = db_get_game_round(game_id)
-    next_question = question_factory(game_round)
-    next_delay = rate_controller(prev_delay, result)
+    next_question = QuestionFactory().next_question(game_round)
+    next_delay = RateController().delay_before_next_question(prev_delay, result)
 
     message = {
         "game_id": game_id,
@@ -87,11 +91,11 @@ def administer_question(message):
         "question_text": next_question.as_text(),
         "question_answer": next_question.correct_answer(),
         "prev_delay": next_delay,
-        "question_score": next_question.points,
+        "question_points": next_question.points,
         "question_difficulty": question_difficulty
     }
 
-    queue.send_message(
+    res = queue.send_message(
         MessageBody=json.dumps(message),
         DelaySeconds=next_delay,
         MessageAttributes={
@@ -105,7 +109,38 @@ def administer_question(message):
             },
         }
     )
-    return
+    return json.dumps(res)
+
+
+def calculate_points_gained(player_position, question_points, result, lenient=True):
+    if result == "CORRECT":
+        return question_points
+
+    # What is lenient mode and do we need it - Dev?
+    elif result == "WRONG":
+        return -1 * question_points / player_position
+        # return (
+        #     self.allow_passes(question, leaderboard_position)
+        #     if lenient
+        #     else self.penalty(question, leaderboard_position)
+        # )
+
+    elif result == "ERROR_RESPONSE" or result == "NO_SERVER_RESPONSE":
+        return -1 * PROBLEM_DECREMENT
+
+    else:
+        print(f"Error: unrecognized result {result}")
+
+# # Based on game mode (lenient), let player "off" for incorrect response
+# def allow_passes(self, question, leaderboard_position):
+#     return (
+#         0 if question.answer == "" else self.penalty(question, leaderboard_position)
+#     )
+
+# # Penalty that adjusts based on leadeboard pos
+# # Conceptually, better-ranked players get deducted more for wrong answers than worse-ranked players
+# def penalty(self, question, leaderboard_position):
+#     return -1 * question.points / leaderboard_position
 
 
 def monitor_game(message):

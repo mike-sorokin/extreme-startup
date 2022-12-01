@@ -142,7 +142,7 @@ class AWSGamesManager:
             "question_text": next_question.as_text(),
             "question_answer": next_question.correct_answer(),
             "prev_delay": DEFAULT_DELAY,
-            "question_score": next_question.points,
+            "question_points": next_question.points,
             "question_difficulty": curr_round
         }
 
