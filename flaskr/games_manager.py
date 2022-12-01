@@ -2,7 +2,7 @@ from flaskr.json_encoder import JSONEncoder
 from flaskr.game import Game
 from flaskr.player import Player
 from flaskr.game_stats import GameStats
-from flaskr.question_factory import QuestionFactory
+from flaskr.shared.question_factory import QuestionFactory
 
 DEFAULT_DELAY = 5
 # Manages all active game instances -- instructing what games should modify when live and also in charge

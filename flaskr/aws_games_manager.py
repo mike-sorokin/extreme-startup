@@ -1,12 +1,12 @@
 import json
 from uuid import uuid4
 from flaskr.shared.dynamo_db import *
-from flaskr.question_factory import (MAX_ROUND)
+from flaskr.shared.question_factory import (MAX_ROUND)
 from flaskr.json_encoder import JSONEncoder
 from flaskr.game import Game
 from flaskr.player import Player
 from flaskr.game_stats import GameStats
-from flaskr.question_factory import QuestionFactory
+from flaskr.shared.question_factory import QuestionFactory
 
 sqs_client = boto3.client('sqs')
 sqs_resource = boto3.resource('sqs')

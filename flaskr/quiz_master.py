@@ -1,6 +1,6 @@
 import datetime
-from flaskr.question_factory import QuestionFactory
-from flaskr.rate_controller import RateController
+from flaskr.shared.question_factory import QuestionFactory
+from flaskr.shared.rate_controller import RateController
 
 # Unique to each player. Responsible for sending questions to user api endpoint at frequency determined by rate_controller
 # and incrementing player score in scoreboard

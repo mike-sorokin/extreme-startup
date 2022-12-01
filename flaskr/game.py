@@ -1,5 +1,5 @@
 from uuid import uuid4
-from flaskr.question_factory import QuestionFactory
+from flaskr.shared.question_factory import QuestionFactory
 from flaskr.scoreboard import Scoreboard
 from flaskr.quiz_master import QuizMaster
 from flaskr.game_analysis import *
