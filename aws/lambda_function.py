@@ -13,11 +13,12 @@ def lambda_handler(event, context):
     message = event.get("Records")[0]
 
     # Get counter attribute from message object (will return None if "Counter" key does not exist)
-    counter_attribute = message["messageAttributes"].get("Counter")
-    if counter_attribute is not None:
-        counter = int(counter_attribute.get("stringValue", 0))
+    counter = message["messageAttributes"].get("Counter", {}).get("stringValue")
+
+    if counter is not None:
+        counter = int(counter)
     else:
-        print("counter property does not exist")
+        print("counter attribute does not exist")
         return
 
     print("counter", counter)
@@ -48,7 +49,7 @@ def lambda_handler(event, context):
 
     # sqs = boto3.client('sqs')
     res = queue.send_message(
-        QueueUrl="https://sqs.eu-west-2.amazonaws.com/572990232030/GameTasks",
+        # QueueUrl="https://sqs.eu-west-2.amazonaws.com/572990232030/GameTasks",
         MessageBody="hello",
         MessageAttributes={
             'GameID': {
