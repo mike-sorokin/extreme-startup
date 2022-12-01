@@ -20,10 +20,12 @@ function Home () {
   const [gameReviewId, setGameReviewId] = useState('')
   const [newGameId, setNewGameId] = useState('')
   const [pwd, setPwd] = useState('')
+  const [creating, setCreating] = useState(false)
 
   // Creates a new game
   const handleCreateGame = async (event) => {
     event.preventDefault()
+    setCreating(true)
 
     try {
       showLoadingNotification('create-game', 'Game creation in progress', 'Creating game...')
@@ -40,6 +42,8 @@ function Home () {
       if (error.response && error.response.status === 400) {
         console.error('password cannot be empty')
       }
+    } finally {
+      setCreating(false)
     }
   }
 
@@ -91,7 +95,7 @@ function Home () {
             <PasswordInput value={pwd} onChange={(e) => setPwd(e.target.value)}
               placeholder="Game password" label="Enter game password:" required data-cy="password-input" />
               <Space h="md" />
-            <Button variant="outline" color="green" type="submit">Create Game!</Button>
+            <Button variant="outline" color="green" type="submit" loading={creating}>Create Game!</Button>
           </form>
         </div>
       </Modal>
