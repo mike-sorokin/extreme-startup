@@ -1,3 +1,4 @@
+import json
 from uuid import uuid4
 from flaskr.shared.dynamo_db import *
 from flaskr.question_factory import (MAX_ROUND)
@@ -40,14 +41,6 @@ class AWSGamesManager:
         """ Creates a new game in the database and returns newly created <game_id>"""
         assert password.strip() != ""
 
-        # new_game = {
-        #     "id": uuid4().hex[:8],
-        #     "admin_password": password,
-        #     "round": 0,
-        #     "players": [],
-        #     "paused": False,
-        #     "auto_mode": False
-        # }
         gid = db_add_new_game(password, round=0)
 
         # Start game monitor thread
@@ -143,9 +136,19 @@ class AWSGamesManager:
         curr_round = db_get_round(game_id)
         next_question = self.question_factory.next_question(curr_round)
 
+        message = {
+            "game_id": game_id,
+            "player_id": new_player['id'],
+            "question_text": next_question.as_text(),
+            "question_answer": next_question.correct_answer(),
+            "prev_delay": DEFAULT_DELAY,
+            "question_score": next_question.points,
+            "question_difficulty": curr_round
+        }
+
         # Start administering questions
         self.queue.send_message(
-            MessageBody=next_question.as_text(),
+            MessageBody=json.dumps(message),
             DelaySeconds=0,
             MessageAttributes={
                 'MessageType': {
@@ -156,30 +159,6 @@ class AWSGamesManager:
                     'StringValue': modification_hash,
                     'DataType': 'String'
                 },
-                'GameID': {
-                    'StringValue': game_id,
-                    'DataType': 'String'
-                },
-                'PlayerID': {
-                    'StringValue': new_player['id'],
-                    'DataType': 'String'
-                },
-                'QuestionAnswer': {
-                    'StringValue': str(next_question.correct_answer()),
-                    'DataType': 'String'
-                },
-                'QuestionDelay': {
-                    'StringValue': str(DEFAULT_DELAY),
-                    'DataType': 'Number'
-                },
-                'QuestionScore': {
-                    'StringValue': str(next_question.points),
-                    'DataType': 'Number'
-                },
-                'QuestionDifficulty': {
-                    'StringValue': str(curr_round),
-                    'DataType': 'Number'
-                }
             }
         )
 
