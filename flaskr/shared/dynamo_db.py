@@ -125,9 +125,7 @@ def db_add_new_game(password, round=0):
     return id
 
 def db_get_player_score(game_id, player_id):
-    game = db_get_game(game_id)
-
-    return
+    return dynamo_resource.Tbale(game_id).get_item(Key = {'ComponentId': player_id})['Item']['Score']
 
 def db_get_game_ids():
     """ Returns list of game ids """
