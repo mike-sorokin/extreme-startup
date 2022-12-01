@@ -1,5 +1,6 @@
 import json
 import boto3
+from botocore.exceptions import ClientError
 import requests
 from flaskr.shared.dynamo_db import *
 from flaskr.shared.question_factory import QuestionFactory
@@ -160,7 +161,12 @@ def monitor_game(message):
     gid = message["body"] 
     modification_hash = message["messageAttributes"].get("ModificationHash", {}).get("stringValue")
 
-    game = db_get_game(gid)
+    try:
+        game = db_get_game(gid)
+    except ClientError as e:
+        print(f"Error! Game with id {gid} DOES NOT EXIST or cannot be accessed or eradicated by Andrey")
+        print(e)
+        return
 
     if game['ended'] and not db_check_state_modification_hash(gid, modification_hash):
         return
