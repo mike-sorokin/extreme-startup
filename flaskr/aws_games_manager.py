@@ -12,20 +12,21 @@ sqs_resource = boto3.resource('sqs')
 
 DEFAULT_DELAY = 5
 
+
 class AWSGamesManager:
     """ Game manager class for lambda functions and backend server to interface with the DynamoDB """
 
     def __init__(self):
         self.question_factory = QuestionFactory()
-        
-        try: 
+
+        try:
             self.queue = sqs_resource.create_queue(
-                QueueName = 'GameTasks'
+                QueueName='GameTasks'
             )
         except sqs_client.exceptions.QueueNameExists:
             self.queue = sqs_resource.get_queue_by_name(QueueName='GameTasks')
-        except sqs_client.exceptions.QueueDeletedRecently: 
-            raise 
+        except sqs_client.exceptions.QueueDeletedRecently:
+            raise
 
     def get_all_games(self) -> dict:
         """ Returns dict containing all games in the database """
@@ -36,7 +37,7 @@ class AWSGamesManager:
         return db_get_game(game_id)
 
     def new_game(self, password, round=0) -> dict:
-        """ Creates a new game in the database and returns newly created <game_id>""" 
+        """ Creates a new game in the database and returns newly created <game_id>"""
         assert password.strip() != ""
 
         # new_game = {
@@ -49,13 +50,17 @@ class AWSGamesManager:
         # }
         gid = db_add_new_game(password, round=0)
 
-        # Start game monitor thread 
+        # Start game monitor thread
         self.queue.send_message(
-            MessageBody = str(gid),
-            DelaySeconds = 0,
-            MessageAttributes = {
+            MessageBody=str(gid),
+            DelaySeconds=0,
+            MessageAttributes={
                 'MessageType': {
                     'StringValue': 'Monitor',
+                    'DataType': 'String'
+                },
+                'ModificationHash': {
+                    'StringValue': 'SomeHash',
                     'DataType': 'String'
                 }
             }
@@ -125,7 +130,7 @@ class AWSGamesManager:
 
     def remove_game_players(self, game_id, *player_id):
         """ If player_id(s) provded, deletes corresponding players, else deletes all players for a given game """
-        
+
         if player_id:
             for pid in list(player_id):
                 db_delete_player(game_id, pid)
@@ -137,11 +142,25 @@ class AWSGamesManager:
         new_player, modification_hash = db_add_player(game_id, name, api)
         curr_round = db_get_round(game_id)
 
+        next_question = self.question_factory.next_question(curr_round)
+
         # Start administering questions
         self.queue.send_message(
-            MessageBody = self.question_factory.next_question(curr_round).as_text(),
-            DelaySeconds = 0, 
-            MessageAttributes = {
+            MessageBody=next_question.as_text(),
+            DelaySeconds=0,
+            MessageAttributes={
+                'MessageType': {
+                    'StringValue': 'AdministerQuestion',
+                    'DataType': 'String'
+                },
+                'ModificationHash': {
+                    'StringValue': modification_hash,
+                    'DataType': 'String'
+                },
+                'GameID': {
+                    'StringValue': game_id,
+                    'DataType': 'String'
+                },
                 'PlayerID': {
                     'StringValue': new_player['id'],
                     'DataType': 'String'
@@ -150,21 +169,13 @@ class AWSGamesManager:
                     'StringValue': str(DEFAULT_DELAY),
                     'DataType': 'Number'
                 },
-                'GameID': {
-                    'StringValue': game_id,
-                    'DataType': 'String'
-                },
-                'ModificationHash': { 
-                    'StringValue': modification_hash,
-                    'DataType': 'String'
-                },
-                'MessageType': {
-                    'StringValue': 'AdministerQuestion',
-                    'DataType': 'String'
+                'QuestionScore': {
+                    'StringValue': str(next_question.points),
+                    'DataType': 'Number'
                 }
             }
         )
-        
+
         return new_player
 
     def get_players_to_assist(self, game_id) -> dict:
@@ -216,16 +227,16 @@ class AWSGamesManager:
             # Need to make sure to stop/kill all threads by deleting sqs queue or stopping aws lambda idk
             if len(player_data) > 0:
                 self.analyse_game(gid, player_data, scoreboard_data, analysis_event_data)
-                
+
     def analyse_game(self, game_id, player_data, scoreboard, analysis_events):
         """
         Args:
         game_id :: uuid4() [8 chars]
         player_data :: { player_id -> Player }
         scoreboard :: Scoreboard
-        """ 
+        """
         encoded_players, finalboard, stats = GameStats(player_data, scoreboard).generate_game_stats()
-        
+
         finalgraph = scoreboard.running_totals
         finalboard.sort(key=lambda x: -x["score"])
 
