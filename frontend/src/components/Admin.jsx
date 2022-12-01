@@ -5,7 +5,7 @@ import { useClipboard } from '@mantine/hooks'
 
 import { fetchGame, updateAutoRoundAdvance, updateGame } from '../utils/requests'
 import { showInfoNotification } from '../utils/utils'
-import { gameReviewUrl } from '../utils/urls'
+import { gameReviewUrl, homeUrl } from '../utils/urls'
 import usePrevious from '../utils/hooks/usePrevious'
 
 import ConfirmationModal from '../utils/ConfirmationModal'
@@ -28,8 +28,14 @@ function Admin () {
   // Fetches game data every 2 seconds (current round and number of players)
   useEffect(() => {
     const getGameData = async () => {
+      let response
       try {
-        const response = await fetchGame(params.gameId)
+        response = await fetchGame(params.gameId)
+      } catch (error) {
+        showInfoNotification('Game Abandoned', 'An admin has ended the game with no players.')
+        navigate(homeUrl())
+      }
+      try {
         const notifyAdvance = autoAdvance && response.round > round
         if (notifyAdvance) {
           showInfoNotification('Current Round: ' + response.round, 'The round has been automatically advanced')
@@ -57,7 +63,7 @@ function Admin () {
   useEffect(() => {
     for (const team of teamsNeedingHelp) {
       if (!prevList.includes(team)) {
-        showInfoNotification('Notification', 'There are teams needing assistance!')
+        showInfoNotification('Assist Teams!', 'There are teams needing assistance!')
         break
       }
     }
@@ -100,7 +106,12 @@ function Admin () {
       // TODO
     } finally {
       setOpenedEndGame(false)
-      navigate(gameReviewUrl(params.gameId))
+      if (playerNo) {
+        navigate(gameReviewUrl(params.gameId))
+      } else {
+        showInfoNotification('Game Abandoned', 'The game was ended with no players.')
+        navigate(homeUrl())
+      }
     }
   }
 

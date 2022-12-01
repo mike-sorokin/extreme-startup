@@ -1,7 +1,8 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { MD5 } from 'crypto-js'
 import { Button } from '@mantine/core'
-import { showNotification } from '@mantine/notifications'
+import { showNotification, updateNotification } from '@mantine/notifications'
 import { IconCheck, IconHome, IconX, IconAlertTriangle, IconInfoCircle } from '@tabler/icons'
 import { homeUrl } from './urls'
 
@@ -22,6 +23,26 @@ export default function HomeButton ({ size }) {
       Go to Home Page
     </Button>
   )
+}
+
+export function showLoadingNotification (notifId, header, msg) {
+  showNotification({
+    id: notifId,
+    title: header,
+    message: msg,
+    color: 'teal',
+    loading: true
+  })
+}
+
+export function updateLoadingNotification (notifId, header, msg) {
+  updateNotification({
+    id: notifId,
+    title: header,
+    message: msg,
+    icon: <IconCheck size={18} />,
+    color: 'teal'
+  })
 }
 
 export function showSuccessNotification (msg) {
@@ -66,6 +87,36 @@ export function playersAsArray (playersDict) {
     arr.push(playersDict[playerId])
   }
   return arr
+}
+
+function scaleColour (col, multiplier, capL, capU) {
+  const colScaled = Math.round(col * multiplier)
+  const newCol = (col < capL) ? (capL + colScaled) : ((col < capU) ? colScaled : col)
+  return Math.min(newCol, 255)
+}
+
+function lightenColour (colour, multiplier) {
+  let R = parseInt(colour.substring(1, 3), 16)
+  let G = parseInt(colour.substring(3, 5), 16)
+  let B = parseInt(colour.substring(5, 7), 16)
+
+  // lower and upper caps found through experimentation
+  R = scaleColour(R, multiplier, 96, 192)
+  G = scaleColour(G, multiplier, 96, 192)
+  B = scaleColour(B, multiplier, 96, 192)
+
+  const r = R.toString(16)
+  const g = G.toString(16)
+  const b = B.toString(16)
+
+  return '#' + r + g + b
+}
+
+export function stringToColour (str) {
+  const prefix = '#'
+  const hash = MD5(str).toString().substring(0, 6)
+  const colour = prefix.concat(hash)
+  return lightenColour(colour, 1.25)
 }
 
 /**

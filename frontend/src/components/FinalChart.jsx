@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Line, LineChart, CartesianGrid, XAxis, YAxis } from 'recharts'
-import { MD5 } from 'crypto-js'
 
 import { fetchGameScores } from '../utils/requests'
+import { stringToColour } from '../utils/utils'
 
 function FinalChart ({ gameId, players }) {
   const [chartData, setChartData] = useState([])
@@ -30,12 +30,6 @@ function FinalChart ({ gameId, players }) {
     }
     getChartData()
   }, [])
-
-  const stringToColour = (str) => {
-    const colour = '#'
-    const hash = MD5(str).toString().substring(0, 6)
-    return colour.concat(hash)
-  }
 
   return (
     <div>

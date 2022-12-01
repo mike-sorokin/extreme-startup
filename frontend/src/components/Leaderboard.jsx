@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Badge, ColorSwatch, Container, Group, Space, Table, Title } from '@mantine/core'
-import { MD5 } from 'crypto-js'
 
 import { fetchAllPlayers } from '../utils/requests'
 import useSessionData from '../utils/hooks/useSessionData'
+import { stringToColour } from '../utils/utils'
 
 import Chart from './Chart'
 
@@ -41,11 +41,6 @@ function Leaderboard () {
     } else {
       return <ColorSwatch color="red"/>
     }
-  }
-  const stringToColour = (str) => {
-    const colour = '#'
-    const hash = MD5(str).toString().substring(0, 6)
-    return colour.concat(hash)
   }
 
   return (

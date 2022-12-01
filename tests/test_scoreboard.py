@@ -173,7 +173,7 @@ def test_scoreboard_penalises_higher_ranking_players_more(full_game_setup):
     assert diff_for_better_player < diff_for_worse_player
 
 
-def test_reseting_player_sets_score_and_tally_to_zero_but_retain_request_count(
+def test_reseting_player_sets_score_and_tally_and_request_count_to_zero(
     full_game_setup,
 ):
     scoreboard, player, question = full_game_setup
@@ -195,7 +195,7 @@ def test_reseting_player_sets_score_and_tally_to_zero_but_retain_request_count(
     scoreboard.reset_player(player)
 
     assert scoreboard.correct_tally[player.uuid] == 0
-    assert scoreboard.request_counts[player.uuid] == 1
+    assert scoreboard.request_counts[player.uuid] == 0
 
     assert scoreboard.scores[player.uuid] == 0
     assert player.score == 0

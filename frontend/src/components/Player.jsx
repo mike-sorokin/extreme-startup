@@ -6,6 +6,7 @@ import { useClipboard } from '@mantine/hooks'
 import { fetchPlayer } from '../utils/requests'
 
 import PlayerTable from './PlayerTable'
+import useSessionData from '../utils/hooks/useSessionData'
 
 function Player () {
   const [playerData, setPlayerData] = useState({})
@@ -14,6 +15,8 @@ function Player () {
   const clipboard = useClipboard({ timeout: 500 })
 
   const params = useParams()
+
+  const [isAdmin, playerID] = useSessionData(params.gameId)
 
   // Fetches player json object from backend
   useEffect(() => {
@@ -58,9 +61,9 @@ function Player () {
           </Button>
         </div>
         <Space h="md" />
-        <br />
-        <h3>API</h3>
-        <h4 style={{ color: 'grey' }} data-cy='api'>{playerData.api}</h4>
+        {isAdmin || (playerData.id === playerID)
+          ? <div><br /><h3>API</h3><h4 style={{ color: 'grey' }} data-cy='api'>{playerData.api}</h4></div>
+          : <></>}
         <br />
         <h3>Score</h3>
         <Title order={4} color="white" weight={1000} data-cy='score'>{playerData.score}</Title>

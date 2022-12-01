@@ -4,7 +4,7 @@ import { Button, Card, Center, Modal, PasswordInput, Space, Stack, Text, TextInp
 
 import { checkGameEnded, createNewGame } from '../utils/requests'
 import { gameReviewUrl } from '../utils/urls'
-import { showErrorNotification, showFailureNotification, showSuccessNotification } from '../utils/utils'
+import { showErrorNotification, showFailureNotification, showLoadingNotification, updateLoadingNotification } from '../utils/utils'
 
 import AddPlayer from './AddPlayer'
 import GoToGame from './GoToGame'
@@ -20,14 +20,17 @@ function Home () {
   const [gameReviewId, setGameReviewId] = useState('')
   const [newGameId, setNewGameId] = useState('')
   const [pwd, setPwd] = useState('')
+  const [creating, setCreating] = useState(false)
 
   // Creates a new game
   const handleCreateGame = async (event) => {
     event.preventDefault()
+    setCreating(true)
 
     try {
+      showLoadingNotification('create-game', 'Game creation in progress', 'Creating game...')
       const response = await createNewGame({ password: pwd })
-      showSuccessNotification('Successfully Created Game!')
+      updateLoadingNotification('create-game', 'Success!', 'Game successfully created!')
       setNewGameId(response.id)
       setOpenedChoosePwd(false)
       setOpenedCreateGame(true)
@@ -39,6 +42,8 @@ function Home () {
       if (error.response && error.response.status === 400) {
         console.error('password cannot be empty')
       }
+    } finally {
+      setCreating(false)
     }
   }
 
@@ -90,7 +95,7 @@ function Home () {
             <PasswordInput value={pwd} onChange={(e) => setPwd(e.target.value)}
               placeholder="Game password" label="Enter game password:" required data-cy="password-input" />
               <Space h="md" />
-            <Button variant="outline" color="green" type="submit">Create Game!</Button>
+            <Button variant="outline" color="green" type="submit" loading={creating}>Create Game!</Button>
           </form>
         </div>
       </Modal>
