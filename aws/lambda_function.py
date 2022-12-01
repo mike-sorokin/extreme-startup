@@ -4,8 +4,8 @@ import requests
 import random
 
 # dynamodb = boto3.client('dynamodb')
-sqs_resource = boto3.resource("sqs")
-queue = sqs_resource.get_queue_by_name(QueueName="GameTasks")
+sqs_resource = boto3.resource('sqs')
+queue = sqs_resource.get_queue_by_name(QueueName='GameTasks')
 
 
 def lambda_handler(event, context):
@@ -17,7 +17,8 @@ def lambda_handler(event, context):
     message = event.get("Records")[0]
 
     # Get counter attribute from message object (will return None if "Counter" key does not exist)
-    counter = message["messageAttributes"].get("Counter", {}).get("stringValue")
+    counter = message["messageAttributes"].get(
+        "Counter", {}).get("stringValue")
 
     if counter is not None:
         counter = int(counter)
@@ -57,10 +58,19 @@ def lambda_handler(event, context):
         DelaySeconds=10,
         MessageBody="hello",
         MessageAttributes={
-            "GameID": {"StringValue": "test_id", "DataType": "String"},
-            "Counter": {"StringValue": str(counter), "DataType": "Number"},
-            "MessageType": {"StringValue": "AdministerQuestion", "DataType": "String"},
-        },
+            'GameID': {
+                'StringValue': 'test_id',
+                'DataType': 'String'
+            },
+            'Counter': {
+                'StringValue': str(counter),
+                'DataType': 'Number'
+            },
+            'MessageType': {
+                'StringValue': 'AdministerQuestion',
+                'DataType': 'String'
+            }
+        }
     )
     print(res)
     return
@@ -107,9 +117,18 @@ if __name__ == "__main__":
         DelaySeconds=10,
         MessageBody="hello",
         MessageAttributes={
-            "GameID": {"StringValue": "test_id", "DataType": "String"},
-            "Counter": {"StringValue": str(10), "DataType": "Number"},
-            "MessageType": {"StringValue": "AdministerQuestion", "DataType": "String"},
-        },
+            'GameID': {
+                'StringValue': 'test_id',
+                'DataType': 'String'
+            },
+            'Counter': {
+                'StringValue': str(10),
+                'DataType': 'Number'
+            },
+            'MessageType': {
+                'StringValue': 'AdministerQuestion',
+                'DataType': 'String'
+            }
+        }
     )
     print(res)
