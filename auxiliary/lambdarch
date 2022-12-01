@@ -10,5 +10,6 @@ zip -gr aws/aws_deployment_package.zip flaskr/shared
 cd aws
 mkdir flaskr
 touch flaskr/__init__.py
+cp -r ../flaskr/yaml flaskr
 zip -gr aws_deployment_package.zip flaskr
 rm -rf flaskr
