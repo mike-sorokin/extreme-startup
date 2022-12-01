@@ -1,0 +1,12 @@
+echo "Installing dependencies from requirements.txt..."
+pip install -r "aws/requirements.txt" -t aws/lib
+echo "Archiving lambda function..."
+cd aws/lib
+pwd
+zip -r9 ../aws_deployment_package.zip .
+pwd
+cd .. 
+pwd
+zip -g aws_deployment_package.zip lambda_function.py
+cd ../flaskr
+zip -gr ../aws/aws_deployment_package.zip shared
