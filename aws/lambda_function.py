@@ -4,11 +4,15 @@ import requests
 import random
 
 # dynamodb = boto3.client('dynamodb')
-sqs_resource = boto3.resource('sqs')
-queue = sqs_resource.get_queue_by_name(QueueName='GameTasks')
+sqs_resource = boto3.resource("sqs")
+queue = sqs_resource.get_queue_by_name(QueueName="GameTasks")
 
 
 def lambda_handler(event, context):
+
+    print("event")
+    print(event)
+
     # Get message object
     message = event.get("Records")[0]
 
@@ -53,19 +57,10 @@ def lambda_handler(event, context):
         DelaySeconds=10,
         MessageBody="hello",
         MessageAttributes={
-            'GameID': {
-                'StringValue': 'test_id',
-                'DataType': 'String'
-            },
-            'Counter': {
-                'StringValue': str(counter),
-                'DataType': 'Number'
-            },
-            'MessageType': {
-                'StringValue': 'AdministerQuestion',
-                'DataType': 'String'
-            }
-        }
+            "GameID": {"StringValue": "test_id", "DataType": "String"},
+            "Counter": {"StringValue": str(counter), "DataType": "Number"},
+            "MessageType": {"StringValue": "AdministerQuestion", "DataType": "String"},
+        },
     )
     print(res)
     return
@@ -107,24 +102,14 @@ def lambda_handler(event, context):
 #     # db_correct_answer(game_id, player_id, question)?
 
 if __name__ == "__main__":
-    pass
-    # sqs = boto3.client('sqs')
-    # res = sqs.send_message(
-    #     QueueUrl="https://sqs.eu-west-2.amazonaws.com/572990232030/GameTasks",
-    #     MessageBody="hello",
-    #     MessageAttributes={
-    #         'GameID': {
-    #             'StringValue': 'test_id',
-    #             'DataType': 'String'
-    #         },
-    #         'Counter': {
-    #             'StringValue': '10',
-    #             'DataType': 'Number'
-    #         },
-    #         'MessageType': {
-    #             'StringValue': 'AdministerQuestion',
-    #             'DataType': 'String'
-    #         }
-    #     }
-    # )
-    # print(res)
+    res = queue.send_message(
+        # QueueUrl="https://sqs.eu-west-2.amazonaws.com/572990232030/GameTasks",
+        DelaySeconds=10,
+        MessageBody="hello",
+        MessageAttributes={
+            "GameID": {"StringValue": "test_id", "DataType": "String"},
+            "Counter": {"StringValue": str(10), "DataType": "Number"},
+            "MessageType": {"StringValue": "AdministerQuestion", "DataType": "String"},
+        },
+    )
+    print(res)
