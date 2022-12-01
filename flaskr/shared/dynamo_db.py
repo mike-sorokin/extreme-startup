@@ -161,6 +161,9 @@ def db_set_paused(game_id, value: bool):
 
 def db_end_game(game_id):
     """ Sets ended to true """ 
+    # TODO
+    # Process Post Game Analysis
+    # Store Post Game Analysis in Database
     return 
 
 def db_advance_round(game_id):
@@ -223,7 +226,8 @@ def db_get_all_players(game_id):
         player_json['score'] = int(player_item['Score'])
         player_json['api'] = player_item['API']
         player_json['events'] = player_item['Events']
-        player_item['streak'] = player_item['Streak']
+        player_json['streak'] = player_item['Streak']
+        player_json["round_index"] = player_item['RoundIndex']
 
         jsonified_players[pid] = player_json
 
@@ -412,6 +416,8 @@ def db_add_event(game_id, player_id, query, difficulty, points_gained, response_
 
 def db_get_scoreboard(game_id):
     """ Returns Scoreboard object for a game (or at least a mock version) """ 
+    # TODO
+    # Might not be neccessary
     return
 
 def db_add_analysis_event(game_id, event):
