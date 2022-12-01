@@ -50,6 +50,7 @@ def lambda_handler(event, context):
     # sqs = boto3.client('sqs')
     res = queue.send_message(
         # QueueUrl="https://sqs.eu-west-2.amazonaws.com/572990232030/GameTasks",
+        DelaySeconds=10,
         MessageBody="hello",
         MessageAttributes={
             'GameID': {
