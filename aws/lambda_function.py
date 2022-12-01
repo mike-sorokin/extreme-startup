@@ -26,27 +26,23 @@ def lambda_handler(event, context):
 
 
 def administer_question(message):
-    message_attributes = message["messageAttributes"]
-
     # Validate hash
-    modification_hash = message_attributes.get("ModificationHash", {}).get("stringValue")
+    modification_hash = message["messageAttributes"].get("ModificationHash", {}).get("stringValue")
 
-    game_id = message_attributes.get("GameID", {}).get("stringValue")
-    player_id = message_attributes.get("PlayerID", {}).get("stringValue")
-    question_text = message["messageBody"]
-    question_answer = message_attributes.get("QuestionAnswer", {}).get("stringValue")
-    question_score = message_attributes.get("QuestionScore", {}).get("stringValue")
-    question_delay = message_attributes.get("QuestionDelay", {}).get("stringValue")
-    question_difficulty = message_attributes.get("QuestionDifficulty", {}).get("stringValue", 0)
+    message = json.loads(message["messageBody"])
 
-    if (game_id is None) or (player_id is None) or (question_text is None) or (question_answer is None) or (question_score is None) or (question_delay is None) or (question_difficulty is None):
-        print("some attributes don't exist")
+    game_id = message.get("game_id")  # string
+    player_id = message.get("player_id")  # string
+    question_text = message.get("question_text")  # string
+    question_answer = message.get("question_answer")  # string
+    prev_delay = message.get("prev_delay")  # int
+    question_score = message.get("question_score")  # int
+    question_difficulty = message.get("question_difficulty")  # int
 
-    question_score = int(question_score)
-    question_delay = int(question_delay)
-    question_difficulty = int(question_difficulty)
+    if (game_id is None) or (player_id is None) or (question_text is None) or (question_answer is None) or (prev_delay is None) or (question_score is None) or (question_difficulty is None):
+        print("Error: Some attributes do not exist")
+        return
 
-    # Check modification hash
     if db_is_game_paused(game_id):
         # put event back on the queue and return?
         reschedule_message(message)
@@ -54,20 +50,19 @@ def administer_question(message):
 
     # 1. Send request to player, and check response
     player = db_get_player(player_id)
-    answer = None
     try:
-        response = requests.get(player["player_api"], params={"q": question_text})
+        response = requests.get(player["API"], params={"q": question_text})
 
         if response.status_code == 200:
             answer = response.text.strip().lower()
         else:
-            problem = "ERROR_RESPONSE"
+            answer = "ERROR_RESPONSE"
 
     except Exception:
-        problem = "NO_SERVER_RESPONSE"
+        answer = "NO_SERVER_RESPONSE"
 
-    if answer is None:
-        result = problem  # result should equal "ERROR_RESPONSE" or "NO_SERVER_RESPONSE"
+    if answer == "ERROR_RESPONSE" or answer == "NO_SERVER_RESPONSE":
+        result = answer
     elif ALLOW_CHEATING and answer == "cheat":  # Allows cheating for demo/test purposes only (Remove)
         result = "CORRECT"
     elif answer == question_answer:
@@ -76,7 +71,7 @@ def administer_question(message):
         result = "WRONG"
 
     # 2. Update database based on result
-    player_position = db_get_player_position(game_id, player_id)
+    player_position = db_get_leaderboard_position(game_id, player_id)
     points_gained = calculate_points_gained(player_position, question_score, result)
     # This function should add event to a player's list of events, and update their score in the database, based on the result
     add_event(game_id, player_id, question_text, question_difficulty, points_gained, result)
@@ -84,10 +79,20 @@ def administer_question(message):
     # 3. Schedule next question
     game_round = db_get_game_round(game_id)
     next_question = question_factory(game_round)
-    next_delay = rate_controller(question_delay, result)
+    next_delay = rate_controller(prev_delay, result)
+
+    message = {
+        "game_id": game_id,
+        "player_id": player_id,
+        "question_text": next_question.as_text(),
+        "question_answer": next_question.correct_answer(),
+        "prev_delay": next_delay,
+        "question_score": next_question.points,
+        "question_difficulty": question_difficulty
+    }
 
     queue.send_message(
-        MessageBody=next_question.as_text(),
+        MessageBody=json.dumps(message),
         DelaySeconds=next_delay,
         MessageAttributes={
             'MessageType': {
@@ -95,33 +100,9 @@ def administer_question(message):
                 'DataType': 'String'
             },
             'ModificationHash': {
-                'StringValue': modification_hash,
+                'StringValue': modification_hash,  # Need to get a new modification hash
                 'DataType': 'String'
             },
-            'GameID': {
-                'StringValue': game_id,
-                'DataType': 'String'
-            },
-            'PlayerID': {
-                'StringValue': player_id,
-                'DataType': 'String'
-            },
-            'QuestionAnswer': {
-                'StringValue': str(next_question.correct_answer()),
-                'DataType': 'String'
-            },
-            'QuestionDelay': {
-                'StringValue': str(next_delay),
-                'DataType': 'Number'
-            },
-            'QuestionScore': {
-                'StringValue': str(next_question.points),
-                'DataType': 'Number'
-            },
-            'QuestionDifficulty': {
-                'StringValue': str(game_round),
-                'DataType': 'Number'
-            }
         }
     )
     return
@@ -144,7 +125,7 @@ def monitor_game(message):
 
     queue.send_message(
         MessageBody=str(gid),
-        DelaySeconds=2,
+        DelaySeconds=5,
         MessageAttributes={
             'MessageType': {
                 'StringValue': 'Monitor',
@@ -239,50 +220,6 @@ def reschedule_message(message):
 #         MessageBody = message["messageBody"],
 #         MessageAttributes = message["messageAttributes"],
 #     )
-
-
-# def lambda_handler(event, context):
-
-#     # Get message object
-#     message = event.get("Records")[0]
-
-#     # Get counter attribute from message object (will return None if "Counter" key does not exist)
-#     counter = message["messageAttributes"].get(
-#         "Counter", {}).get("stringValue")
-
-#     if counter is not None:
-#         counter = int(counter)
-#     else:
-#         print("counter attribute does not exist")
-#         return
-
-#     print("counter", counter)
-
-#     counter -= 1
-
-#     if counter <= 0:
-#         return
-
-#     res = queue.send_message(
-#         DelaySeconds=10,
-#         MessageBody="hello",
-#         MessageAttributes={
-#             'GameID': {
-#                 'StringValue': 'test_id',
-#                 'DataType': 'String'
-#             },
-#             'Counter': {
-#                 'StringValue': str(counter),
-#                 'DataType': 'Number'
-#             },
-#             'MessageType': {
-#                 'StringValue': 'AdministerQuestion',
-#                 'DataType': 'String'
-#             }
-#         }
-#     )
-#     print(res)
-#     return
 
 
 if __name__ == "__main__":
