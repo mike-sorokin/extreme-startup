@@ -48,7 +48,7 @@ def administer_question(sqs_message):
     question_points = message.get("question_score")  # int
     question_difficulty = message.get("question_difficulty")  # int
 
-    if not game_id or not player_id or not question_text or not question_answer or not prev_delay or not question_score or not question_difficulty:
+    if not all([game_id, player_id, question_text, question_answer, prev_delay, question_points, question_difficulty]):
         print("ERROR: Some attributes do not exist")
         return
 
@@ -95,7 +95,7 @@ def administer_question(sqs_message):
 
     # 2. Update database based on result
     player_position = player_leaderboard_position(game_id, player_id)
-    points_gained = calculate_points_gained(player_position, question_score, result)
+    points_gained = calculate_points_gained(player_position, question_points, result)
     # This function should add event to a player's list of events, and update their score in the database, based on the result
     # add_event(game_id, player_id, question_text, question_difficulty, points_gained, result)
 

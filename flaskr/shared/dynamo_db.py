@@ -588,3 +588,16 @@ def db_review_exists(game_id):
 
 def db_game_ended(game_id):
     return dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': 'State'})['Item']['Ended']
+
+def db_is_game_paused(game_id):
+    res = dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': 'State'})['Item']['Running']
+    assert type(res) == bool
+    return not res
+
+def db_get_game_round(game_id):
+    res = dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': 'State'})['Item']['Round']
+
+def db_check_state_modification_hash(game_id, modification_hash):
+    # TODO: implement whatever it is
+    return True
+
