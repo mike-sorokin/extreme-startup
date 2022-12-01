@@ -128,10 +128,15 @@ def administer_question(message):
 
 
 def monitor_game(message):
-    gid = message["messageBody"]
+    gid = message["messageBody"] 
+    modification_hash = message["messageAttributes"].get("ModificationHash", {}).get("stringValue")
+
     game = db_get_game(gid)
 
-    if not game['paused'] and len(game['players']) > 0:         # Does ended => paused
+    if game['ended'] and not db_check_state_modification_hash(gid, modification_hash):
+        return
+
+    if not game['paused'] and len(game['players']) > 0:  
         if game['auto_mode'] and game['round'] != 0:
             auto_increment_round(game)
         update_player_to_assist()
@@ -149,26 +154,26 @@ def monitor_game(message):
     )
 
 
-def auto_increment_game(game):
+def auto_increment_round(game):
     ratio_threshold = 0.4
     advancable_players = 0
 
     for pid in game["players"]:
         curr_player = db_get_player(pid)
         round_index = curr_player["round_index"]
-        position = db_get_leaderboard_position(pid)       # TODO: Implement this function
+        position = player_leaderboard_position(game['id'], pid)
         round_streak = curr_player["streak"][-round_index:] if round_index != 0 else ""
 
         c_tail = streak_length(round_streak, "1")
 
-        if c_tail >= 6 and position <= max(0.6 * len(player_ids), 1):
+        if c_tail >= 6 and position <= max(0.6 * len(game['players']), 1):
             advancable_players += 1
 
-    if advancable_players / len(player_ids) > ratio_threshold:
+    if advancable_players / len(game['players']) > ratio_threshold:
         db_advance_round(pid)
 
 
-def update_players_to_assist(game):
+def update_player_to_assist(game):
     players_to_assist = db_get_players_to_assist(game["id"])
     needs_assistance = players_to_assist["needs_assistance"]
     being_assisted = players_to_assist["being_assisted"]
@@ -181,8 +186,8 @@ def update_players_to_assist(game):
 
         # corect and incorrect tail(s)
         c_tail, ic_tail = (
-            streak_length(round_streak, STREAK_CHARS[0]),
-            streak_length(round_streak, "".join(STREAK_CHARS[1:])),
+            streak_length(round_streak, "1"),
+            streak_length(round_streak, "X0"),
         )
 
         if c_tail > 0:
@@ -197,11 +202,26 @@ def update_players_to_assist(game):
         elif ic_tail > 15 and (curr_name not in needs_assistance and curr_name not in being_assisted):
             needs_assistance.append(curr_name)
 
-    db_set_players_to_assist(game["id"], players_to_assist)          # TODO: Implement this function
+    db_set_players_to_assist(game["id"], players_to_assist)
+
+def monitor_analysis_game():
+    #TODO
+    pass
 
 
 def streak_length(response_history, streak_char):
     return len(response_history) - len(response_history.rstrip(streak_char))
+
+def player_leaderboard_position(game_id, player_id):
+    scoreboard = db_get_scoreboard(game_id)
+    leaderboard = {k: v 
+            for k, v in sorted(
+                scoreboard.items(), key=lambda item: item['score'], reverse=True
+            )
+        }
+    return list(leaderboard.keys()).index(player_id) + 1
+
+
 
 
 def reschedule_message(message):

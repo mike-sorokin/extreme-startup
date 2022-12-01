@@ -48,7 +48,7 @@ class AWSGamesManager:
         #     "paused": False,
         #     "auto_mode": False
         # }
-        gid = db_add_new_game(password, round=0)
+        gid, modification_hash = db_add_new_game(password, round=0)
 
         # Start game monitor thread
         self.queue.send_message(
@@ -60,7 +60,7 @@ class AWSGamesManager:
                     'DataType': 'String'
                 },
                 'ModificationHash': {
-                    'StringValue': 'SomeHash',
+                    'StringValue': modification_hash,
                     'DataType': 'String'
                 }
             }
