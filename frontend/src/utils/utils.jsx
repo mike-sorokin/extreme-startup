@@ -100,9 +100,10 @@ function lightenColour (colour, multiplier) {
   let G = parseInt(colour.substring(3, 5), 16)
   let B = parseInt(colour.substring(5, 7), 16)
 
-  R = scaleColour(R, multiplier, 64, 128)
-  G = scaleColour(G, multiplier, 64, 128)
-  B = scaleColour(B, multiplier, 64, 128)
+  // lower and upper caps found through experimentation
+  R = scaleColour(R, multiplier, 96, 192)
+  G = scaleColour(G, multiplier, 96, 192)
+  B = scaleColour(B, multiplier, 96, 192)
 
   const r = R.toString(16)
   const g = G.toString(16)
@@ -115,7 +116,7 @@ export function stringToColour (str) {
   const prefix = '#'
   const hash = MD5(str).toString().substring(0, 6)
   const colour = prefix.concat(hash)
-  return lightenColour(colour, 1.1)
+  return lightenColour(colour, 1.25)
 }
 
 /**
