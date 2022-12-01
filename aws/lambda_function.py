@@ -36,7 +36,7 @@ def administer_question(sqs_message):
     try:
         message = json.loads(sqs_message["body"])
     except json.decoder.JSONDecodeError as e:
-        print(f"Json error occured when trying to parse message {message}")
+        print(f"Json error occured when trying to parse message {sqs_message['body']}")
         print(e)
         return
 
