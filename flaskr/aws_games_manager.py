@@ -185,11 +185,10 @@ class AWSGamesManager:
 
     def assist_player(self, game_id, player_name):
         """ Updates a player's state from 'needing assistance' to 'being assisted' """
-        db_assist_player(game_id, player_name)
+        return db_assist_player(game_id, player_name)
 
     def update_player(self, game_id, player_id, name=None, api=None):
         """ Updates name and api of player """
-
         db_update_player(game_id, player_id, name, api)
 
     def get_player_events(self, game_id, player_id) -> list:

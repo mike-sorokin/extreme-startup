@@ -128,9 +128,7 @@ def db_add_new_game(password, round=0):
 
 
 def db_get_player_score(game_id, player_id):
-    game = db_get_game(game_id)
-
-    return
+    return dynamo_resource.Tbale(game_id).get_item(Key={'ComponentId': player_id})['Item']['Score']
 
 
 def db_get_game_ids():
@@ -155,7 +153,7 @@ def db_get_game_password(game_id):
 
 def db_is_game_paused(game_id):
     """ Returns true if game is paused false if not """
-    return
+    return not dynamo_resource.Table(game_id).get_item(Key={'ComponentId': 'State'})['Item']['Running']
 
 
 def db_set_paused(game_id, value: bool):
@@ -222,7 +220,7 @@ def db_set_auto_mode(game_id, value: bool):
 
 def db_get_scores(game_id):
     """ Returns game scores as a list of objects in the form {"time": timestamp, "pid": score} """
-    return
+    return dynamo_resource.Table(game_id).get_item(Key={'ComponentId': 'RunningTotals'})['Item']['GraphData']
 
 
 def db_get_all_players(game_id):
@@ -357,23 +355,89 @@ def db_add_player(game_id, name, api):
 
 def db_get_players_to_assist(game_id):
     """ Returns names of players to assist in the form { "needs_assistance": [], "being_assisted": [] } """
-    return
+    game_table = dynamo_resource.Table(game_id)
+    players_to_assist = game_table.get_item(Key={'ComponentId': 'PlayersToAssist'})['Item']
+    return {"needs_assistance": players_to_assist['NeedsAssistance'], "being_assisted": players_to_assist['BeingAssisted']}
 
 
 def db_assist_player(game_id, player_name):
     """ Updates a player's state from 'needing assistance' to 'being assisted' """
-    pass
+    game_table = dynamo_resource.Table(game_id)
+    players_to_assist = game_table.get_item(Key={'ComponentId': 'PlayersToAssist'})['Item']
+    needs_assistance = players_to_assist['NeedsAssistance']
+    being_assisted = players_to_assist['BeingAssisted']
+
+    if player_name not in needs_assistance:
+        return False
+
+    needs_assistance.remove(player_name)
+    being_assisted.append(player_name)
+
+    game_table.update_item(
+        Key={'ComponentId': 'PlayersToAssist'},
+        UpdateExpression='SET NeedsAssistance = :newNeedsAssistance, BeingAssisted = :beingAssisted',
+        ExpressionAttributeValues={
+            ':newNeedsAssistance': needs_assistance,
+            ':beingAssisted': being_assisted,
+        }
+    )
+    return True
 
 
 def db_update_player(game_id, player_id, name, api):
     """ Updates name and api of player """
-    # I don't think this is ever used currently
-    return
+    game_table = dynamo_resource.Table(game_id)
+
+    if name:
+        game_table.update_item(
+            Key={'ComponentId': player_id},
+            UpdateExpression='SET #Name = :newName',
+            ExpressionAttributeValues={
+                ':newName': name,
+            },
+            ExpressionAttributeNames={
+                "#Name": "Name"
+            }
+        )
+
+    if api:
+        game_table.update_item(
+            Key={'ComponentId': player_id},
+            UpdateExpression='SET API = :newAPI',
+            ExpressionAttributeValues={
+                ':newAPI': api,
+            }
+        )
 
 
 def db_get_events(game_id, player_id):
     """ Returns list of event objects for a player """
-    return
+    return dynamo_resource.Table(game_id).get_item(Key={'ComponentId': player_id})['Item']['Events']
+
+
+def db_add_event(game_id, player_id, query, difficulty, points_gained, response_type):
+    game_table = dynamo_resource.Table(game_id)
+
+    event = {
+        'event_id': uuid4().hex[:8],
+        'player_id': player_id,
+        'game_id': game_id,
+        'query': query,
+        'difficulty': difficulty,
+        'points_gained': points_gained,
+        'response_type': response_type,
+        'timestamp': dt.datetime.now(dt.timezone.utc).isoformat()
+    }
+    events = game_table.get_item(Key={'ComponentId': player_id})['Item']['Events']
+    events.append(event)
+
+    game_table.update_item(
+        Key={'ComponentId': player_id},
+        UpdateExpression='SET Events = :newEvent',
+        ExpressionAttributeValues={
+            ':newEvent': events,
+        }
+    )
 
 
 def db_get_scoreboard(game_id):
@@ -381,6 +445,21 @@ def db_get_scoreboard(game_id):
     return
 
 
+def db_add_analysis_event(game_id, event):
+    game_table = dynamo_resource.Table(game_id)
+
+    events = game_table.get_item(Key={'ComponentId': 'AnalysisEvents'})['Item']['Events']
+    events.append(event)
+
+    game_table.update_item(
+        Key={'ComponentId': 'AnalysisEvents'},
+        UpdateExpression='SET Events = :newEvent',
+        ExpressionAttributeValues={
+            ':newEvent': events,
+        }
+    )
+
+
 def db_get_analysis_events(game_id):
     """ Returns analysis events for a game (not sure what this means) """
-    return
+    return dynamo_resource.Table(game_id).get_item(Key={'ComponentId': 'AnalysisEvents'})['Item']['Events']
