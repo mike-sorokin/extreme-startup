@@ -1,5 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { MD5 } from 'crypto-js'
 import { Button } from '@mantine/core'
 import { showNotification, updateNotification } from '@mantine/notifications'
 import { IconCheck, IconHome, IconX, IconAlertTriangle, IconInfoCircle } from '@tabler/icons'
@@ -86,6 +87,37 @@ export function playersAsArray (playersDict) {
     arr.push(playersDict[playerId])
   }
   return arr
+}
+
+export function lightenColour (colour, multiplier) {
+  let R = parseInt(colour.substring(1, 3), 16)
+  let G = parseInt(colour.substring(3, 5), 16)
+  let B = parseInt(colour.substring(5, 7), 16)
+
+  if (Math.min(R, G, B) > 127) {
+    return colour
+  }
+
+  R *= multiplier
+  G *= multiplier
+  B *= multiplier
+
+  R = Math.min(R, 255)
+  G = Math.min(G, 255)
+  B = Math.min(B, 255)
+
+  const r = R.toString(16)
+  const g = G.toString(16)
+  const b = B.toString(16)
+
+  return '#' + r + g + b
+}
+
+export function stringToColour (str) {
+  const prefix = '#'
+  const hash = MD5(str).toString().substring(0, 6)
+  const colour = prefix.concat(hash)
+  return lightenColour(colour, 1.1)
 }
 
 /**
