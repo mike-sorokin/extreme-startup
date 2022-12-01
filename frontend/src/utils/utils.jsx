@@ -89,22 +89,20 @@ export function playersAsArray (playersDict) {
   return arr
 }
 
-export function lightenColour (colour, multiplier) {
+function scaleColour (col, multiplier, capL, capU) {
+  const colScaled = Math.round(col * multiplier)
+  const newCol = (col < capL) ? (capL + colScaled) : ((col < capU) ? colScaled : col)
+  return Math.min(newCol, 255)
+}
+
+function lightenColour (colour, multiplier) {
   let R = parseInt(colour.substring(1, 3), 16)
   let G = parseInt(colour.substring(3, 5), 16)
   let B = parseInt(colour.substring(5, 7), 16)
 
-  if (Math.min(R, G, B) > 127) {
-    return colour
-  }
-
-  R *= multiplier
-  G *= multiplier
-  B *= multiplier
-
-  R = Math.min(R, 255)
-  G = Math.min(G, 255)
-  B = Math.min(B, 255)
+  R = scaleColour(R, multiplier, 64, 128)
+  G = scaleColour(G, multiplier, 64, 128)
+  B = scaleColour(B, multiplier, 64, 128)
 
   const r = R.toString(16)
   const g = G.toString(16)
