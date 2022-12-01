@@ -13,6 +13,9 @@ sqs_resource = boto3.resource('sqs')
 queue = sqs_resource.get_queue_by_name(QueueName='GameTasks')
 
 def lambda_handler(event, context):
+
+    print(f"\n\n\n\n\n{event}\n\n\n\n")
+
     message = event["Records"][0]
 
     # Get counter attribute from message object (will return None if "Counter" key does not exist)
