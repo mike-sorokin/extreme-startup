@@ -3,7 +3,7 @@ import sys
 sys.path.append(".")
 
 from flaskr.shared.question_factory import QuestionFactory, MAX_ROUND
-from flaskr.questions import WarmupQuestion, Question
+from flaskr.shared.questions import WarmupQuestion, Question
 import pytest
 import random
 from unittest.mock import Mock, patch

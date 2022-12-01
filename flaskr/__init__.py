@@ -11,7 +11,7 @@ from flask import (
 from flaskr.player import Player
 from flaskr.aws_games_manager import AWSGamesManager
 from flaskr.json_encoder import JSONEncoder
-from flaskr.questions import *
+from flaskr.shared.questions import *
 import threading
 import secrets
 from random import randint

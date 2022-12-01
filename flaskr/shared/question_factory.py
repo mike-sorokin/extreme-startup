@@ -1,4 +1,4 @@
-from flaskr.questions import *
+from flaskr.shared.questions import *
 import random
 
 QUESTION_TYPES = [

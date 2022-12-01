@@ -2,9 +2,9 @@ import json
 import boto3
 import requests
 import random
-from shared.dynamo_db import *
-from shared.question_factory import QuestionFactory
-from shared.rate_controller import RateController
+from flaskr.shared.dynamo_db import *
+from flaskr.shared.question_factory import QuestionFactory
+from flaskr.shared.rate_controller import RateController
 
 ALLOW_CHEATING = True
 PROBLEM_DECREMENT = 50

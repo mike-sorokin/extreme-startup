@@ -2,6 +2,7 @@ auxiliary/logs
 dontrunme
 vite
 response.json
+aws_deployment_package.zip
 
 # cypress
 frontend/cypress/screenshots
