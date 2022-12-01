@@ -145,7 +145,7 @@ def db_get_game_password(game_id):
 
 def db_is_game_paused(game_id):
     """ Returns true if game is paused false if not """ 
-    return
+    return not dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': 'State'})['Item']['Running']
 
 def db_set_paused(game_id, value: bool):
     """ Sets paused to given value (true/false) """ 
