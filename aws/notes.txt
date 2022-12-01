@@ -4,3 +4,13 @@ Lambda function tasks:
     2. verify response was correct (Question Object)
     3. Update database to reflect outcome and points change (Scoreboard logic to determine points change)
     4. Schedule the next question (QuestionFactory logic, RateController logic)
+
+    QuestionFactory (round) => next question
+    RateController  (player's old delay, question response type) => new delay
+    Scoreboard      (player's position, question base score?, question response type) => points delta
+
+    round - from database
+    player position - from database
+    old delay - from message
+    question score - from message
+    question response type - undertermined (depends on how they answer the question)

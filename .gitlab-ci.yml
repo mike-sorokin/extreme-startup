@@ -166,6 +166,8 @@ archive-lambda:
     - zip -r9 ../aws_deployment_package.zip .
     - cd .. 
     - zip -g aws_deployment_package.zip lambda_function.py
+    - cd ../flaskr
+    - zip -gr ../aws/aws_deployment_package.zip shared
   artifacts:
     paths:
       - "aws/aws_deployment_package.zip"
