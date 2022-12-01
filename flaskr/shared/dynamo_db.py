@@ -154,7 +154,7 @@ def db_get_game_password(game_id):
     return dynamo_resource.Table(game_id).get_item(Key={'ComponentId': 'State'})['Item']['AdminPassword']
 
 
-def db_is_game_paused(game_id):
+def db_game_paused(game_id):
     """ Returns true if game is paused false if not """
     return not dynamo_resource.Table(game_id).get_item(Key={'ComponentId': 'State'})['Item']['Running']
 
@@ -170,7 +170,6 @@ def db_set_paused(game_id, value: bool):
             ':pause': not value
         }
     )
-
 
 def db_end_game(game_id):
     """ Sets ended to true """
@@ -265,7 +264,8 @@ def db_get_player(game_id, player_id):
     player_json['api'] = player_item['API']
     player_json['events'] = player_item['Events']
     player_json['streak'] = player_item['Streak']
-    player_json["round_index"] = int(player_item['RoundIndex'])
+    player_json['round_index'] = int(player_item['RoundIndex'])
+    player_json['active'] = player_item['Active']
 
     return player_json
 
@@ -337,7 +337,7 @@ def db_add_player(game_id, name, api):
             'LongestStreak': 0,
             'CorrectTally': 0,
             'IncorrectTally': 0,
-            'RequestCounts': 0,
+            'RequestCount': 0,
             'ModificationHash': modification_hash
         }
     )
@@ -371,7 +371,6 @@ def db_add_running_total(game_id, player_id, score, event_timestamp):
     datetime object -> string: isoformat()
     string -> datetime object: fromisoformat() 
     '''
-
     game_table = dynamo_resource.Table(game_id)
     current_running_totals = game_table.get_item(Key={'ComponentId': 'RunningTotals'})['GraphData']
 
@@ -401,7 +400,6 @@ def db_get_players_to_assist(game_id):
     return {"needs_assistance": players_to_assist['NeedsAssistance'], "being_assisted": players_to_assist['BeingAssisted']}
 
 
-<<<<<<< HEAD
 def db_set_players_to_assist(game_id, players_to_assist):
     game_table = dynamo_resource.Table(game_id)
     game_table.update_item(
@@ -413,9 +411,6 @@ def db_set_players_to_assist(game_id, players_to_assist):
         }
     )
 
-
-=======
->>>>>>> 412aee8b4b6db705706a9ec17d3295089d359bac
 def db_assist_player(game_id, player_name):
     """ Updates a player's state from 'needing assistance' to 'being assisted' """
     game_table = dynamo_resource.Table(game_id)
@@ -438,7 +433,6 @@ def db_assist_player(game_id, player_name):
         }
     )
     return True
-
 
 def db_update_player(game_id, player_id, name, api):
     """ Updates name and api of player """
@@ -465,6 +459,59 @@ def db_update_player(game_id, player_id, name, api):
             }
         )
 
+def db_set_player_score(game_id, player_id, new_score):
+    dynamo_resource.Table(game_id).update_item(
+        Key={'ComponentId': player_id},
+            UpdateExpression='SET Score = :newScore',
+            ExpressionAttributeValues={
+                ':newScore': new_score,
+            }
+    )
+
+def db_set_player_incorrect_tally(game_id, player_id, new_incorrect_tally):
+    dynamo_resource.Table(game_id).update_item(
+        Key={'ComponentId': player_id},
+            UpdateExpression='SET IncorrectTally = :newIncorrectTally',
+            ExpressionAttributeValues={
+                ':newIncorrectTally': new_incorrect_tally,
+            }
+    )
+
+def db_set_player_streak(game_id, player_id, new_streak):
+    dynamo_resource.Table(game_id).update_item(
+        Key={'ComponentId': player_id},
+            UpdateExpression='SET Streak = :newStreak',
+            ExpressionAttributeValues={
+                ':newStreak': new_streak,
+            }
+    )
+    
+def db_set_player_correct_tally(game_id, player_id, new_correct_tally):
+    dynamo_resource.Table(game_id).update_item(
+        Key={'ComponentId': player_id},
+            UpdateExpression='SET CorrectTally = :newCorrectTally',
+            ExpressionAttributeValues={
+                ':newCorrectTally': new_correct_tally,
+            }
+    )
+
+def db_set_player_round_index(game_id, player_id, new_round_index):
+    dynamo_resource.Table(game_id).update_item(
+        Key={'ComponentId': player_id},
+            UpdateExpression='SET RoundIndex = :newRoundIndex',
+            ExpressionAttributeValues={
+                ':newRoundIndex': new_round_index,
+            }
+    )
+
+def db_set_request_count(game_id, player_id, new_request_count):
+    dynamo_resource.Table(game_id).update_item(
+        Key={'ComponentId': player_id},
+            UpdateExpression='SET RequestCount = :newRequestCount',
+            ExpressionAttributeValues={
+                ':newRequestCount': new_request_count,
+            }
+    )
 
 def db_get_events(game_id, player_id):
     """ Returns list of event objects for a player """
@@ -497,13 +544,12 @@ def db_add_event(game_id, player_id, query, difficulty, points_gained, response_
 
 
 def db_get_scoreboard(game_id):
-<<<<<<< HEAD
     """ Returns Scoreboard object for a game (or at least a mock version) """ 
     # TODO
     # Might not be neccessary
     game_table = dynamo_resource.Table(game_id)
     scoreboard_data = game_table.scan(
-        ProjectionExpression="ComponentId, Score, CorrectTally, IncorrectTally, RequestCounts, Active",
+        ProjectionExpression="ComponentId, Score, CorrectTally, IncorrectTally, RequestCount, Active",
         FilterExpression="attribute_exists(Score)"
     )["Items"]
 
@@ -514,14 +560,9 @@ def db_get_scoreboard(game_id):
         res[entry['ComponentId']] = {'score': entry['Score'],
                                      'correct_tally': entry["CorrectTally"],
                                      'incorrect_tally': entry["IncorrectTally"],
-                                     'request_counts': entry["RequestCounts"]
+                                     'request_counts': entry["RequestCount"]
                                      }
     return res
-    
-=======
-    """ Returns Scoreboard object for a game (or at least a mock version) """
-    return
->>>>>>> 412aee8b4b6db705706a9ec17d3295089d359bac
 
 
 def db_add_analysis_event(game_id, event):
@@ -538,15 +579,12 @@ def db_add_analysis_event(game_id, event):
         }
     )
 
-
 def db_get_analysis_events(game_id):
-<<<<<<< HEAD
     """ Returns analysis events for a game (not sure what this means) """ 
     return dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': 'AnalysisEvents'})['Item']['Events']
 
 def db_review_exists(game_id):
     return 'Item' in dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': 'Review'})
-=======
-    """ Returns analysis events for a game (not sure what this means) """
-    return dynamo_resource.Table(game_id).get_item(Key={'ComponentId': 'AnalysisEvents'})['Item']['Events']
->>>>>>> 412aee8b4b6db705706a9ec17d3295089d359bac
+
+def db_game_ended(game_id):
+    return dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': 'State'})['Item']['Ended']

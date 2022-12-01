@@ -9,7 +9,6 @@ ALLOW_CHEATING = True
 sqs_resource = boto3.resource('sqs')
 queue = sqs_resource.get_queue_by_name(QueueName='GameTasks')
 
-
 def lambda_handler(event, context):
     message = event["Records"][0]
 
@@ -24,13 +23,10 @@ def lambda_handler(event, context):
         print("Invalid message type")
         return
 
+def administer_question(sqs_message):
+    modification_hash = sqs_message["messageAttributes"].get("ModificationHash", {}).get("stringValue")
 
-def administer_question(message):
-    # Validate hash
-    modification_hash = message["messageAttributes"].get("ModificationHash", {}).get("stringValue")
-
-    message = json.loads(message["messageBody"])
-
+    message = json.loads(sqs_message["messageBody"])
     game_id = message.get("game_id")  # string
     player_id = message.get("player_id")  # string
     question_text = message.get("question_text")  # string
@@ -39,17 +35,31 @@ def administer_question(message):
     question_score = message.get("question_score")  # int
     question_difficulty = message.get("question_difficulty")  # int
 
-    if (game_id is None) or (player_id is None) or (question_text is None) or (question_answer is None) or (prev_delay is None) or (question_score is None) or (question_difficulty is None):
-        print("Error: Some attributes do not exist")
+    if not game_id or not player_id or not question_text or not question_answer or not prev_delay or not question_score or not question_difficulty:
+        print("ERROR: Some attributes do not exist")
         return
 
+    player = db_get_player(game_id, player_id)
+
+    if db_game_ended(game_id) or not player['active']:
+        return # Terminate lambda loop 
+
     if db_is_game_paused(game_id):
-        # put event back on the queue and return?
-        reschedule_message(message)
+        # Put equivalent message on SQS queue again 
+        queue.send_message(sqs_message)
         return
 
     # 1. Send request to player, and check response
-    player = db_get_player(player_id)
+    if db_get_game(game_id)['round'] == 1 and player['round_index'] == 0:
+        # Reset score to 0 once warmup ends, add to running_totals
+        db_set_player_score(game_id, player_id, 0)
+        db_set_player_streak(game_id, player_id, "")
+        db_set_player_correct_tally(game_id,player_id, 0)
+        db_set_player_incorrect_tally(game_id, player_id, 0)
+        db_set_request_count(game_id, player_id, 0)
+
+        db_add_running_total(game_id, player_id, 0, dt.datetime.now(dt.timezone.utc))
+
     try:
         response = requests.get(player["API"], params={"q": question_text})
 
@@ -57,10 +67,10 @@ def administer_question(message):
             answer = response.text.strip().lower()
         else:
             answer = "ERROR_RESPONSE"
-
     except Exception:
         answer = "NO_SERVER_RESPONSE"
 
+    # Get result of question
     if answer == "ERROR_RESPONSE" or answer == "NO_SERVER_RESPONSE":
         result = answer
     elif ALLOW_CHEATING and answer == "cheat":  # Allows cheating for demo/test purposes only (Remove)
@@ -71,12 +81,13 @@ def administer_question(message):
         result = "WRONG"
 
     # 2. Update database based on result
-    player_position = db_get_leaderboard_position(game_id, player_id)
+    player_position = player_leaderboard_position(game_id, player_id)
     points_gained = calculate_points_gained(player_position, question_score, result)
     # This function should add event to a player's list of events, and update their score in the database, based on the result
     add_event(game_id, player_id, question_text, question_difficulty, points_gained, result)
 
-    # 3. Schedule next question
+
+    # 3. Schedule next question on queue
     game_round = db_get_game_round(game_id)
     next_question = question_factory(game_round)
     next_delay = rate_controller(prev_delay, result)
@@ -105,8 +116,6 @@ def administer_question(message):
             },
         }
     )
-    return
-
 
 def monitor_game(message):
     gid = message["messageBody"] 
@@ -201,25 +210,6 @@ def player_leaderboard_position(game_id, player_id):
             )
         }
     return list(leaderboard.keys()).index(player_id) + 1
-
-
-
-
-def reschedule_message(message):
-    pass
-#     game_id = message["messageAttributes"].get("GameID", {}).get("stringValue")
-#     player_id = message["messageAttributes"].get("PlayerID", {}).get("stringValue")
-#     question_score = message["messageAttributes"].get("QuestionScore", {}).get("stringValue")
-#     question_delay = message["messageAttributes"].get("QuestionDelay", {}).get("stringValue")
-#     question_difficulty = message["messageAttributes"].get("QuestionDifficulty", {}).get("stringValue", -1)
-
-
-# }
-#     queue.send_message(
-#         DelaySeconds = 10,
-#         MessageBody = message["messageBody"],
-#         MessageAttributes = message["messageAttributes"],
-#     )
 
 
 if __name__ == "__main__":
