@@ -141,7 +141,6 @@ class AWSGamesManager:
         """ Adds a player to a game and returns newly added player """
         new_player, modification_hash = db_add_player(game_id, name, api)
         curr_round = db_get_round(game_id)
-
         next_question = self.question_factory.next_question(curr_round)
 
         # Start administering questions
@@ -165,12 +164,20 @@ class AWSGamesManager:
                     'StringValue': new_player['id'],
                     'DataType': 'String'
                 },
+                'QuestionAnswer': {
+                    'StringValue': str(next_question.correct_answer()),
+                    'DataType': 'String'
+                },
                 'QuestionDelay': {
                     'StringValue': str(DEFAULT_DELAY),
                     'DataType': 'Number'
                 },
                 'QuestionScore': {
                     'StringValue': str(next_question.points),
+                    'DataType': 'Number'
+                },
+                'QuestionDifficulty': {
+                    'StringValue': str(curr_round),
                     'DataType': 'Number'
                 }
             }
@@ -223,7 +230,7 @@ class AWSGamesManager:
             analysis_event_data = db_get_analysis_events(gid)
 
             db_end_game(gid)
-            # Need to make sure to stop/kill all threads by deleting sqs queue or stopping aws lambda idk
+            # Need to make sure to stop/kill all threads
             if len(player_data) > 0:
                 self.analyse_game(gid, player_data, scoreboard_data, analysis_event_data)
 

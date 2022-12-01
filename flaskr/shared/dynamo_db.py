@@ -342,15 +342,45 @@ def db_add_player(game_id, name, api):
         }
     )
 
-    dynamo_resource.Table(game_id).update_item(
-        Key={'ComponentId': 'RunningTotals'},
-        UpdateExpression='SET PlayerIds = :newPlayerIds',
-        ExpressionAttributeValues={
-            ':newPlayerIds': pids
-        }
-    )
+    db_add_running_total(game_id, pid, 0, dt.datetime.now(dt.timezone.utc))
 
     return {'id': pid, 'game_id': game_id, 'score': 0, 'api': api, 'events': [], 'streak': ""}, modification_hash
+
+
+def db_add_running_total(game_id, player_id, score, event_timestamp):
+    '''
+    Args:
+    game_id {String}
+    player_id {String}
+    score {int}
+    event_timestamp {dt_datetime}: creation timestamp for event
+
+    Note:
+    In running_totals, must be stored strings, not datetime objects.
+    datetime object -> string: isoformat()
+    string -> datetime object: fromisoformat() 
+    '''
+
+    game_table = dynamo_resource.Table(game_id)
+    current_running_totals = game_table.get_item(Key={'ComponentId': 'RunningTotals'})['GraphData']
+
+    prev_time = dt.datetime.fromisoformat(current_running_totals[-1]["time"])
+    diff = event_timestamp - prev_time
+
+    if diff.total_seconds() < 1:
+        current_running_totals[-1][player_id] = score
+    else:
+        current_running_totals.append(
+            {"time": event_timestamp.isoformat(), f"{player_id}": score}
+        )
+
+    game_table.update_item(
+        Key={'ComponentId': 'RunningTotals'},
+        UpdateExpression='SET GraphData = :newGraphData',
+        ExpressionAttributeValues={
+            ':newGraphData': current_running_totals
+        }
+    )
 
 
 def db_get_players_to_assist(game_id):
