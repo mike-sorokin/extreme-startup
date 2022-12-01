@@ -319,7 +319,7 @@ def create_app():
 
     @app.get("/api/<game_id>/review/existed")
     def game_existed(game_id):
-        return {"existed": f"{game_id}_players" in db_client.xs.list_collection_names()}
+        return {"existed": games_manager.game_exists(game_id) and games_manager.review_exists(game_id)}
 
     @app.get("/api/<game_id>/review/finalboard")
     def total_player_scores(game_id):

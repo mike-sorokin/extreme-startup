@@ -8,7 +8,6 @@ dynamo_resource = boto3.resource('dynamodb')
 def db_get_all_games():
     game_tables = list(dynamo_resource.tables.all())
     jsonified_games = {}
-    print(len(game_tables))
     for game_table in game_tables:
         game_json = {} 
         game_state = game_table.get_item(Key = {'ComponentId': 'State'})['Item']
@@ -227,7 +226,7 @@ def db_get_all_players(game_id):
         player_json['api'] = player_item['API']
         player_json['events'] = player_item['Events']
         player_json['streak'] = player_item['Streak']
-        player_json["round_index"] = player_item['RoundIndex']
+        player_json["round_index"] = int(player_item['RoundIndex'])
 
         jsonified_players[pid] = player_json
 
@@ -244,7 +243,8 @@ def db_get_player(game_id, player_id):
     player_json['score'] = int(player_item['Score'])
     player_json['api'] = player_item['API']
     player_json['events'] = player_item['Events']
-    player_item['streak'] = player_item['Streak']
+    player_json['streak'] = player_item['Streak']
+    player_json["round_index"] = int(player_item['RoundIndex'])
 
     return player_json
 
@@ -311,6 +311,9 @@ def db_add_player(game_id, name, api):
             'RoundIndex': 0,
             'CurrentStreakLength': 0, 
             'LongestStreak': 0,
+            'CorrectTally': 0,
+            'IncorrectTally': 0,
+            'RequestCounts': 0,
             'ModificationHash': modification_hash
         }
     )
@@ -431,7 +434,23 @@ def db_get_scoreboard(game_id):
     """ Returns Scoreboard object for a game (or at least a mock version) """ 
     # TODO
     # Might not be neccessary
-    return
+    game_table = dynamo_resource.Table(game_id)
+    scoreboard_data = game_table.scan(
+        ProjectionExpression="ComponentId, Score, CorrectTally, IncorrectTally, RequestCounts, Active", 
+        FilterExpression="attribute_exists(Score)"
+    )["Items"]
+
+    res = {}
+    for entry in scoreboard_data:
+        if not entry['Active']:
+            continue
+        res[entry['ComponentId']] = {'score': entry['Score'],
+                                     'correct_tally': entry["CorrectTally"],
+                                     'incorrect_tally': entry["IncorrectTally"],
+                                     'request_counts': entry["RequestCounts"]
+                                    }
+    return res
+    
 
 def db_add_analysis_event(game_id, event):
     game_table = dynamo_resource.Table(game_id)
@@ -451,3 +470,6 @@ def db_add_analysis_event(game_id, event):
 def db_get_analysis_events(game_id):
     """ Returns analysis events for a game (not sure what this means) """ 
     return dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': 'AnalysisEvents'})['Item']['Events']
+
+def db_review_exists(game_id):
+    return 'Item' in dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': 'Review'})

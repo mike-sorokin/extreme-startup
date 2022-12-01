@@ -243,3 +243,6 @@ class AWSGamesManager:
     def upload_data(self, game_id, players_data, **reviews_items):
         self.db_client.xs[f"{game_id}_players"].insert_many(players_data)
         self.db_client.xs[f"{game_id}_review"].insert_many([{"item": k, "stats": v} for k, v in reviews_items.items()])
+
+    def review_exists(self, game_id):
+        return db_review_exists(game_id)
