@@ -334,6 +334,19 @@ def db_get_players_to_assist(game_id):
     players_to_assist = game_table.get_item(Key = {'ComponentId': 'PlayersToAssist'})['Item']
     return {"needs_assistance": players_to_assist['NeedsAssistance'], "being_assisted": players_to_assist['BeingAssisted']}
 
+
+def db_set_players_to_assist(game_id, players_to_assist):
+    game_table = dynamo_resource.Table(game_id)
+    game_table.update_item(
+        Key = {'ComponentId' : 'PlayersToAssist'},
+        UpdateExpression='SET NeedsAssistance = :newNeedsAssistance, BeingAssisted = :beingAssisted',
+        ExpressionAttributeValues={
+            ':newNeedsAssistance' : players_to_assist["needs_assistance"],
+            ':beingAssisted' : players_to_assist["being_assisted"],
+        }
+    )
+
+
 def db_assist_player(game_id, player_name):
     """ Updates a player's state from 'needing assistance' to 'being assisted' """ 
     game_table = dynamo_resource.Table(game_id)
