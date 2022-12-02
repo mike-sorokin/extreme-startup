@@ -286,7 +286,7 @@ def player_leaderboard_position(game_id, player_id):
     scoreboard = db_get_scoreboard(game_id)
     leaderboard = {k: v
                    for k, v in sorted(
-                       scoreboard.items(), key=lambda item: item['score'], reverse=True
+                       scoreboard.items(), key=lambda item: item[1]['score'], reverse=True
                    )
                    }
     return list(leaderboard.keys()).index(player_id) + 1
