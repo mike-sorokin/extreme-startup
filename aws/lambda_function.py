@@ -53,16 +53,27 @@ def administer_question(sqs_message):
         game_id, player_id, question_text, question_answer,
         prev_delay, question_points, question_difficulty
     ]):
-        print("ERROR: Some attributes do not exist")
+        print("ERROR: Some attributes do not exist. The attribute values are as follows:")
+        print(f"""
+            game_id: {game_id},
+            player_id: {player_id},
+            question_text: {question_text},
+            question_answer: {question_answer},
+            prev_delay: {prev_delay},
+            question_points: {question_points},
+            question_difficulty: {question_difficulty}
+        """)
         return
 
     player = db_get_player(game_id, player_id)
 
     if db_game_ended(game_id) or not player['active']:
+        print("Game is ended")
         return  # Terminate lambda loop
 
     if db_is_game_paused(game_id):
         # Put equivalent message on SQS queue again
+        print("Game is paused. Resending message")
         queue.send_message(sqs_message)
         return
 
