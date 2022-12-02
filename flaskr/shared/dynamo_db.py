@@ -383,7 +383,7 @@ def db_add_running_total(game_id, player_id, score, event_timestamp):
     current_running_totals = game_table.get_item(Key={'ComponentId': 'RunningTotals'})['Item']['GraphData']
 
     prev_time = dt.datetime.fromisoformat(current_running_totals[-1]["time"])
-    diff = event_timestamp - prev_time
+    diff = event_timestamp.replace(tzinfo=None) - prev_time
 
     if diff.total_seconds() < 1:
         current_running_totals[-1][player_id] = score
