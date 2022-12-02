@@ -54,6 +54,16 @@ def administer_question(sqs_message):
     question_points = message.get("question_points")  # int
     question_difficulty = message.get("question_difficulty")  # int
 
+
+
+    try:
+        game = db_get_game(game_id)
+    except ClientError as e:
+        print(f"Error! Game with id {game_id} DOES NOT EXIST or cannot be accessed or eradicated by Andrey")
+        print(e)
+        return
+
+
     if not all(map(lambda it: it is not None, [
         game_id, player_id, question_text, question_answer,
         prev_delay, question_points, question_difficulty
