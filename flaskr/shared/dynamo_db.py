@@ -6,6 +6,12 @@ dynamo_client = boto3.client('dynamodb')
 dynamo_resource = boto3.resource('dynamodb')
 
 
+def convert_decimals(event_dic):
+    event_dic['difficulty'] = int(event_dic['difficulty'])
+    event_dic['points_gained'] = int(event_dic['points_gained'])
+    return event_dic
+
+
 def db_get_all_games():
     game_tables = list(dynamo_resource.tables.all())
     jsonified_games = {}
@@ -230,12 +236,6 @@ def db_get_scores(game_id):
 
 def db_get_all_players(game_id):
     """ Returns players as a dict in the form {player_id: Player, player_id: Player, ...} """
-
-    def convert_decimals(event_dic):
-        event_dic['difficulty'] = int(event_dic['difficulty'])
-        event_dic['points_gained'] = int(event_dic['points_gained'])
-        return event_dic
-
     game_table = dynamo_resource.Table(game_id)
     pids = game_table.get_item(Key={'ComponentId': 'State'})['Item']['PlayerIds']
     jsonified_players = {}
@@ -270,7 +270,7 @@ def db_get_player(game_id, player_id):
     player_json['name'] = player_item['Name']
     player_json['score'] = int(player_item['Score'])
     player_json['api'] = player_item['API']
-    player_json['events'] = player_item['Events']
+    player_json['events'] = list(map(convert_decimals, player_item['Events']))
     player_json['streak'] = player_item['Streak']
     player_json['round_index'] = int(player_item['RoundIndex'])
     player_json['active'] = player_item['Active']

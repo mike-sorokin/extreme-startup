@@ -107,7 +107,8 @@ class AWSGamesManager:
     # PLAYER MANAGEMENT
 
     def get_game_players(self, game_id, *player_id) -> dict:
-        """ If player_id(s) given, returns Player objects for only those players, else returns all Player objects """
+        """ If player_id(s) given, returns Player objects for only those players, 
+            else returns all Player objects """
 
         if player_id:
             return {pid: db_get_player(game_id, pid) for pid in list(player_id)}
