@@ -100,7 +100,9 @@ def administer_question(sqs_message):
             answer = response.text.strip().lower()
         else:
             answer = "ERROR_RESPONSE"
-    except Exception:
+    except Exception as e:
+        print("Player's server did not respond!")
+        print(e)
         answer = "NO_SERVER_RESPONSE"
 
     # Get result of question
