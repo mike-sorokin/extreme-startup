@@ -50,7 +50,7 @@ def administer_question(sqs_message):
     player_id = message.get("player_id")  # string
     question_text = message.get("question_text")  # string
     question_answer = message.get("question_answer")  # string
-    prev_delay = mbotocore.exceptions.ClientErroressage.get("prev_delay")  # int
+    prev_delay = message.get("prev_delay")  # int
     question_points = message.get("question_points")  # int
     question_difficulty = message.get("question_difficulty")  # int
 
@@ -73,7 +73,7 @@ def administer_question(sqs_message):
     player = None
     try:
         player = db_get_player(game_id, player_id)
-    except ClientError as e:
+    except ResourceNotFoundException as e:
         print(f"Error occured when trying to get player with id {player_id} in game {game_id}")
         print(e)
         return
