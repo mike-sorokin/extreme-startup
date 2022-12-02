@@ -53,10 +53,10 @@ def administer_question(sqs_message):
     question_points = message.get("question_points")  # int
     question_difficulty = message.get("question_difficulty")  # int
 
-    if not all([
+    if not all(map(lambda it: it is not None, [
         game_id, player_id, question_text, question_answer,
         prev_delay, question_points, question_difficulty
-    ]):
+    ])):
         print("ERROR: Some attributes do not exist. The attribute values are as follows:")
         print(f"""
             game_id: {game_id},

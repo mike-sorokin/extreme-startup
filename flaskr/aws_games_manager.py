@@ -160,6 +160,7 @@ class AWSGamesManager:
                 },
             }
         )
+        print(f"Server has sent player message {message}")
 
         return new_player
 
