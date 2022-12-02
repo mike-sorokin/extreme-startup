@@ -372,7 +372,7 @@ def db_add_running_total(game_id, player_id, score, event_timestamp):
     string -> datetime object: fromisoformat() 
     '''
     game_table = dynamo_resource.Table(game_id)
-    current_running_totals = game_table.get_item(Key={'ComponentId': 'RunningTotals'})['GraphData']
+    current_running_totals = game_table.get_item(Key={'ComponentId': 'RunningTotals'})['Item']['GraphData']
 
     prev_time = dt.datetime.fromisoformat(current_running_totals[-1]["time"])
     diff = event_timestamp - prev_time

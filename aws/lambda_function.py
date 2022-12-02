@@ -49,7 +49,10 @@ def administer_question(sqs_message):
     question_points = message.get("question_score")  # int
     question_difficulty = message.get("question_difficulty")  # int
 
-    if not all([game_id, player_id, question_text, question_answer, prev_delay, question_points, question_difficulty]):
+    if not all([
+        game_id, player_id, question_text, question_answer,
+        prev_delay, question_points, question_difficulty
+    ]):
         print("ERROR: Some attributes do not exist")
         return
 
@@ -180,7 +183,7 @@ def monitor_game(message):
     if not game['paused'] and len(game['players']) > 0:
         if game['auto_mode'] and game['round'] != 0:
             auto_increment_round(game)
-        update_player_to_assist()
+        update_player_to_assist(game)
         monitor_analysis_game()
 
     queue.send_message(
