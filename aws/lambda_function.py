@@ -219,6 +219,7 @@ def monitor_game(message):
 
     try:
         game = db_get_game(gid)
+        print(f"The game obtained from db is {game}")
     except ClientError as e:
         print(f"Error! Game with id {gid} DOES NOT EXIST or cannot be accessed or eradicated by Andrey")
         print(e)
