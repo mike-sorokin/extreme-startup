@@ -89,7 +89,7 @@ function Home () {
         opened={openedChoosePwd}
         onClose={() => setOpenedChoosePwd(false)}
         title="Choose a password"
-        withCloseButton={false}>
+        withCloseButton={false} closeOnClickOutside={false}>
         <div>
           <form onSubmit={handleCreateGame}>
             <PasswordInput value={pwd} onChange={(e) => setPwd(e.target.value)}
