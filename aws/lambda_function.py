@@ -112,7 +112,7 @@ def administer_question(sqs_message):
     player_position = player_leaderboard_position(game_id, player_id)
     points_gained = calculate_points_gained(player_position, question_points, result)
     # This function should add event to a player's list of events, and update their score in the database, based on the result
-    # add_event(game_id, player_id, question_text, question_difficulty, points_gained, result)
+    add_event(game_id, player_id, question_text, question_difficulty, points_gained, result)
 
     # 3. Schedule next question on queue
     game_round = db_get_game_round(game_id)
@@ -144,6 +144,12 @@ def administer_question(sqs_message):
         }
     )
     return json.dumps(res)
+
+
+
+def add_event(game_id, player_id, question_text, question_difficulty, points_gained, result):
+    db_add_event(game_id, player_id, question_text, question_difficulty, points_gained, result)
+
 
 
 def calculate_points_gained(player_position, question_points, result, lenient=True):
