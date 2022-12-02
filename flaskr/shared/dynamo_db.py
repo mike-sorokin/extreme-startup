@@ -1,6 +1,7 @@
 import boto3
 from uuid import uuid4
 import datetime as dt
+import pytz
 
 dynamo_client = boto3.client('dynamodb')
 dynamo_resource = boto3.resource('dynamodb')
@@ -382,8 +383,8 @@ def db_add_running_total(game_id, player_id, score, event_timestamp):
     game_table = dynamo_resource.Table(game_id)
     current_running_totals = game_table.get_item(Key={'ComponentId': 'RunningTotals'})['Item']['GraphData']
 
-    prev_time = dt.datetime.fromisoformat(current_running_totals[-1]["time"])
-    diff = event_timestamp.replace(tzinfo=None) - prev_time
+    prev_time = pytz.utc.localize(dt.datetime.fromisoformat(current_running_totals[-1]["time"]))
+    diff = event_timestamp - prev_time
 
     if diff.total_seconds() < 1:
         current_running_totals[-1][player_id] = score
