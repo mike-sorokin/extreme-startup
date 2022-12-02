@@ -67,10 +67,6 @@ class AWSGamesManager:
 
         return gid
 
-    def game_round(self, game_id) -> int:
-        """ Returns the round that the game is on """
-        return db_get_round(game_id)
-
     def game_ended(self, game_id) -> bool:
         """ returns True if game has ended, False if not """
         return db_game_ended(game_id)
@@ -133,16 +129,6 @@ class AWSGamesManager:
 
         return db_get_player_score(game_id, player_id)
 
-    def player_leaderboard_position(self, game_id, player_id) -> int:
-        """ Returns a player's position in the leaderboard """
-        scoreboard = db_get_scoreboard(game_id)
-        leaderboard = {k: v
-                       for k, v in sorted(
-                           scoreboard.items(), key=lambda item: item['score'], reverse=True
-                       )
-                       }
-        return list(leaderboard.keys()).index(player_id) + 1
-
     def add_player_to_game(self, game_id, name, api) -> dict:
         """ Adds a player to a game and returns newly added player """
         new_player, modification_hash = db_add_player(game_id, name, api)
@@ -176,16 +162,6 @@ class AWSGamesManager:
         )
 
         return new_player
-
-    def reset_player(self, game_id, player_id):
-        """ Resets a players score after warmup round ends """
-        db_set_player_score(game_id, player_id, 0)
-        db_set_player_streak(game_id, player_id, "")
-        db_set_player_correct_tally(game_id, player_id, 0)
-        db_set_player_incorrect_tally(game_id, player_id, 0)
-        db_set_request_count(game_id, player_id, 0)
-
-        db_add_running_total(game_id, player_id, 0, dt.datetime.now(dt.timezone.utc))
 
     def get_players_to_assist(self, game_id) -> dict:
         """ Returns names of players to assist in the form { "needs_assistance": [], "being_assisted": [] } """
