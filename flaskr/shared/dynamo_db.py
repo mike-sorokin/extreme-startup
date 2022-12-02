@@ -255,7 +255,7 @@ def db_get_all_players(game_id):
 
         jsonified_players[pid] = player_json
 
-    print("jsonified players are:", jsonified_players)
+    print(jsonified_players)
 
     return jsonified_players
 
@@ -603,7 +603,7 @@ def db_is_game_paused(game_id):
     return not res
 
 def db_get_game_round(game_id):
-    res = dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': 'State'})['Item']['Round']
+    return dynamo_resource.Table(game_id).get_item(Key = {'ComponentId': 'State'})['Item']['Round']
 
 def db_check_state_modification_hash(game_id, modification_hash):
     # TODO: implement whatever it is
