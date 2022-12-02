@@ -1,6 +1,6 @@
 import json
 import boto3
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError, ResourceNotFoundException
 import requests
 from datetime import datetime
 from flaskr.shared.dynamo_db import *
@@ -70,7 +70,14 @@ def administer_question(sqs_message):
         """)
         return
 
-    player = db_get_player(game_id, player_id)
+    player = None
+    try:
+        player = db_get_player(game_id, player_id)
+    except ResourceNotFoundException as e:
+        print(f"Error occured when trying to get player with id {player_id} in game {game_id}")
+        print(e)
+        return
+
 
     if db_game_ended(game_id) or not player['active']:
         print("Game is ended")
