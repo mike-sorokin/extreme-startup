@@ -122,6 +122,7 @@ def administer_question(sqs_message):
     game_round = db_get_game_round(game_id)
     next_question = QuestionFactory().next_question(game_round)
     next_delay = RateController().delay_before_next_question(prev_delay, result)
+    print("next delay is", next_delay)
 
     message = {
         "game_id": game_id,
@@ -211,7 +212,7 @@ def monitor_game(message):
 
     queue.send_message(
         MessageBody=str(gid),
-        DelaySeconds=5,
+        DelaySeconds=40,
         MessageAttributes={
             'MessageType': {
                 'StringValue': 'Monitor',
