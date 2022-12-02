@@ -118,7 +118,7 @@ def administer_question(sqs_message):
     points_gained = calculate_points_gained(player_position, question_points, result)
     # This function should add event to a player's list of events, and update their score in the database, based on the result
     add_event(game_id, player_id, question_text, question_difficulty, points_gained, result)
-    db_add_running_total(game_id, player_id, points_gained + int(player["Score"]), datetime.now())
+    db_add_running_total(game_id, player_id, points_gained + int(player["score"]), datetime.now())
 
     # 3. Schedule next question on queue
     game_round = db_get_game_round(game_id)
