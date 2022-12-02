@@ -234,7 +234,7 @@ def update_player_to_assist(game):
     being_assisted = players_to_assist["being_assisted"]
 
     for pid in game["players"]:
-        curr_player = db_get_player(pid)
+        curr_player = db_get_player(game["id"], pid)
         curr_name = curr_player["name"]
         streak, round_index = curr_player["streak"], curr_player["round_index"]
         round_streak = streak[-round_index:] if round_index != 0 else ""
