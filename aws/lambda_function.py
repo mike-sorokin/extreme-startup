@@ -50,7 +50,7 @@ def administer_question(sqs_message):
     question_text = message.get("question_text")  # string
     question_answer = message.get("question_answer")  # string
     prev_delay = message.get("prev_delay")  # int
-    question_points = message.get("question_score")  # int
+    question_points = message.get("question_points")  # int
     question_difficulty = message.get("question_difficulty")  # int
 
     if not all([
