@@ -534,12 +534,12 @@ def db_add_event(game_id, player_id, query, difficulty, points_gained, response_
         'player_id': player_id,
         'game_id': game_id,
         'query': query,
-        'difficulty': difficulty,
-        'points_gained': points_gained,
+        'difficulty': int(difficulty),
+        'points_gained': int(points_gained),
         'response_type': response_type,
         'timestamp': dt.datetime.now(dt.timezone.utc).isoformat()
     }
-    events = game_table.get_item(Key={'ComponentId': player_id})['Item']['Events']
+    events = list(map(convert_decimals, game_table.get_item(Key={'ComponentId': player_id})['Item']['Events']))
     events.append(event)
 
     game_table.update_item(
