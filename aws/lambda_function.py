@@ -13,10 +13,14 @@ STREAK_LENGTH = 30
 sqs_resource = boto3.resource('sqs')
 queue = sqs_resource.get_queue_by_name(QueueName='GameTasks')
 
+def print_dict_nicely(dic):
+    print(json.dumps(dic, sort_keys=True, indent=4))
+
 
 def lambda_handler(event, context):
 
-    print(f"\n\n\n\n\n{event}\n\n\n\n")
+    print("The event is as follows:")
+    print_dict_nicely(event)
 
     message = event["Records"][0]
     message_type = message["messageAttributes"].get("MessageType", {}).get("stringValue")
@@ -143,7 +147,8 @@ def administer_question(sqs_message):
             },
         }
     )
-    print(f"sent message {message}")
+    print(f"sent message as follows:")
+    print_dict_nicely(message)
     return json.dumps(res)
 
 
