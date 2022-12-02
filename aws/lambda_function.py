@@ -214,7 +214,7 @@ def auto_increment_round(game):
     advancable_players = 0
 
     for pid in game["players"]:
-        curr_player = db_get_player(pid)
+        curr_player = db_get_player(game['id'], pid)
         round_index = curr_player["round_index"]
         position = player_leaderboard_position(game['id'], pid)
         round_streak = curr_player["streak"][-round_index:] if round_index != 0 else ""
