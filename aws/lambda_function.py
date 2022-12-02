@@ -73,7 +73,7 @@ def administer_question(sqs_message):
     player = None
     try:
         player = db_get_player(game_id, player_id)
-    except ResourceNotFoundException as e:
+    except ClientError as e:
         print(f"Error occured when trying to get player with id {player_id} in game {game_id}")
         print(e)
         return
