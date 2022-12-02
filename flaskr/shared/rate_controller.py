@@ -14,6 +14,15 @@ class RateController:
     def __init__(self, delay=DEFAULT_DELAY):
         self.delay = min(delay, MAX_REQUEST_INTERVAL_SECS)
 
+    def delay_before_next_question(self, prev_delay, result):
+        if result == "CORRECT":
+            return max(MIN_REQUEST_INTERVAL_SECS, prev_delay - 1)
+        elif result == "WRONG":
+            return min(MAX_REQUEST_INTERVAL_SECS, prev_delay + 1)
+        else:
+            return min(MAX_REQUEST_INTERVAL_SECS, prev_delay + 2)
+
+
     def delay_before_next_request(self, question):
         error_problem = question.problem != ""
         correct_answer = question.answered_correctly()

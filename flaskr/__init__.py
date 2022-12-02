@@ -9,10 +9,9 @@ from flask import (
     session,
 )
 from flaskr.player import Player
-from flaskr.games_manager import GamesManager
+from flaskr.aws_games_manager import AWSGamesManager
 from flaskr.json_encoder import JSONEncoder
-from flaskr.questions import *
-from flaskr.database import get_mongo_client
+from flaskr.shared.questions import *
 import threading
 import secrets
 from random import randint
@@ -42,9 +41,7 @@ def create_app():
 
     app.config["SECRET_KEY"] = secrets.token_hex()
 
-    db_client = get_mongo_client()
-
-    games_manager = GamesManager(db_client)
+    games_manager = AWSGamesManager()
 
     # Temporary list of ended game ids
     ended_games = []
@@ -69,7 +66,7 @@ def create_app():
     @app.route("/api", methods=["GET", "POST", "DELETE"])
     def api_index():
         if request.method == "GET":  # fetch all games
-            return encoder.encode(games_manager.get_all_games())
+            return games_manager.get_all_games()
 
         elif (
             request.method == "POST"
@@ -78,8 +75,8 @@ def create_app():
                 return NOT_ACCEPTABLE
 
             new_game = games_manager.new_game(request.get_json()["password"])
-            add_session_admin(new_game.id, session)
-            return encoder.encode(new_game)
+            add_session_admin(new_game, session)
+            return games_manager.get_game(new_game)
 
         elif (
             request.method == "DELETE"
@@ -126,7 +123,7 @@ def create_app():
             return NOT_ACCEPTABLE
 
         if request.method == "GET":  # fetch game with <game_id>
-            return encoder.encode(games_manager.get_game(game_id))
+            return games_manager.get_game(game_id)
 
         elif request.method == "PUT":  # update game settings --- only admin can do this
             if not is_admin(game_id, session):
@@ -165,8 +162,10 @@ def create_app():
                 return ("GAME_ENDED", 200)
 
             elif "assisting" in r: # r["assisting"] is player_name
-                games_manager.assist_player(game_id, r["assisting"])
-                return ("ASSISTING {}".format(r["assisting"].upper()), 200)
+                if games_manager.assist_player(game_id, r["assisting"]):
+                    return ("ASSISTING {}".format(r["assisting"].upper()), 200)
+                else:
+                    return ("{} not in needs_assistance list".format(r["assisting"]), NOT_ACCEPTED)
 
             return NOT_ACCEPTABLE
 
@@ -183,7 +182,7 @@ def create_app():
             return NOT_ACCEPTABLE
 
         cumulative_sums = games_manager.get_game_running_totals(game_id)
-        r = make_response(encoder.encode(cumulative_sums))
+        r = make_response(cumulative_sums)
         r.mimetype = "application/json"
         return r
 
@@ -204,7 +203,7 @@ def create_app():
             new_player = games_manager.add_player_to_game(
                 game_id, request.get_json()["name"], request.get_json()["api"]
             )
-            session["player"] = new_player.uuid
+            session["player"] = new_player["id"]
 
             r = make_response(encoder.encode(new_player))
             r.mimetype = "application/json"
@@ -227,7 +226,7 @@ def create_app():
 
         return games_manager.get_players_to_assist(game_id)
 
-    @app.get("/api/<game_id>/gameover")
+    @app.get("/api/<game_id>/gameover")                                     # <-------------------- TODO WHY WE NEED THIS
     def gameover(game_id):
         r = make_response(encoder.encode({"game_over": game_id in ended_games}))
         r.mimetype = "application/json"
@@ -320,7 +319,7 @@ def create_app():
 
     @app.get("/api/<game_id>/review/existed")
     def game_existed(game_id):
-        return {"existed": f"{game_id}_players" in db_client.xs.list_collection_names()}
+        return {"existed": games_manager.game_exists(game_id) and games_manager.review_exists(game_id)}
 
     @app.get("/api/<game_id>/review/finalboard")
     def total_player_scores(game_id):

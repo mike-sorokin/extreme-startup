@@ -229,8 +229,19 @@ export async function fetchGameScores (gameId, loadOldGame = false) {
     const apiEndPoint = loadOldGame ? reviewAPIs(gameId).finalgraph : scoresAPI(gameId)
     const response = await instance.get(apiEndPoint)
     response.data.forEach((pt) => {
+      Object.keys(pt).forEach(key => {
+        if (key != "time") {
+          pt[key] = parseInt(pt[key], 10)
+          if (isNaN(pt[key])) {
+            console.log("Got NaN")
+            pt[key] = 0
+          }
+        }
+      })
       pt.time = (new Date(pt.time)).getTime()
     })
+    console.log("game scores")
+    console.log(response.data)
     return response.data
   } catch (error) {
     alertError(error)

@@ -2,7 +2,7 @@ import sys
 
 sys.path.append(".")
 
-from flaskr.questions import *
+from flaskr.shared.questions import *
 import pytest
 
 UNARY_MATH_QUESTIONS = [FibonacciQuestion]

@@ -2,7 +2,7 @@ import sys
 
 sys.path.append(".")
 
-from flaskr.rate_controller import RateController
+from flaskr.shared.rate_controller import RateController
 from unittest.mock import Mock, patch
 import pytest
 
