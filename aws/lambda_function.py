@@ -2,7 +2,7 @@ import json
 import boto3
 from botocore.exceptions import ClientError
 import requests
-import datetime
+from datetime import datetime
 from flaskr.shared.dynamo_db import *
 from flaskr.shared.question_factory import QuestionFactory
 from flaskr.shared.rate_controller import RateController
