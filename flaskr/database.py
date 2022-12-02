@@ -1,5 +1,4 @@
 import pymongo, os, json, subprocess, shutil, os
-import boto3
 
 
 def get_mongo_client(local=False):

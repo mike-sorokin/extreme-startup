@@ -1,182 +1,143 @@
 stages:
-# - test
-# - build
-# - kill
-# - deploy
-- aws_archiving
-- aws_deploy
-
-# variables:
-#   AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-#   AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+- test
+- build
+- kill
+- deploy
 
 .preamble: &preamble
   - python3 -m venv venv
   - source venv/bin/activate
   - pip install -r flaskr/requirements.txt
 
-# hello-world-test:
-#   stage: test
-#   script:
-#     - *preamble
-#     - pytest test/test_sanity.py
-
-# # Tests of the support test code which should be executed
-# # before other bot-related tests
-# bot-resp-test:
-#   stage: test
-#   script:
-#     - *preamble
-#     - pytest test/bots/test_bot_resp.py
-
-# bot-entry-test:
-#   stage: test
-#   script:
-#     - *preamble
-#     - pytest test/bots/test_bot_entry.py
-
-# database-test:
-#   stage: test
-#   script:
-#     - *preamble
-#     - pytest tests/test_database.py
-
-# flaskr-test:
-#   stage: test
-#   script:
-#     - *preamble
-#     - pytest tests/test_flaskr.py
-
-# event-test:
-#   stage: test
-#   script:
-#     - *preamble
-#     - pytest tests/test_event.py
-
-# game-test:
-#   stage: test
-#   script:
-#     - *preamble
-#     - pytest tests/test_game.py
-
-# player-test:
-#   stage: test
-#   script:
-#     - *preamble
-#     - pytest tests/test_player.py
-
-# question-factory-test:
-#   stage: test
-#   script:
-#     - *preamble
-#     - pytest tests/test_question_factory.py
-
-# question-test:
-#   stage: test
-#   script:
-#     - *preamble
-#     - pytest tests/test_question.py
-
-# questions-test:
-#   stage: test
-#   script:
-#     - *preamble
-#     - pytest tests/test_questions.py
-
-# quiz-master-test:
-#   stage: test
-#   script:
-#     - *preamble
-#     - pytest tests/test_quiz_master.py
-
-# rate-controller-test:
-#   stage: test
-#   script:
-#     - *preamble
-#     - pytest tests/test_rate_controller.py
-
-# scoreboard-test:
-#   stage: test
-#   script:
-#     - *preamble
-#     - pytest tests/test_scoreboard.py
-
-
-# # The following are done only on master branch.
-
-# docker-build-image:
-#   stage: build
-#   script:
-#     - docker build -t se-xp  .
-#   rules:
-#     - if: $CI_COMMIT_BRANCH == "master"
-
-# docker-clear-old-resources:
-#   stage: kill
-#   script:
-#     - docker system prune --filter "until=24h" --force
-#   rules:
-#     - if: $CI_COMMIT_BRANCH == "master"
-
-# docker-stop-previous-container:
-#   stage: kill
-#   script:
-#     - docker stop se-xp-container
-#   rules:
-#   - if: $CI_COMMIT_BRANCH == "master"
-#   allow_failure: true
-
-# dockerremove-previous-container:
-#   stage: kill
-#   script:
-#     - docker rm se-xp-container
-#   rules:
-#   - if: $CI_COMMIT_BRANCH == "master"
-#   allow_failure: true
-
-# docker-run-new-container:
-#   stage: deploy
-#   script:
-#     - docker run --name se-xp-container -d -p80:5000 se-xp
-#   rules:
-#     - if: $CI_COMMIT_BRANCH == "master"
-
-# fly-deploy:
-#   stage: deploy
-#   script:
-#     - /home/gitlab-runner/.fly/bin/fly deploy . --detach --now
-#   rules:
-#     - if: $CI_COMMIT_BRANCH == "master"
-
-archive-lambda:
-  stage: aws_archiving
-  only:
-    - master
-    - aws_attachment_attempt
-    - lambdaHandler
-    - lambdaCtd
-  image: ubuntu
-  when:
-    on_success
+hello-world-test:
+  stage: test
   script:
-    - ./auxiliary/lambdarch
-  artifacts:
-    paths:
-      - "aws/aws_deployment_package.zip"
+    - *preamble
+    - pytest test/test_sanity.py
 
-deploy-lambda:
-  stage: aws_deploy
-  only:
-    - master
-    - aws_attachment_attempt
-    - lambdaHandler
-    - lambdaCtd
-  image:
-    name: amazon/aws-cli
-    entrypoint: [""]
+# Tests of the support test code which should be executed
+# before other bot-related tests
+bot-resp-test:
+  stage: test
   script:
-    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-    - aws configure set region eu-west-2
-    - aws lambda update-function-code --function-name BubbleLambda --zip-file fileb://aws/aws_deployment_package.zip
+    - *preamble
+    - pytest test/bots/test_bot_resp.py
 
+bot-entry-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest test/bots/test_bot_entry.py
+
+database-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_database.py
+
+flaskr-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_flaskr.py
+
+event-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_event.py
+
+game-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_game.py
+
+player-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_player.py
+
+question-factory-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_question_factory.py
+
+question-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_question.py
+
+questions-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_questions.py
+
+quiz-master-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_quiz_master.py
+
+rate-controller-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_rate_controller.py
+
+scoreboard-test:
+  stage: test
+  script:
+    - *preamble
+    - pytest tests/test_scoreboard.py
+
+
+# The following are done only on master branch.
+
+docker-build-image:
+  stage: build
+  script:
+    - docker build -t se-xp  .
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+
+docker-clear-old-resources:
+  stage: kill
+  script:
+    - docker system prune --filter "until=24h" --force
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+
+docker-stop-previous-container:
+  stage: kill
+  script:
+    - docker stop se-xp-container
+  rules:
+  - if: $CI_COMMIT_BRANCH == "master"
+  allow_failure: true
+
+dockerremove-previous-container:
+  stage: kill
+  script:
+    - docker rm se-xp-container
+  rules:
+  - if: $CI_COMMIT_BRANCH == "master"
+  allow_failure: true
+
+docker-run-new-container:
+  stage: deploy
+  script:
+    - docker run --name se-xp-container -d -p80:5000 se-xp
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+
+fly-deploy:
+  stage: deploy
+  script:
+    - /home/gitlab-runner/.fly/bin/fly deploy . --detach --now
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
