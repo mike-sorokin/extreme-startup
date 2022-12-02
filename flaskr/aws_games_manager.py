@@ -29,6 +29,12 @@ class AWSGamesManager:
         except sqs_client.exceptions.QueueDeletedRecently:
             raise
 
+    # GAME MANAGEMENT
+
+    def game_exists(self, game_id) -> bool:
+        """ Checks if game_id exists in database """
+        return game_id in db_get_game_ids()
+
     def get_all_games(self) -> dict:
         """ Returns dict containing all games in the database """
         return db_get_all_games()
@@ -61,13 +67,13 @@ class AWSGamesManager:
 
         return gid
 
-    def game_exists(self, game_id) -> bool:
-        """ Checks if game_id exists in database """
-        return game_id in db_get_game_ids()
+    def game_round(self, game_id) -> int:
+        """ Returns the round that the game is on """
+        return db_get_round(game_id)
 
-    def player_exists(self, game_id, player_id) -> bool:
-        """ Checks if player_id exists in the given game """
-        return player_id in db_get_player_ids(game_id)
+    def game_ended(self, game_id) -> bool:
+        """ returns True if game has ended, False if not """
+        return db_game_ended(game_id)
 
     def game_has_password(self, game_id, password) -> bool:
         """ Checks that game password equals given password """
@@ -76,6 +82,11 @@ class AWSGamesManager:
     def game_in_last_round(self, game_id) -> bool:
         """ Check if game is in its final round """
         return db_get_round(game_id) == MAX_ROUND
+
+    def advance_game_round(self, game_id):
+        """ Advances game round """
+        db_advance_round(game_id)
+        db_reset_round_indices(game_id)
 
     def pause_game(self, game_id):
         """ Pause a game """
@@ -89,11 +100,6 @@ class AWSGamesManager:
         """ Ends a game """
         db_end_game(game_id)
 
-    def advance_game_round(self, game_id):
-        """ Advances game round """
-        db_advance_round(game_id)
-        db_reset_round_indices(game_id)
-
     def set_auto_mode(self, game_id):
         """ Turns on auto advance round """
         db_set_auto_mode(game_id, True)
@@ -102,10 +108,7 @@ class AWSGamesManager:
         """ Turns off auto advance round """
         db_set_auto_mode(game_id, False)
 
-    def get_game_running_totals(self, game_id) -> list:
-        """ Gets list of objects in the form {"time": timestamp, "pid": score} """
-
-        return db_get_scores(game_id)
+    # PLAYER MANAGEMENT
 
     def get_game_players(self, game_id, *player_id) -> dict:
         """ If player_id(s) given, returns Player objects for only those players, else returns all Player objects """
@@ -115,20 +118,30 @@ class AWSGamesManager:
         else:
             return db_get_all_players(game_id)
 
+    def player_exists(self, game_id, player_id) -> bool:
+        """ Checks if player_id exists in the given game """
+        return player_id in db_get_player_ids(game_id)
+
+    def get_game_running_totals(self, game_id) -> list:
+        """ Gets list of objects in the form {"time": timestamp, "pid": score} """
+
+        return db_get_scores(game_id)
+
     def get_score_for_player(self, game_id, player_id) -> int:
         # This function is unused as far as I can see
         """ Returns a player's score """
 
         return db_get_player_score(game_id, player_id)
 
-    def remove_game_players(self, game_id, *player_id):
-        """ If player_id(s) provded, deletes corresponding players, else deletes all players for a given game """
-
-        if player_id:
-            for pid in list(player_id):
-                db_delete_player(game_id, pid)
-        else:
-            db_delete_all_players(game_id)
+    def player_leaderboard_position(self, game_id, player_id) -> int:
+        """ Returns a player's position in the leaderboard """
+        scoreboard = db_get_scoreboard(game_id)
+        leaderboard = {k: v
+                       for k, v in sorted(
+                           scoreboard.items(), key=lambda item: item['score'], reverse=True
+                       )
+                       }
+        return list(leaderboard.keys()).index(player_id) + 1
 
     def add_player_to_game(self, game_id, name, api) -> dict:
         """ Adds a player to a game and returns newly added player """
@@ -164,6 +177,16 @@ class AWSGamesManager:
 
         return new_player
 
+    def reset_player(self, game_id, player_id):
+        """ Resets a players score after warmup round ends """
+        db_set_player_score(game_id, player_id, 0)
+        db_set_player_streak(game_id, player_id, "")
+        db_set_player_correct_tally(game_id, player_id, 0)
+        db_set_player_incorrect_tally(game_id, player_id, 0)
+        db_set_request_count(game_id, player_id, 0)
+
+        db_add_running_total(game_id, player_id, 0, dt.datetime.now(dt.timezone.utc))
+
     def get_players_to_assist(self, game_id) -> dict:
         """ Returns names of players to assist in the form { "needs_assistance": [], "being_assisted": [] } """
 
@@ -182,24 +205,18 @@ class AWSGamesManager:
 
         return db_get_events(game_id, player_id)
 
+    def remove_game_players(self, game_id, *player_id):
+        """ If player_id(s) provded, deletes corresponding players, else deletes all players for a given game """
+
+        if player_id:
+            for pid in list(player_id):
+                db_delete_player(game_id, pid)
+        else:
+            db_delete_all_players(game_id)
+
+    # Methods used after game is ended
     def delete_games(self, *game_id):
         """ If game_id(s) provided, deletes those games, else deletes all games """
-
-        # gids = game_id if game_id else self.games.keys()
-
-        # for gid in list(gids):
-        #     # Copy player/scoreboard data for game review.
-        #     player_data = self.games[gid].get_players()
-        #     scoreboard_data = self.games[gid].scoreboard
-        #     analysis_event_data = self.games[gid].analysis_events
-
-        #     self.end_game(gid)  # ensures monitor threads are killed
-        #     self.remove_game_players(gid)  # kills administering question threads
-        #     self.unpause_game(gid)  # removes dangling administering question threads
-        #     del self.games[gid]
-
-        #     if len(player_data) > 0:
-        #         self.analyse_game(gid, player_data, scoreboard_data, analysis_event_data)
 
         gids = game_id if game_id else db_get_game_ids()
 

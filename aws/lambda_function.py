@@ -13,13 +13,12 @@ STREAK_LENGTH = 30
 sqs_resource = boto3.resource('sqs')
 queue = sqs_resource.get_queue_by_name(QueueName='GameTasks')
 
+
 def lambda_handler(event, context):
 
     print(f"\n\n\n\n\n{event}\n\n\n\n")
 
     message = event["Records"][0]
-
-    # Get counter attribute from message object (will return None if "Counter" key does not exist)
     message_type = message["messageAttributes"].get("MessageType", {}).get("stringValue")
 
     if message_type == "AdministerQuestion":
@@ -30,7 +29,9 @@ def lambda_handler(event, context):
         print("Invalid message type")
         return
 
+
 def administer_question(sqs_message):
+    # TODO: validate modification hash
     modification_hash = sqs_message["messageAttributes"].get("ModificationHash", {}).get("stringValue")
 
     try:
@@ -58,10 +59,10 @@ def administer_question(sqs_message):
     player = db_get_player(game_id, player_id)
 
     if db_game_ended(game_id) or not player['active']:
-        return # Terminate lambda loop 
+        return  # Terminate lambda loop
 
     if db_is_game_paused(game_id):
-        # Put equivalent message on SQS queue again 
+        # Put equivalent message on SQS queue again
         queue.send_message(sqs_message)
         return
 
@@ -70,7 +71,7 @@ def administer_question(sqs_message):
         # Reset score to 0 once warmup ends, add to running_totals
         db_set_player_score(game_id, player_id, 0)
         db_set_player_streak(game_id, player_id, "")
-        db_set_player_correct_tally(game_id,player_id, 0)
+        db_set_player_correct_tally(game_id, player_id, 0)
         db_set_player_incorrect_tally(game_id, player_id, 0)
         db_set_request_count(game_id, player_id, 0)
 
@@ -101,7 +102,6 @@ def administer_question(sqs_message):
     points_gained = calculate_points_gained(player_position, question_points, result)
     # This function should add event to a player's list of events, and update their score in the database, based on the result
     # add_event(game_id, player_id, question_text, question_difficulty, points_gained, result)
-
 
     # 3. Schedule next question on queue
     game_round = db_get_game_round(game_id)
@@ -167,7 +167,7 @@ def calculate_points_gained(player_position, question_points, result, lenient=Tr
 
 
 def monitor_game(message):
-    gid = message["body"] 
+    gid = message["body"]
     modification_hash = message["messageAttributes"].get("ModificationHash", {}).get("stringValue")
 
     try:
@@ -180,7 +180,7 @@ def monitor_game(message):
     if game['ended'] and not db_check_state_modification_hash(gid, modification_hash):
         return
 
-    if not game['paused'] and len(game['players']) > 0:  
+    if not game['paused'] and len(game['players']) > 0:
         if game['auto_mode'] and game['round'] != 0:
             auto_increment_round(game)
         update_player_to_assist(game)
@@ -248,21 +248,23 @@ def update_player_to_assist(game):
 
     db_set_players_to_assist(game["id"], players_to_assist)
 
+
 def monitor_analysis_game():
-    #TODO
+    # TODO
     pass
 
 
 def streak_length(response_history, streak_char):
     return len(response_history) - len(response_history.rstrip(streak_char))
 
+
 def player_leaderboard_position(game_id, player_id):
     scoreboard = db_get_scoreboard(game_id)
-    leaderboard = {k: v 
-            for k, v in sorted(
-                scoreboard.items(), key=lambda item: item['score'], reverse=True
-            )
-        }
+    leaderboard = {k: v
+                   for k, v in sorted(
+                       scoreboard.items(), key=lambda item: item['score'], reverse=True
+                   )
+                   }
     return list(leaderboard.keys()).index(player_id) + 1
 
 
