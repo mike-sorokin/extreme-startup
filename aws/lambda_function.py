@@ -143,6 +143,7 @@ def administer_question(sqs_message):
             },
         }
     )
+    print(f"sent message {message}")
     return json.dumps(res)
 
 
