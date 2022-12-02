@@ -73,8 +73,8 @@ def db_add_new_game(password, round=0):
                 }
             ],
             ProvisionedThroughput={  # BillingMode <- decide as group
-                'ReadCapacityUnits': 1,
-                'WriteCapacityUnits': 1
+                'ReadCapacityUnits': 10,
+                'WriteCapacityUnits': 10
             }
         )
     except dynamo_client.exceptions.ResourceInUseException:
