@@ -270,23 +270,3 @@ def player_leaderboard_position(game_id, player_id):
 
 if __name__ == "__main__":
     pass
-    # res = queue.send_message(
-    #     # QueueUrl="https://sqs.eu-west-2.amazonaws.com/572990232030/GameTasks",
-    #     DelaySeconds=10,
-    #     MessageBody="hello",
-    #     MessageAttributes={
-    #         'GameID': {
-    #             'StringValue': 'test_id',
-    #             'DataType': 'String'
-    #         },
-    #         'Counter': {
-    #             'StringValue': str(10),
-    #             'DataType': 'Number'
-    #         },
-    #         'MessageType': {
-    #             'StringValue': 'AdministerQuestion',
-    #             'DataType': 'String'
-    #         }
-    #     }
-    # )
-    # print(res)
