@@ -120,6 +120,7 @@ def administer_question(sqs_message):
 
     # 3. Schedule next question on queue
     game_round = db_get_game_round(game_id)
+    assert game_round, f"game round is {game_round}"
     next_question = QuestionFactory().next_question(game_round)
     next_delay = RateController().delay_before_next_question(prev_delay, result)
     print("next delay is", next_delay)
