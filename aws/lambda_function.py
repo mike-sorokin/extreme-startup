@@ -94,7 +94,7 @@ def administer_question(sqs_message):
         db_add_running_total(game_id, player_id, 0, dt.datetime.now(dt.timezone.utc))
 
     try:
-        response = requests.get(player["API"], params={"q": question_text})
+        response = requests.get(player["api"], params={"q": question_text})
 
         if response.status_code == 200:
             answer = response.text.strip().lower()
