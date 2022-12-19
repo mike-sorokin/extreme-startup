@@ -40,7 +40,7 @@ class JSONEncoder(json.JSONEncoder):
                 auto_mode=obj.auto_mode,
             )
         elif isinstance(obj, datetime.datetime):
-            return obj.isoformat()
+            return obj.strftime("%H:%M:%S")
         elif isinstance(obj, AnalysisEvent):
             return dict(
                 title=obj.get_title(),
