@@ -1,3 +1,4 @@
+import datetime
 import time
 
 
@@ -5,7 +6,7 @@ class AnalysisEvent:
     def __init__(self, title, description, player_id):
         self.title = title
         self.description = description
-        self.time = time.time()
+        self.time = datetime.datetime.now().strftime("%b %d %H:%M:%S")
         self.player_id = player_id
 
     def get_title(self):
@@ -65,7 +66,7 @@ class NewLeaderMonitor(AnalysisMonitor):
             self.log_func(
                 AnalysisEvent(
                     "New Leader",
-                    "player X beat previous leader and maintained that position for more than 15 seconds",
+                    f"Player {self.scoreboard.uuid_to_names.get(self.curr_leader, '???')} beat the previous leader and maintained that position for more than 15 seconds",
                     self.curr_leader,
                 )
             )
@@ -104,7 +105,7 @@ class NewLastPlayerMonitor(AnalysisMonitor):
             self.log_func(
                 AnalysisEvent(
                     "New Leader",
-                    "player X became the worst one and maintained that position for more than 15 seconds",
+                    f"Player {self.scoreboard.uuid_to_names.get(self.prev_last, '???')} became the worst one and maintained that position for more than 15 seconds",
                     self.prev_last,
                 )
             )
@@ -172,7 +173,7 @@ class EpicComebackMonitor(AnalysisMonitor):
                 self.log_func(
                     AnalysisEvent(
                         "Epic Comeback",
-                        "player X started his epic comeback which was at least 5 seconds long",
+                        f"Player {self.scoreboard.uuid_to_names.get(pid, '???')} started his epic comeback which was at least 5 seconds long",
                         pid,
                     )
                 )
@@ -240,7 +241,7 @@ class EpicFailMonitor(AnalysisMonitor):
                 self.log_func(
                     AnalysisEvent(
                         "Epic Fail",
-                        "player X started his epic fail which was at least 5 seconds long",
+                        f"Player {self.scoreboard.uuid_to_names.get(self.pid, '???')} started his epic fail which was at least 5 seconds long",
                         pid,
                     )
                 )
