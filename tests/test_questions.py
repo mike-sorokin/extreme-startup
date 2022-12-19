@@ -214,7 +214,7 @@ def test_scrabble_question():
     scrabble_question = ScrabbleQuestion("Helix")
     assert scrabble_question.word == "helix"
     assert scrabble_question.as_text() == "What is the scrabble score of helix?"
-    assert scrabble_question.points == 10
+    assert scrabble_question.points == 70
     assert scrabble_question.correct_answer() == 4 + 1 + 1 + 1 + 8
 
 
