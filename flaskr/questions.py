@@ -284,7 +284,8 @@ class PrimesQuestion(Question):
         # that the string isn't too too long
         return (
             lambda answer: all(str(prime) in answer for prime in self.chosen_primes)
-            and len(answer) < sum(len(str(p)) + 1 for p in self.chosen_primes) + 1
+            and len(answer) < sum(len(str(p)) + 3 for p in self.chosen_primes) + 1
+            and all(not str(np) in answer for np in self.chosen_not_primes)
         )
 
 
