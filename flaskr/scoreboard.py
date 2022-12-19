@@ -63,7 +63,7 @@ class Scoreboard:
             self.running_totals[-1][player.uuid] = player.score
         else:
             self.running_totals.append(
-                {"time": event.timestamp, f"{player.uuid}": player.score}
+                {"time": event.timestamp, player.uuid: player.score}
             )
 
         player.log_event(event)

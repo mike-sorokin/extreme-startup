@@ -28,6 +28,7 @@ class JSONEncoder(json.JSONEncoder):
                 points_gained=obj.points_gained,
                 response_type=obj.response_type,
                 timestamp=obj.timestamp,
+                timestamp_nice=obj.timestamp.strftime("%H:%M:%S"),
             )
         elif isinstance(obj, Game):
             return dict(
@@ -40,7 +41,7 @@ class JSONEncoder(json.JSONEncoder):
                 auto_mode=obj.auto_mode,
             )
         elif isinstance(obj, datetime.datetime):
-            return obj.strftime("%H:%M:%S")
+            return obj.isoformat()
         elif isinstance(obj, AnalysisEvent):
             return dict(
                 title=obj.get_title(),

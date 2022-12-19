@@ -20,7 +20,7 @@ function PlayerTable ({ events }) {
               <td>{event.id}</td>
               <td>{event.query}</td>
               <td>{event.points_gained}</td>
-              <td>{event.timestamp}</td>
+              <td>{event.timestamp_nice}</td>
               <td>
                 {(event.response_type === 'NO_SERVER_RESPONSE' ||
                   event.response_type === 'ERROR_RESPONSE') && (
