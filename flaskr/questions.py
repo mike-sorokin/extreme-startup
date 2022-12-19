@@ -237,8 +237,12 @@ class SquareCubeQuestion(Question):
         # Choose a random square+cube number
         self.sq_cube = random.choice([1, 64, 729, 4096])
         self.numbers = random.sample(range(1, 5000), 4) + [self.sq_cube]
+        # Throw in a random square and cube number for good measure
+        self.numbers += [random.randint(2, 70) ** 2, random.randint(2, 17) ** 3]
+
         # Make sure to remove duplicates
         self.numbers = list(set(self.numbers))
+        random.shuffle(self.numbers)
 
     def as_text(self):
         return f"Which of the following numbers is both a square and a cube: {', '.join(map(str, self.numbers))}?"
