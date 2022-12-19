@@ -6,7 +6,7 @@ import yaml
 import os
 import requests
 
-ALLOW_CHEATING = True
+ALLOW_CHEATING = False
 
 # Basic question object. Questions asked to players are instances of subclasses. Should be treated as abstract class
 class Question:
