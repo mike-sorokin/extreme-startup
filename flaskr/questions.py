@@ -6,7 +6,7 @@ import yaml
 import os
 import requests
 
-ALLOW_CHEATING = False
+ALLOW_CHEATING = True
 
 # Basic question object. Questions asked to players are instances of subclasses. Should be treated as abstract class
 class Question:
@@ -196,7 +196,7 @@ class AdditionMultiplicationQuestion(TernaryMathsQuestion):
         self.points = 60
 
     def as_text(self):
-        return f"What is {self.n1} plus {self.n2} multiplied by {self.n3}"
+        return f"What is {self.n1} plus {self.n2} multiplied by {self.n3}?"
 
     def correct_answer(self):
         return self.n1 + self.n2 * self.n3
@@ -324,7 +324,8 @@ class FibonacciQuestion(UnaryyMathsQuestion):
 # Ask a general knowledge questions from a file
 class GeneralKnowledgeQuestion(Question):
     def __init__(self, question="", answer=""):
-        super().__init__
+        super().__init__()
+        self.points = 60
         if question == "" or answer == "":
             with open("flaskr/yaml/general_knowledge.yaml", "r") as infile:
                 quiz_cards = yaml.safe_load(infile)
@@ -337,7 +338,7 @@ class GeneralKnowledgeQuestion(Question):
             self.answer = answer
 
     def as_text(self):
-        return self.quesion
+        return self.question
 
     def correct_answer(self):
         return self.answer
@@ -346,7 +347,8 @@ class GeneralKnowledgeQuestion(Question):
 # Ask the anagram of a word given a list of correct and incorrect anagram
 class AnagramQuestion(Question):
     def __init__(self, anagram="", correct="", incorrect=[]):
-        super().__init__
+        super().__init__()
+        self.points = 70
         if anagram == "" or correct == "" or len(incorrect) == 0:
             with open("flaskr/yaml/anagrams.yaml", "r") as infile:
                 anagrams = yaml.safe_load(infile)
@@ -359,7 +361,8 @@ class AnagramQuestion(Question):
 
     def as_text(self):
         possible_words = [self.correct] + self.incorrect
-        return f"Which of the following is an anagram of {self.anagram}: {', '.join(random.shuffle(possible_words))}?"
+        random.shuffle(possible_words)
+        return f"Which of the following is an anagram of {self.anagram}: {', '.join(possible_words)}?"
 
     def correct_answer(self):
         return self.correct
@@ -398,6 +401,7 @@ class ScrabbleQuestion(Question):
 
     def __init__(self, word=""):
         super().__init__()
+        self.points = 70
         if word == "":
             self.word = random.choice(
                 ["banana", "september", "cloud", "zoo", "ruby", "buzzword"]
