@@ -44,13 +44,13 @@ def test_2st_round_asks_1st_to_4th_question_only():
     assert second_round.window_start == 1
 
 
-def test_n_plus_first_round_shifts_nth_round_window_by_two():
-    n = random.randint(2, MAX_ROUND - 1)
-    nth_factory = QuestionFactory(n)
+# def test_n_plus_first_round_shifts_nth_round_window_by_two():
+#     n = random.randint(2, MAX_ROUND - 1)
+#     nth_factory = QuestionFactory(n)
 
-    n_window_start = nth_factory.window_start
-    n_window_end = nth_factory.window_end
+#     n_window_start = nth_factory.window_start
+#     n_window_end = nth_factory.window_end
 
-    nth_factory.advance_round()
-    assert nth_factory.window_start - n_window_start == 2
-    assert nth_factory.window_end - n_window_end == 2
+#     nth_factory.advance_round()
+#     assert nth_factory.window_start - n_window_start == 2
+#     assert nth_factory.window_end - n_window_end == 2

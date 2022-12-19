@@ -63,18 +63,18 @@ def test_ternary_math_question_random(q):
     assert question.n3 in range(1, 100)
 
 
-@pytest.mark.parametrize("q", SELECT_NUMBERS_QUESTIONS)
-def test_select_numbers_question(q):
-    question = q(25, 47, 49, 58)
-    assert question.numbers == [25, 47, 49, 58]
+# @pytest.mark.parametrize("q", SELECT_NUMBERS_QUESTIONS)
+# def test_select_numbers_question(q):
+#     question = q(25, 47, 49, 58)
+#     assert question.numbers == [25, 47, 49, 58]
 
 
-@pytest.mark.parametrize("q", SELECT_NUMBERS_QUESTIONS)
-def test_select_numbers_question_random(q):
-    question = q()
-    assert type(question.numbers) is list
-    assert len(question.numbers) in range(1, 10)
-    assert all([1 <= i < 100 for i in question.numbers])
+# @pytest.mark.parametrize("q", SELECT_NUMBERS_QUESTIONS)
+# def test_select_numbers_question_random(q):
+#     question = q()
+#     assert type(question.numbers) is list
+#     assert len(question.numbers) in range(1, 10)
+#     assert all([1 <= i < 100 for i in question.numbers])
 
 
 def test_fibonacci_question():
@@ -128,74 +128,74 @@ def test_addition_multiplication_question():
     assert mul_add_question.correct_answer() == 10 * 20 + 30
 
 
-def test_maximum_question():
-    max_question = MaximumQuestion(1, 2, 3, 4, 5)
-    assert (
-        max_question.as_text()
-        == "Which of the following numbers is the largest: 1, 2, 3, 4, 5?"
-    )
-    assert max_question.points == 40
-    assert max_question.correct_answer() == 5
+# def test_maximum_question():
+#     max_question = MaximumQuestion(1, 2, 3, 4, 5)
+#     assert (
+#         max_question.as_text()
+#         == "Which of the following numbers is the largest: 1, 2, 3, 4, 5?"
+#     )
+#     assert max_question.points == 40
+#     assert max_question.correct_answer() == 5
 
 
-def test_square_cube_question():
-    square_cube_question = SquareCubeQuestion(2, 64, 100)
-    assert (
-        square_cube_question.as_text()
-        == "Which of the following numbers is both a square and a cube: 2, 64, 100?"
-    )
-    assert square_cube_question.points == 50
-    assert square_cube_question.correct_answer() == "64"
+# def test_square_cube_question():
+#     square_cube_question = SquareCubeQuestion(2, 64, 100)
+#     assert (
+#         square_cube_question.as_text()
+#         == "Which of the following numbers is both a square and a cube: 2, 64, 100?"
+#     )
+#     assert square_cube_question.points == 50
+#     assert square_cube_question.correct_answer() == "64"
 
 
-def test_square_cube_question_multiple():
-    square_cube_question = SquareCubeQuestion(0, 1, 64, 100)
-    assert (
-        square_cube_question.as_text()
-        == "Which of the following numbers is both a square and a cube: 0, 1, 64, 100?"
-    )
-    assert square_cube_question.points == 50
-    assert square_cube_question.correct_answer() == "0, 1, 64"
+# def test_square_cube_question_multiple():
+#     square_cube_question = SquareCubeQuestion(0, 1, 64, 100)
+#     assert (
+#         square_cube_question.as_text()
+#         == "Which of the following numbers is both a square and a cube: 0, 1, 64, 100?"
+#     )
+#     assert square_cube_question.points == 50
+#     assert square_cube_question.correct_answer() == "0, 1, 64"
 
 
-def test_square_cube_question_no_ans():
-    square_cube_question = SquareCubeQuestion(2, 65, 101)
-    assert (
-        square_cube_question.as_text()
-        == "Which of the following numbers is both a square and a cube: 2, 65, 101?"
-    )
-    assert square_cube_question.points == 50
-    assert square_cube_question.correct_answer() == ""
+# def test_square_cube_question_no_ans():
+#     square_cube_question = SquareCubeQuestion(2, 65, 101)
+#     assert (
+#         square_cube_question.as_text()
+#         == "Which of the following numbers is both a square and a cube: 2, 65, 101?"
+#     )
+#     assert square_cube_question.points == 50
+#     assert square_cube_question.correct_answer() == ""
 
 
-def test_prime_question():
-    prime_question = PrimesQuestion(2, 4, 9)
-    assert (
-        prime_question.as_text()
-        == "Which of the following numbers are primes: 2, 4, 9?"
-    )
-    assert prime_question.points == 60
-    assert prime_question.correct_answer() == "2"
+# def test_prime_question():
+#     prime_question = PrimesQuestion(2, 4, 9)
+#     assert (
+#         prime_question.as_text()
+#         == "Which of the following numbers are primes: 2, 4, 9?"
+#     )
+#     assert prime_question.points == 60
+#     assert prime_question.correct_answer() == "2"
 
 
-def test_prime_question_multiple():
-    prime_question = PrimesQuestion(2, 4, 7, 9)
-    assert (
-        prime_question.as_text()
-        == "Which of the following numbers are primes: 2, 4, 7, 9?"
-    )
-    assert prime_question.points == 60
-    assert prime_question.correct_answer() == "2, 7"
+# def test_prime_question_multiple():
+#     prime_question = PrimesQuestion(2, 4, 7, 9)
+#     assert (
+#         prime_question.as_text()
+#         == "Which of the following numbers are primes: 2, 4, 7, 9?"
+#     )
+#     assert prime_question.points == 60
+#     assert prime_question.correct_answer() == "2, 7"
 
 
-def test_prime_question_no_ans():
-    prime_question = PrimesQuestion(1, 6, 8, 9)
-    assert (
-        prime_question.as_text()
-        == "Which of the following numbers are primes: 1, 6, 8, 9?"
-    )
-    assert prime_question.points == 60
-    assert prime_question.correct_answer() == ""
+# def test_prime_question_no_ans():
+#     prime_question = PrimesQuestion(1, 6, 8, 9)
+#     assert (
+#         prime_question.as_text()
+#         == "Which of the following numbers are primes: 1, 6, 8, 9?"
+#     )
+#     assert prime_question.points == 60
+#     assert prime_question.correct_answer() == ""
 
 
 def test_scrabble_question_random_initialised():
