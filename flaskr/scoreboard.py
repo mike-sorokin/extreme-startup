@@ -7,7 +7,7 @@ STREAK_LENGTH = 30
 
 # Track player's score in a particular game. Scores players based on question type, positioning on scoreboard, and leniency mode.
 class Scoreboard:
-    def __init__(self, lenient=True):
+    def __init__(self, lenient=False):
         self.lenient = lenient
 
         # scores: { player_id -> player score }
