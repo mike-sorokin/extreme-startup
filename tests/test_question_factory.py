@@ -32,15 +32,15 @@ def test_zero_round_asks_warmup_question_only():
         assert factory.next_question().as_text() == "What is your name?"
 
 
-def test_1st_round_asks_1st_question_only():
+def test_1st_round_asks_1st_2nd_question_only():
     first_round = QuestionFactory(1)
-    assert first_round.window_end == 2
+    assert first_round.window_end == 3
     assert first_round.window_start == 1
 
 
 def test_2st_round_asks_1st_to_4th_question_only():
     second_round = QuestionFactory(2)
-    assert second_round.window_end == 4
+    assert second_round.window_end == 5
     assert second_round.window_start == 1
 
 
