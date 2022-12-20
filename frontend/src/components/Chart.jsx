@@ -18,7 +18,7 @@ function Chart ({ gameId }) {
 
         const response = await fetchGameScores(gameId)
         const startTime = response[0].time
-
+        console.log(response)
         response.forEach((pt) => {
           pt.time -= startTime
           pt.time /= 1000

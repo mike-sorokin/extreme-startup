@@ -7,11 +7,14 @@ STREAK_LENGTH = 30
 
 # Track player's score in a particular game. Scores players based on question type, positioning on scoreboard, and leniency mode.
 class Scoreboard:
-    def __init__(self, lenient=True):
+    def __init__(self, lenient=False):
         self.lenient = lenient
 
         # scores: { player_id -> player score }
         self.scores = {}
+
+        # {player_id -> player_name}
+        self.uuid_to_names = {}
 
         # running_totals: [ {"time": timestamp, "pid": score} ]
         self.running_totals = [{"time": dt.datetime.now(dt.timezone.utc)}]
@@ -60,7 +63,7 @@ class Scoreboard:
             self.running_totals[-1][player.uuid] = player.score
         else:
             self.running_totals.append(
-                {"time": event.timestamp, f"{player.uuid}": player.score}
+                {"time": event.timestamp, player.uuid: player.score}
             )
 
         player.log_event(event)
@@ -77,12 +80,14 @@ class Scoreboard:
         self.correct_tally[player.uuid] = 0
         self.incorrect_tally[player.uuid] = 0
         self.scores[player.uuid] = 0
+        self.uuid_to_names[player.uuid] = player.name
 
     def delete_player(self, player):
         del self.scores[player.uuid]
         del self.incorrect_tally[player.uuid]
         del self.correct_tally[player.uuid]
         del self.request_counts[player.uuid]
+        del self.uuid_to_names[player.uuid]
 
     def current_score(self, player):
         return self.scores[player.uuid]

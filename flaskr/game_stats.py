@@ -10,9 +10,9 @@ class GameStats:
         self.finalboard = []
         self.stats = {}
 
-        self.__initialise_stats_vars() 
+        self.__initialise_stats_vars()
 
-    def __initialise_stats_vars(self): 
+    def __initialise_stats_vars(self):
         self.num_players = len(self.players)
         assert self.num_players > 0
 
@@ -43,8 +43,8 @@ class GameStats:
 
         # ...for most_epic_comeback
         self.most_epic_comeback = {}
-        
-    def __generate_player_stats(self): 
+
+    def __generate_player_stats(self):
         for (id, player) in self.players.items():
             player_events = player.get_events()
 
@@ -114,6 +114,8 @@ class GameStats:
 
         if self.total_num_of_on_fires > 0:
             self.stats["average_on_fire_duration"] = self.total_on_fire_duration / self.total_num_of_on_fires
+        else:
+            self.stats["average_on_fire_duration"] = 0
 
         if self.longest_on_fire_team:
             self.stats["longest_on_fire_duration"] = {
@@ -121,14 +123,22 @@ class GameStats:
                 "duration" : self.longest_on_fire_duration,
                 "streak_len": self.longest_streak_length
             }
+        else:
+            self.stats["longest_on_fire_duration"] = {
+                "achieved_by_team": "None",
+                "duration": 0,
+                "streak_len": 0
+            }
 
         self.stats["longest_streak"] = self.longest_streak_length
         self.stats["average_success_rate"] = self.total_player_success_rate / self.num_players
 
         if self.best_success_rate["team"]:
             self.stats["best_success_rate"] = self.best_success_rate
+        else:
+            self.stats["best_success_rate"] = 0
 
     def generate_game_stats(self):
         self.__generate_player_stats()
-        self.__build_stats_dict() 
-        return self.encoded_players, self.finalboard, self.stats 
+        self.__build_stats_dict()
+        return self.encoded_players, self.finalboard, self.stats

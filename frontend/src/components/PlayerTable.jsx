@@ -8,7 +8,6 @@ function PlayerTable ({ events }) {
         <tr>
           <th>ID</th>
           <th>Query</th>
-          <th>Difficulty</th>
           <th>Points</th>
           <th>Timestamp</th>
           <th>Outcome</th>
@@ -20,9 +19,8 @@ function PlayerTable ({ events }) {
             <tr key={event.id}>
               <td>{event.id}</td>
               <td>{event.query}</td>
-              <td>{event.difficulty}</td>
               <td>{event.points_gained}</td>
-              <td>{event.timestamp}</td>
+              <td>{event.timestamp_nice}</td>
               <td>
                 {(event.response_type === 'NO_SERVER_RESPONSE' ||
                   event.response_type === 'ERROR_RESPONSE') && (

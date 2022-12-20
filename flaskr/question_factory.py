@@ -7,7 +7,6 @@ QUESTION_TYPES = [
     MaximumQuestion,
     MultiplicationQuestion,
     SquareCubeQuestion,
-    GeneralKnowledgeQuestion,
     PrimesQuestion,
     SubtractionQuestion,
     PowerQuestion,
@@ -40,8 +39,14 @@ class QuestionFactory:
         self.adjust_window()
 
     def adjust_window(self):
-        self.window_end = max(1, self.round * 2)
-        self.window_start = max(0, self.window_end - 4)
+        # If round is 0, set bound to 0:1 (only warmup question)
+        # Otherwise, make sure to limit lower bound to 1 to avoid asking warmup q
+        if self.round == 0:
+            self.window_start = 0
+            self.window_end = 1
+        else:
+            self.window_end = min(len(QUESTION_TYPES), self.round * 2 + 1)
+            self.window_start = max(1, self.window_end - 4)
 
     def total_rounds(self):
         return MAX_ROUND

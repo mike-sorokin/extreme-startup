@@ -1,13 +1,16 @@
 ---
 -
-  question: which year was Theresa May first elected as the Prime Minister of Great Britain
+  question: Which year was Theresa May first elected as the Prime Minister of Great Britain?
   answer: 2016
 -
-  question: which city is the Eiffel tower in
+  question: Which city is the Eiffel Tower located in?
   answer: Paris
 -
-  question: what colour is a banana
-  answer: yellow
+  question: Which country is the Eiffel Tower located in?
+  answer: France
 -
-  question: who played James Bond in the film Dr No
-  answer: Sean Connery
+  question: What colour is a stereotypical, normal, perfectly ripe, banana?
+  answer: Yellow
+-
+  question: What colour is the sky?
+  answer: Blue
