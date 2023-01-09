@@ -1,9 +1,30 @@
 # Extreme Restartup
+
 >If you are developing the project and want to see how to run it locally, scroll to the end pls
 
-## User guide
+# NOTE FOR TESTERS/ASSESSORS: HOW TO RUN
+Creating a game and navigating to admin overview page
+* Go to https://extreme-startup.fly.dev/
+* Press "Create a Game!"
+* Enter any password
+* Press "Create Game!"
+* Press "To Game Page"
 
-If you are simply wanting to play Extreme (Re)Startup, go to https://extreme-restartup.fly.dev/. Hopefully it's up when you navigate to it!
+Creating a dummy player
+* Open https://extreme-startup.fly.dev/ in an incognito window, new browser, or new device (to avoid messing up cookies)
+* Press "Join a Game!"
+* Enter the game id you generated above
+* Player name: "Bot1"
+* Player URL: "https://extreme-startup.fly.dev/api/bot/1"
+
+Combining the two
+* (admin) Hamburger menu (top-left) -> Leaderboard
+You should see a chart and leaderboard, which will show the dummy player scoring points
+* (any) Navigate to "https://extreme-startup.fly.dev/api/bot/1/hello" to update the dummy player's response to "hello"
+The player page should now show incorrect responses and the leaderboard page should show a drop in the score.
+
+
+If you are simply wanting to play Extreme (Re)Startup, go to https://extreme-startup.fly.dev/. Hopefully it's up when you navigate to it!
 ### Docker
 Run this if you just want to run it locally. This will 99.99% work if you have [Docker installed](https://docs.docker.com/engine/install/)
 ```
