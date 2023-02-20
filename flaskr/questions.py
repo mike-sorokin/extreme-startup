@@ -251,15 +251,15 @@ class SquareCubeQuestion(Question):
 
 
 def is_prime(x):
-    return not any(x % i for i in range(2, round(x ** (1 / 2)) + 1))
+    return all(x % i != 0 for i in range(2, round(x ** (1 / 2)) + 1))
 
 
 # Ask which number from list if numbers is a prime number
 class PrimesQuestion(Question):
     # This is technically a horrible algorithm in terms of efficiency
     # but it only runs once so it's ok
-    primes = [x for x in range(100) if is_prime(x)]
-    not_primes = [x for x in range(100) if not is_prime(x)]
+    primes = [x for x in range(2, 100) if is_prime(x)]
+    not_primes = [x for x in range(2, 100) if not is_prime(x)]
 
     def __init__(self):
         super().__init__()
