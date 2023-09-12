@@ -1,4 +1,4 @@
-# Extreme Restartup
+# Extreme Startup
 
 >If you are developing the project and want to see how to run it locally, scroll to the end pls
 
