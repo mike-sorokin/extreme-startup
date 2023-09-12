@@ -6,7 +6,9 @@ If you are simply wanting to play Extreme (Re)Startup, go to https://extreme-sta
 
 ### Docker
 
-> THIS IS BROKEN RIGHT NOW, PLEASE REFER TO MANUAL!
+>Note: this method is currently broken because the environment variables in the docker container do not get filled with valid MongoDB credentials. The program then attempts to create a local instance, and fails, as MongoDB doesn't exist in the Docker container.
+
+>To fix this, either change the credentials in the Dockerfile, find a way to install mongod+mongosh within the container, or refer to "Manual".
 
 Run this if you just want to run it locally. This will 99.99% work if you have [Docker installed](https://docs.docker.com/engine/install/)
 ```
