@@ -1,21 +1,20 @@
 # Extreme Startup
 
->If you are developing the project and want to see how to run it locally, scroll to the end pls
+>If you are developing the project and want to see how to run it locally, scroll to the end
 
 If you are simply wanting to play Extreme (Re)Startup, go to https://extreme-startup.fly.dev/. Hopefully it's up when you navigate to it!
 
 ### Docker
 
->Note: this method is currently broken because the environment variables in the docker container do not get filled with valid MongoDB credentials. The program then attempts to create a local instance, and fails, as MongoDB doesn't exist in the Docker container.
+Run this if you just want to run it locally. This will 99.99% work if you have
+[Docker installed](https://docs.docker.com/engine/install/)
 
->To fix this, either change the credentials in the Dockerfile, find a way to install mongod+mongosh within the container, or refer to "Manual".
-
-Run this if you just want to run it locally. This will 99.99% work if you have [Docker installed](https://docs.docker.com/engine/install/)
 ```
-docker build -t se-xp .
-docker run -i -t -p80:5000 se-xp
+docker build -t extremestartup .
+docker run -it -p80:80 -p27017:27017 extremestartup
 ```
 The server should be live on localhost.
+
 ### Manual
 Run this if you don't want to install Docker
 
