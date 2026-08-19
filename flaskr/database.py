@@ -1,4 +1,4 @@
-import pymongo, os, json, subprocess, shutil, os
+import pymongo, os, json, subprocess, shutil, os, sys
 from pathlib import Path
 
 def get_mongo_client(local=False):
@@ -7,6 +7,13 @@ def get_mongo_client(local=False):
     If not found, or if local=True, then boots a local server and connects to it.
     This local server will be completely fresh
     """
+
+    if "MONGO_URL" in os.environ:
+        try:
+            cli = pymongo.MongoClient(os.environ.get("MONGO_URL"))
+            return cli
+        except pymongo.errors.ConnectionFailure:
+            print("unable to connect via MONGO_URL", file=sys.stderr)
 
     if "USE_LOCAL_MONGO_DB" in os.environ:
         destructive_start_localhost_mongo()
